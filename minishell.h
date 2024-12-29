@@ -34,6 +34,7 @@
 # include "library/get_next_line/get_next_line.h"
 # include "library/get_next_line/get_next_line_bonus.h"
 
+# define DELIMITERS " \t\n"
 # define PIPE "|"
 # define REDIR_IN "<"
 # define REDIR_HEREDOC "<<"
@@ -50,10 +51,10 @@
 // 	TOKEN_ARGUMENT,
 // }	t_token_type;
 
-typedef struct s_token
-{
-	t_token_type *type;
-	char *value;
-}	t_token;
+// typedef struct s_token
+// {
+// 	t_token_type *type;
+// 	char *value;
+// }	t_token;
 
 #endif
