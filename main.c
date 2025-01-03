@@ -70,23 +70,66 @@ char *ft_strtok(char *str, char delim)
 	return (token_start);
 }
 
+char *handle_quotes(char **input)
+{
+	char *start = *input + 1;
+	char quote_char = **input;
+	char *end = start;
+
+	while (*end && *end != quote_char)
+		end++;
+	if (*end == quote_char)
+	{
+		*end = '\0';
+		*input = end + 1;
+		return (start);
+	}
+	else
+	{
+		printf("Error: Missing closed quote\n");
+		return (NULL);
+	}
+}
+
 char **lexer(char *line)
 {
-	// return (ft_split(argv, ' '));
 	int i = 0;
 	char **arr;
+	char *current = line;
+	char *quoted_token;
+	char *token_start;
 
 	arr = malloc(sizeof(char *) * MAX_TOKENS);
 	if (!arr)
 		return (NULL);
-	char *token = ft_strtok(line, ' ');
-	while (token != NULL && i < MAX_TOKENS - 1)
+	while (*current && i < MAX_TOKENS - 1)
 	{
-		// if (line == 34 && line == 39)
-		// 	handle_quotes(line, )
-		// else
-			arr[i++] = token;
-			token = ft_strtok(NULL, ' ');
+		while (*current == ' ')
+			current++;
+		if (*current == '\0')
+			break;
+		if (*current == '\'' || *current == '"')
+		{
+			quoted_token = handle_quotes(&current);
+			if (!quoted_token)
+			{
+				free(arr);
+				return (NULL);
+			}
+			arr[i++] = ft_strdup(quoted_token);
+		}
+		else
+		{
+			token_start = current;
+			while (*current && *current != ' ')
+				current++;
+			if (*current)
+			{
+				*current = '\0';
+				current++;
+			}
+			arr[i++] = ft_strdup(token_start);
+		}
 	}
 	arr[i] = NULL;
 	return (arr);
@@ -102,29 +145,37 @@ void sigint_handler(int sig)
 	rl_redisplay();
 }
 
+void start_program(void)
+{
+	char *line;
+	char **tokens;
+	int i;
+
+	signal(SIGINT, sigint_handler);
+	while (1)
+	{
+		line = readline("minishell$ ");
+		if (!line || strcmp(line, "exit") == 0) // if (!line) - handles Ctrl+D signal to quit minishell in interactive mode
+		{
+			free(line);
+			break;
+		}
+		tokens = lexer(line);
+		i = 0;
+		while (tokens[i])
+			printf("%s\n", tokens[i++]);
+		free(tokens);
+		free(line);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	(void)argv;
 
 	if (argc != 1)
 		return (printf("This program doesn't accept arguments\n"), 1);
-	signal(SIGINT, sigint_handler);
-	while (1)
-	{
-		char *line = readline("minishell$ ");
-		if (strcmp(line, "exit") == 0)
-		{
-			free(line);
-			break;
-		}
-		char **tokens = lexer(line);
-		int i = 0;
-		while (tokens[i])
-			printf("%s\n", tokens[i++]);
-		free(tokens);
-		free(line);
-		// signal(SIGINT, sigint_handler);
-	}
+	start_program();
 	return (0);
 }
 
