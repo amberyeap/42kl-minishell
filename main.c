@@ -29,20 +29,103 @@ when using pipes
 3. auto-complete (pressing tab completes with the file name)
 */
 
-char **lexer(char *str)
+// functions needed ?
+// - handle_quotes
+// - handle_expansion ($)
+
+// iterate through the string and return the last letter before the end quote
+// char *handle_quotes(char *argv)
+// {
+	
+// }
+
+char *ft_strtok(char *str, char delim)
 {
-	return (ft_split(str, ' '));
+	static char *next_token;
+	char *token_start;
+	char *token_end;
+	
+	if (str != NULL)
+		next_token = str;
+	if (!next_token)
+		return (NULL);
+	token_start = next_token;
+	while (*token_start && *token_start == delim)
+		token_start++;
+	if (*token_start == '\0')
+	{
+		next_token = NULL;
+		return (NULL);
+	}
+	token_end = token_start;
+	while (*token_end && *token_end != delim)
+		token_end++;
+	if (*token_end)
+	{
+		*token_end = '\0';
+		next_token = token_end + 1;
+	}
+	else
+		next_token = NULL;
+	return (token_start);
+}
+
+char **lexer(char *line)
+{
+	// return (ft_split(argv, ' '));
+	int i = 0;
+	char **arr;
+
+	arr = malloc(sizeof(char *) * MAX_TOKENS);
+	if (!arr)
+		return (NULL);
+	char *token = ft_strtok(line, ' ');
+	while (token != NULL && i < MAX_TOKENS - 1)
+	{
+		// if (line == 34 && line == 39)
+		// 	handle_quotes(line, )
+		// else
+			arr[i++] = token;
+			token = ft_strtok(NULL, ' ');
+	}
+	arr[i] = NULL;
+	return (arr);
+}
+
+// handles the Ctrl+C button in interactive mode - SIGINT signal
+void sigint_handler(int sig)
+{
+	(void)sig;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
 int main(int argc, char **argv)
 {
-	(void)argc;
+	(void)argv;
 
-	char **line = lexer(argv[1]);
-
-	int i = 0;
-	while (line)
-		printf("%s\n", line[i]);
+	if (argc != 1)
+		return (printf("This program doesn't accept arguments\n"), 1);
+	signal(SIGINT, sigint_handler);
+	while (1)
+	{
+		char *line = readline("minishell$ ");
+		if (strcmp(line, "exit") == 0)
+		{
+			free(line);
+			break;
+		}
+		char **tokens = lexer(line);
+		int i = 0;
+		while (tokens[i])
+			printf("%s\n", tokens[i++]);
+		free(tokens);
+		free(line);
+		// signal(SIGINT, sigint_handler);
+	}
+	return (0);
 }
 
 // #define MAX_TOKENS 64

@@ -34,22 +34,27 @@
 # include "library/get_next_line/get_next_line.h"
 # include "library/get_next_line/get_next_line_bonus.h"
 
-# define DELIMITERS " \t\n"
-# define PIPE "|"
-# define REDIR_IN "<"
-# define REDIR_HEREDOC "<<"
-# define REDIR_OUT ">"
-# define REDIR_APPEND ">>"
+# define MAX_TOKENS 100
 
-// typedef enum e_token_type
-// {
-// 	TOKEN_COMMAND, // commands like 'echo', 'ls', 'cat', etc.
-// 	TOKEN_PIPE, // '|'
-// 	TOKEN_REDIR, // '<', '<<', '>', '>>'
-// 	TOKEN_VARIABLE, // variables starting with '$' like '$HOME' and '$PATH'
-// 	TOKEN_QUOTE, // when it encounters "" or ''
-// 	TOKEN_ARGUMENT,
-// }	t_token_type;
+// # define DELIMITERS " \t\n"
+// # define PIPE "|"
+// # define REDIR_IN "<"
+// # define REDIR_HEREDOC "<<"
+// # define REDIR_OUT ">"
+// # define REDIR_APPEND ">>"
+
+typedef enum e_token_type
+{
+	TOKEN_COMMAND, // commands like 'echo', 'ls', 'cat', etc.
+	TOKEN_PIPE, // '|'
+	TOKEN_REDIR_IN, // '<'
+	TOKEN_HEREDOC, // '<<'
+	TOKEN_REDIR_OUT, // '>'
+	TOKEN_REDIT_APPEND, // '>>'
+	TOKEN_VARIABLE, // variables starting with '$' like '$HOME' and '$PATH'
+	TOKEN_QUOTE, // when it encounters "" or ''
+	TOKEN_ARGUMENT,
+}	t_token_type;
 
 // typedef struct s_token
 // {

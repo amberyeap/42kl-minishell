@@ -18,11 +18,11 @@ RL = -lreadline
 NAME = minishell
 LIBFT = library/libft.a
 
-SRC = $(wildcard *.c)
+SRC = main.c
 OBJ = $(SRC:.c=.o)
 
 $(NAME): $(OBJ) $(LIBFT)
-	$(CC) $(CFLAGS) $(LIBFT) $(OBJ) -o $(NAME) $(RL)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME) $(RL)
 
 $(LIBFT):
 	make -C library

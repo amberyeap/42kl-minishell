@@ -42,22 +42,22 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(FT_PRINTF):
-	make -C ft_printf
+	@make -C ft_printf
 
 $(GNL):
-	make -C get_next_line
+	@make -C get_next_line
 
 all: bonus $(NAME)
 
 clean:
 	@$(RM) $(OBJ)
-	make clean -C ft_printf
-	make clean -C get_next_line
+	@make clean -C ft_printf
+	@make clean -C get_next_line
 
 fclean: clean
 	@$(RM) $(NAME)
-	make fclean -C ft_printf
-	make fclean -C get_next_line
+	@make fclean -C ft_printf
+	@make fclean -C get_next_line
 
 re: fclean $(NAME)
 
