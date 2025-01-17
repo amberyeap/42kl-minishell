@@ -33,11 +33,6 @@ when using pipes
 // - handle_quotes
 // - handle_expansion ($)
 
-// iterate through the string and return the last letter before the end quote
-// char *handle_quotes(char *argv)
-// {
-	
-// }
 
 char *ft_strtok(char *str, char delim)
 {
@@ -86,12 +81,67 @@ char *handle_quotes(char **input)
 	}
 	else
 	{
-		printf("Error: Missing closed quote\n");
-		return (NULL);
+		char *closed_quote;
+		char *new_input;
+		size_t len = strlen(start);
+		while (1)
+        {
+
+            closed_quote = readline("> ");
+            len += strlen(closed_quote) + 1;
+            new_input = malloc(len + 1);
+            if (!new_input)
+                return NULL;
+            strcpy(new_input, start);
+            strcat(new_input, "\n");
+            strcat(new_input, closed_quote);
+            free(start);
+            start = new_input;
+            end = start + strlen(start) - strlen(closed_quote);
+
+            while (*end && *end != quote_char)
+                end++;
+            if (*end == quote_char)
+            {
+                *end = '\0';
+                *input = end + 1;
+                return (start);
+            }
+        }
 	}
+	return (NULL);
 }
 
 char **lexer(char *line)
+{
+	int i = 0;
+	char **arr;
+	char *token;
+
+	arr = malloc(sizeof(char *) * MAX_TOKENS);
+	if (!arr)
+		return (NULL);
+	token = ft_strtok(line, ' ');
+	while (token && i < MAX_TOKENS - 1)
+	{
+		if (*token == '\'' || *token == '"')
+		{
+			arr[i++] = handle_quotes(&token);
+			if (!arr[i - 1])
+			{
+				free(arr);
+				return (NULL);
+			}
+		}
+		else
+			arr[i++] = ft_strdup(token);
+		token = ft_strtok(NULL, ' ');
+	}
+	arr[i] = NULL;
+	return (arr);
+}
+
+/* char **lexer(char *line)
 {
 	int i = 0;
 	char **arr;
@@ -133,7 +183,7 @@ char **lexer(char *line)
 	}
 	arr[i] = NULL;
 	return (arr);
-}
+} */
 
 // handles the Ctrl+C button in interactive mode - SIGINT signal
 void sigint_handler(int sig)
@@ -252,3 +302,4 @@ int main(int argc, char **argv)
 // to trigger heredoc
 // [COMMAND] << [DELIMITER]
 // eg: cat << END
+

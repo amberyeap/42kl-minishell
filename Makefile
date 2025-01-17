@@ -18,7 +18,7 @@ RL = -lreadline
 NAME = minishell
 LIBFT = library/libft.a
 
-SRC = main.c
+SRC = main2.c
 OBJ = $(SRC:.c=.o)
 
 $(NAME): $(OBJ) $(LIBFT)

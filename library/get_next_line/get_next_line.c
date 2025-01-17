@@ -82,3 +82,27 @@ char	*get_next_line(int fd)
 	stash = new_stash(stash);
 	return (line);
 }
+
+#include <stdio.h>
+#include <fcntl.h>
+
+int main()
+{
+    int fd;
+    char *line = NULL;
+
+    fd = open("input.txt", O_RDONLY);
+    if (fd < 0)
+    {
+        printf("Error opening file\n");
+        return 1;
+    }
+
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        printf("%s", line);
+        free(line);
+    }
+    close(fd);
+    return 0;
+}

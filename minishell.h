@@ -43,23 +43,23 @@
 // # define REDIR_OUT ">"
 // # define REDIR_APPEND ">>"
 
-typedef enum e_token_type
-{
-	TOKEN_COMMAND, // commands like 'echo', 'ls', 'cat', etc.
-	TOKEN_PIPE, // '|'
-	TOKEN_REDIR_IN, // '<'
-	TOKEN_HEREDOC, // '<<'
-	TOKEN_REDIR_OUT, // '>'
-	TOKEN_REDIT_APPEND, // '>>'
-	TOKEN_VARIABLE, // variables starting with '$' like '$HOME' and '$PATH'
-	TOKEN_QUOTE, // when it encounters "" or ''
-	TOKEN_ARGUMENT,
-}	t_token_type;
-
-// typedef struct s_token
+// typedef enum e_token_type
 // {
-// 	t_token_type *type;
+// 	WORD, // commands like 'echo', 'ls', 'cat', etc.
+// 	PIPE, // '|'
+// 	REDIR_IN, // '<'
+// 	HEREDOC, // '<<'
+// 	REDIR_OUT, // '>'
+// 	APPEND, // '>>'
+// }	t_token_type;
+
+// typedef struct s_lexer
+// {
 // 	char *value;
-// }	t_token;
+// 	t_token_type *type;
+// 	struct s_lexer *next;
+// }	t_lexer;
+
+
 
 #endif
