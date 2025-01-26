@@ -34,7 +34,7 @@
 # include "library/get_next_line/get_next_line.h"
 # include "library/get_next_line/get_next_line_bonus.h"
 
-# define MAX_TOKENS 100
+// # define MAX_TOKENS 100
 
 // # define DELIMITERS " \t\n"
 // # define PIPE "|"

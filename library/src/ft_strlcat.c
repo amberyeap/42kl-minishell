@@ -25,13 +25,13 @@ that means the initial length of dst plus the length of src. */
 // #include <stdio.h>
 #include "libft.h"
 
-int ft_strlen(const char *str)
-{
-	int len = 0;
-	while (str[len])
-		len++;
-	return (len);
-}
+// int ft_strlen(const char *str)
+// {
+// 	int len = 0;
+// 	while (str[len])
+// 		len++;
+// 	return (len);
+// }
 
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
 {
