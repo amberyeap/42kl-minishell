@@ -16,12 +16,12 @@
 
 typedef enum e_token_type
 {
-	WORD, // commands like 'echo', 'ls', 'cat', etc.
-	PIPE, // '|'
-	REDIR_IN, // '<'
-	HEREDOC, // '<<'
-	REDIR_OUT, // '>'
-	APPEND, // '>>'
+	TOKEN_WORD, // commands like 'echo', 'ls', 'cat', etc.
+	TOKEN_PIPE, // '|'
+	TOKEN_REDIR_IN, // '<'
+	TOKEN_HEREDOC, // '<<'
+	TOKEN_REDIR_OUT, // '>'
+	TOKEN_APPEND, // '>>'
 }	t_token_type;
 
 typedef struct s_lexer
@@ -40,12 +40,42 @@ typedef struct s_lexer
 // 	struct s_command *next;
 // }	t_command;
 
+typedef enum e_node_type
+{
+	NODE_COMMAND,
+	NODE_PIPE,
+	NODE_REDIR_IN,
+	NODE_HEREDOC,
+	NODE_REDIR_OUT,
+	NODE_APPEND,
+}	t_node_type;
+
+typedef struct s_node
+{
+	t_node_type type;
+	struct s_node *left_node;
+	struct s_node *right_node;
+}	t_node;
+
+typedef struct s_parser
+{
+	t_node *root;
+	t_lexer *current_token;
+}	t_parser;
+
 typedef struct s_minishell
 {
 	char *user_input;
 	char **env;
 	t_lexer *lexer_list;
+	t_parser *parser_tree;
 }	t_minishell;
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                        utils.c                             */
+/*                                                                            */
+/* ************************************************************************** */
 
 int ft_strcmp(const char *s1, const char *s2)
 {
@@ -63,6 +93,78 @@ int ft_error(char *message)
 	exit(EXIT_FAILURE);
 }
 
+/* ************************************************************************** */
+/*                                                                            */
+/*                                      parser.c                              */
+/*                                                                            */
+/* ************************************************************************** */
+
+void	init_parser(t_minishell *shell)
+{
+	shell->parser_tree = malloc(sizeof(t_parser));
+	if (!shell->parser_tree)
+		ft_error("Memory allocation failed");
+	shell->parser_tree->root = NULL;
+	shell->parser_tree->current_token = shell->lexer_list;
+}
+
+// "consumes" the current token and moves on to the next one
+void consume_token()
+{
+	
+}
+
+// parses redirections like '<', '<<', '>', '>>'
+t_node *parse_redirections(t_parser *parser)
+{}
+
+t_node *parse_command(t_parser *parser)
+{}
+
+t_node *parse_command_suffix(t_parser *parser)
+{
+
+}
+
+t_node *parse_command_prefix(t_parser *parser)
+{
+
+}
+
+// parses simple commands like 'echo', 'ls', 'cat', etc.
+t_node *parse_simple_command(t_parser *parser)
+{
+	t_node *prefix;
+	t_node *suffix;
+	t_node *command;
+
+	prefix = parse_command_prefix(parser);
+	suffix = parse_command_suffix(parser);
+	command = parse_command(parser);
+}
+
+// parses pipes '|'
+t_node *parse_pipe(t_parser *parser)
+{
+	t_node *left_node;
+	t_node *right_node;
+
+	left_node = parse_simple_command(parser);
+	
+}
+
+t_node	*parse(t_minishell *shell)
+{
+	init_parser(shell);
+	shell->parser_tree->root = parse_pipe(shell->parser_tree);
+}
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                     signals.c                              */
+/*                                                                            */
+/* ************************************************************************** */
+
 // handles the Ctrl+C button in interactive mode - SIGINT signal
 void sigint_handler(int sig)
 {
@@ -77,6 +179,12 @@ void handle_signals(void)
 {
 	signal(SIGINT, sigint_handler);
 }
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                 lexer_utils.c                              */
+/*                                                                            */
+/* ************************************************************************** */
 
 // TAKE NOTE - may not work as intended
 int count_quotes(char *line)
@@ -161,21 +269,27 @@ int is_whitespace(char c)
 	return (c == ' ' || c == '\t' || c == '\n');
 }
 
+/* ************************************************************************** */
+/*                                                                            */
+/*                                        lexer.c                             */
+/*                                                                            */
+/* ************************************************************************** */
+
 int check_token(char *str, int i)
 {
 	if (str[i] == '|')
-		return (PIPE);
+		return (TOKEN_PIPE);
 	else if (str[i] == '<')
 	{
 		if (str[i + 1] == '<')
-			return (HEREDOC); // need to i++ to move the pointer?
-		return (REDIR_IN);
+			return (TOKEN_HEREDOC); // need to i++ to move the pointer?
+		return (TOKEN_REDIR_IN);
 	}
 	else if (str[i] == '>')
 	{
 		if (str[i + 1] == '>')
-			return (APPEND); // need to i++?
-		return (REDIR_OUT);
+			return (TOKEN_APPEND); // need to i++?
+		return (TOKEN_REDIR_OUT);
 	}
 	return (0);
 }
@@ -185,20 +299,20 @@ int	handle_token(t_minishell *shell, int i)
 	int token_type;
 
 	token_type = check_token(shell->user_input, i);
-	if (token_type == PIPE)
-		add_lexer(shell->lexer_list, NULL, PIPE);
-	else if (token_type == REDIR_IN)
-		add_lexer(shell->lexer_list, NULL, REDIR_IN);
-	else if (token_type == HEREDOC)
+	if (token_type == TOKEN_PIPE)
+		add_lexer(shell->lexer_list, NULL, TOKEN_PIPE);
+	else if (token_type == TOKEN_REDIR_IN)
+		add_lexer(shell->lexer_list, NULL, TOKEN_REDIR_IN);
+	else if (token_type == TOKEN_HEREDOC)
 	{
-		add_lexer(shell->lexer_list, NULL, HEREDOC);
+		add_lexer(shell->lexer_list, NULL, TOKEN_HEREDOC);
 		return (2);
 	}
-	else if (token_type == REDIR_OUT)
-		add_lexer(shell->lexer_list, NULL, REDIR_OUT);
-	else if (token_type == APPEND)
+	else if (token_type == TOKEN_REDIR_OUT)
+		add_lexer(shell->lexer_list, NULL, TOKEN_REDIR_OUT);
+	else if (token_type == TOKEN_APPEND)
 	{
-		add_lexer(shell->lexer_list, NULL, APPEND);
+		add_lexer(shell->lexer_list, NULL, TOKEN_APPEND);
 		return (2);
 	}
 	return (1);
@@ -236,7 +350,7 @@ int handle_non_tokens(t_lexer *lexer_list, char *str, int i)
 			j++;
 	}
 	if (j > 0)
-		add_lexer(lexer_list, ft_substr(str, i, j), WORD);
+		add_lexer(lexer_list, ft_substr(str, i, j), TOKEN_WORD);
 	return (j);
 }
 
@@ -275,6 +389,12 @@ void test_lexer(t_minishell *shell)
 	}
 }
 
+/* ************************************************************************** */
+/*                                                                            */
+/*                                        main.c                              */
+/*                                                                            */
+/* ************************************************************************** */
+
 int minishell_loop(t_minishell *shell)
 {
 	handle_signals();
@@ -290,6 +410,7 @@ int minishell_loop(t_minishell *shell)
 		if (!lexer(shell))
 			ft_error("Lexer failed");
 		test_lexer(shell);
+		free(shell->user_input);
 	}
 	return (0);
 }
@@ -312,5 +433,6 @@ int main(int argc, char **argv, char **env)
 		return (printf("This program doesn't take any arguments.\n"), 1);
 	init_shell(&shell, env);
 	minishell_loop(&shell);
+	shell->parser_tree = parse(&shell);
 	return (0);
 }
