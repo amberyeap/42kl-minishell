@@ -22,6 +22,8 @@ typedef enum e_token_type
 	TOKEN_HEREDOC, // '<<'
 	TOKEN_REDIR_OUT, // '>'
 	TOKEN_APPEND, // '>>'
+	TOKEN_ERROR,
+	TOKEN_EOF,
 }	t_token_type;
 
 typedef struct s_lexer
@@ -150,7 +152,7 @@ t_node *parse_pipe(t_parser *parser)
 	t_node *right_node;
 
 	left_node = parse_simple_command(parser);
-	
+
 }
 
 t_node	*parse(t_minishell *shell)
