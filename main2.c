@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 16:47:50 by ayeap             #+#    #+#             */
-/*   Updated: 2025/01/26 16:47:50 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/01/28 14:55:33 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,10 @@ typedef enum e_node_type
 typedef struct s_node
 {
 	t_node_type type;
+	char **args;
+	char *heredoc_delim;
+	char *in_file;
+	char *out_file;
 	struct s_node *left_node;
 	struct s_node *right_node;
 }	t_node;
@@ -63,6 +67,7 @@ typedef struct s_parser
 {
 	t_node *root;
 	t_lexer *current_token;
+	// t_lexer *lexer_list;
 }	t_parser;
 
 typedef struct s_minishell
@@ -97,7 +102,7 @@ int ft_error(char *message)
 
 /* ************************************************************************** */
 /*                                                                            */
-/*                                      parser.c                              */
+/*                                parser_utils.c                              */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,13 +113,45 @@ void	init_parser(t_minishell *shell)
 		ft_error("Memory allocation failed");
 	shell->parser_tree->root = NULL;
 	shell->parser_tree->current_token = shell->lexer_list;
+	// shell->parser_tree->lexer_list = shell->lexer_list;
 }
 
 // "consumes" the current token and moves on to the next one
-void consume_token()
+void consume_token(t_parser *parser)
 {
-	
+	if (parser->current_token->next)
+		parser->current_token = parser->current_token->next;
+	// else
+	// 	parser->current_token->type = TOKEN_EOF;
 }
+
+t_node *create_node(t_node_type type)
+{
+	t_node *node;
+
+	node = malloc(sizeof(t_node));
+	if (!node)
+		ft_error("Memory allocation failed");
+	node->type = type;
+	node->args = NULL;
+	node->heredoc_delim = NULL;
+	node->in_file = NULL;
+	node->out_file = NULL;
+	node->left_node = NULL;
+	node->right_node = NULL;
+	return (node);
+}
+
+int match_token(t_parser *parser, t_toke_type type)
+{
+	return (parser->current_token->type == type);
+}
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                      parser.c                              */
+/*                                                                            */
+/* ************************************************************************** */
 
 // parses redirections like '<', '<<', '>', '>>'
 t_node *parse_redirections(t_parser *parser)
@@ -149,10 +186,18 @@ t_node *parse_simple_command(t_parser *parser)
 t_node *parse_pipe(t_parser *parser)
 {
 	t_node *left_node;
-	t_node *right_node;
+	t_node *pipe_node;
 
 	left_node = parse_simple_command(parser);
-
+	while (match_token(parser, TOKEN_PIPE))
+	{
+		pipe_node = create_node(NODE_PIPE);
+		consume_token(parser);
+		pipe_node->left_node = left_node;
+		pipe_node->right_node = parse_simple_command(parser);
+		left_node = pipe_node;
+	}
+	return (left_node);
 }
 
 t_node	*parse(t_minishell *shell)
