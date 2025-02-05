@@ -1,5 +1,17 @@
 #include "minishell.h"
 
+// current checklist for parser:
+// - syntax error -> what if too many redir or pipes
+//   - tokens DONE
+//   - parser
+// - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
+// - empty input -> results in "Parsing failed"
+// - functions too long
+
+// - handle expansion
+// - handle signals
+// - handle history
+
 typedef enum e_token_type
 {
 	TOKEN_WORD,
@@ -59,8 +71,9 @@ typedef struct s_minishell
 {
 	char		*user_input;
 	char		**env;
-	t_token		*token_list;
-	t_ast		*parser_tree;
+	t_token		*token_list; // pointer to the head of the token list
+	t_ast		*parser_tree; // pointer to the root of the tree
+	t_parser	*parser;
 }	t_minishell;
 
 /* ************************************************************************** */
@@ -83,14 +96,6 @@ int	is_operator(char c)
 
 /* ************************************************************************** */
 /*                                                                            */
-/*                         parser_create_nodes.c                              */
-/*                                                                            */
-/* ************************************************************************** */
-
-
-
-/* ************************************************************************** */
-/*                                                                            */
 /*                                parser_utils.c                              */
 /*                                                                            */
 /* ************************************************************************** */
@@ -105,7 +110,9 @@ void	consume_token(t_parser *parser)
 // matches the current token with the expected type
 int	match_token(t_parser *parser, t_token_type type)
 {
-	return (parser->current_token && parser->current_token->type == type);
+	if (parser->current_token && parser->current_token->type == type)
+		return (1);
+	return (0);
 }
 
 // initializes the parser
@@ -123,6 +130,7 @@ t_parser	*init_parser(t_token *token_list)
 	return (parser);
 }
 
+// checks if the token is a redirection token
 int	is_redir_token(t_token_type type)
 {
 	return (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT || type == TOKEN_HEREDOC || type == TOKEN_APPEND);
@@ -140,6 +148,7 @@ void	set_parser_error(t_parser *parser, char *msg)
 /*                                                                            */
 /* ************************************************************************** */
 
+// initialises a new AST node
 t_ast	*create_ast_node(t_ast_type type)
 {
 	t_ast	*node;
@@ -156,6 +165,7 @@ t_ast	*create_ast_node(t_ast_type type)
 	return (node);
 }
 
+// frees the AST node
 void	free_ast_node(t_ast *node)
 {
 	int	i;
@@ -178,6 +188,7 @@ void	free_ast_node(t_ast *node)
 	free(node);
 }
 
+// creates a new AST node based on the token type
 t_ast	*check_node_type(t_token_type type)
 {
 	t_ast	*node;
@@ -196,6 +207,9 @@ t_ast	*check_node_type(t_token_type type)
 	return (node);
 }
 
+// parses a redirection node
+/* 1. from the parse_simple_command() function, if it's the redir token, it will enter this function
+** 2. it will "consume" and move to the next token and check if it's a WORD. if not a WORD, it will set error*/
 t_ast	*parse_redirection(t_parser *parser, t_ast *cmd_node)
 {
 	t_ast			*redir_node;
@@ -413,25 +427,67 @@ void	add_token(t_token **head, t_token *new_token)
 	current->next = new_token;
 }
 
+char	*handle_quotes(t_tokenizer *tokenizer)
+{
+	int		start;
+	int		len;
+	char	*word;
+	char	quote;
+
+	quote = peek(tokenizer);
+	next_char(tokenizer);
+	start = tokenizer->position;
+	while (peek(tokenizer) != quote && peek(tokenizer))
+		next_char(tokenizer);
+	len = tokenizer->position - start;
+	if (peek(tokenizer) != quote)
+		return (NULL);
+	word = ft_substr(tokenizer->user_input, start, len);
+	// if (!word)
+	// {
+	// 	tokenizer->error = 1;
+	// 	tokenizer->error_msg = ft_strdup("Memory allocation failed");
+	// 	return (NULL);
+	// }
+	next_char(tokenizer);
+	return (word);
+}
+
 // creates a word token
 t_token *create_word_token(t_tokenizer *tokenizer)
 {
 	int		start;
 	int		len;
 	char	*word;
+	t_token	*token;
 
-	start = tokenizer->position;
-	while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
-		next_char(tokenizer);
-	len = tokenizer->position - start;
-	word = ft_substr(tokenizer->user_input, start, len);
-	if (!word)
+	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 	{
-		tokenizer->error = 1;
-		tokenizer->error_msg = ft_strdup("Memory allocation failed");
-		return (NULL);
+		word = handle_quotes(tokenizer);
+		if (!word)
+			return (create_token(TOKEN_ERROR, "Unterminated quote"));
+		token = create_token(TOKEN_WORD, word);
+		free(word);
+		return (token);
 	}
-	return (create_token(TOKEN_WORD, word));
+	else
+	{
+		start = tokenizer->position;
+		while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
+			next_char(tokenizer);
+		len = tokenizer->position - start;
+		word = ft_substr(tokenizer->user_input, start, len);
+		// if (!word)
+		// {
+		// 	tokenizer->error = 1;
+		// 	tokenizer->error_msg = ft_strdup("Memory allocation failed");
+		// 	return (NULL);
+		// }
+		token = create_token(TOKEN_WORD, word);
+		free(word);
+		return (token);
+	}
+	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
 }
 
 // creates an operator token
@@ -464,14 +520,14 @@ t_token	*create_op_token(t_tokenizer *tokenizer)
 		else
 			return (create_token(TOKEN_REDIR_OUT, NULL));
 	}
-	return (NULL);
+	return (create_token(TOKEN_ERROR, "Unrecognized operator")); // most likely will not reach here?
 }
 
 // main tokenize function
 /* 1. skips whitespace
 ** 2. checks the char in the user_input.
 **	- if it's a nul terminator, it will break out of the loop and create a EOF token
-**	- if it's an operator, it will create an operator token
+**	- if it's an operator (|<>), it will create an operator token
 **	- else if it's a word, it will create a word token 
 ** 3. check if there was any error encountered
 **	- if NO error, create EOF token
@@ -496,32 +552,20 @@ t_token	*tokenize(char *input)
 			new_token = create_op_token(tokenizer);
 		else
 			new_token = create_word_token(tokenizer);
-		if (!new_token)
-		{
-			free_tokens(head);
-			free(tokenizer);
-			return (NULL);
-		}
 		add_token(&head, new_token);
 	}
-	if (!tokenizer->error)
-	{
-		new_token = create_token(TOKEN_EOF, NULL);
-		if (!new_token)
-		{
-			free_tokens(head);
-			free(tokenizer);
-			return (NULL);
-		}
-		add_token(&head, new_token);
-	}
-	if (tokenizer->error)
-	{
-		if (tokenizer->error_msg)
-			free(tokenizer->error_msg);
-		free_tokens(head);
-		head = NULL;
-	}
+	// if (!tokenizer->error)
+	// {
+	// 	new_token = create_token(TOKEN_EOF, NULL);
+	// 	add_token(&head, new_token);
+	// }
+	// if (tokenizer->error)
+	// {
+	// 	if (tokenizer->error_msg)
+	// 		free(tokenizer->error_msg);
+	// 	free_tokens(head);
+	// 	head = NULL;
+	// }
 	free(tokenizer);
 	return (head);
 }
@@ -691,6 +735,63 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->env = env;
 	shell->token_list = NULL;
 	shell->parser_tree = NULL;
+	shell->parser = NULL;
+}
+
+void reset_main(t_minishell *shell)
+{
+	free_tokens(shell->token_list);
+	free_ast_node(shell->parser_tree);
+	free(shell->user_input);
+	shell->token_list = NULL;
+	shell->parser_tree = NULL;
+	shell->user_input = NULL;
+}
+
+// int main(int argc, char **argv, char **envp)
+// {
+// 	char		*line;
+// 	t_minishell	shell;
+
+// 	(void)argv;
+// 	if (argc != 1)
+// 		return(printf("Program does not accept arguments.\n"), 1);
+// 	init_shell(&shell, envp);
+// 	while (1)
+// 	{
+// 		line = readline("minishell$ ");
+// 		if (!line)
+// 			break ;
+// 		// add_history(line);
+// 		shell.user_input = line;
+// 		shell.token_list = tokenize(shell.user_input);
+// 		shell.parser_tree = parse(shell.token_list);
+// 		if (!shell.parser->error)
+// 			ft_error("Parsing failed");
+// 		print_tokens(shell.token_list);
+// 		print_ast(shell.parser_tree, 0);
+// 		reset_main(&shell);
+// 	}
+// 	return (0);
+// }
+
+int	check_token_error(t_minishell *shell)
+{
+	t_token	*current;
+
+	current = shell->token_list;
+	while (current)
+	{
+		if (current->type == TOKEN_ERROR)
+		{
+			printf("%s\n", current->value);
+			free_tokens(shell->token_list);
+			shell->token_list = NULL;
+			return (1);
+		}
+		current = current->next;
+	}
+	return (0);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -710,22 +811,24 @@ int main(int argc, char **argv, char **envp)
 		// add_history(line);
 		shell.user_input = line;
 		shell.token_list = tokenize(shell.user_input);
-		if (!shell.token_list)
+		if (check_token_error(&shell))
 		{
-			fprintf(stderr, "Tokenization failed\n");
 			free(shell.user_input);
 			shell.user_input = NULL;
 			continue ;
 		}
-		shell.parser_tree = parse(shell.token_list);
-		if (!shell.parser_tree)
+		else
 		{
-			fprintf(stderr, "Parsing failed\n");
-			free_tokens(shell.token_list);
-			free(shell.user_input);
-			shell.token_list = NULL;
-			shell.user_input = NULL;
-			continue ;
+			shell.parser_tree = parse(shell.token_list);
+			if (!shell.parser_tree)
+			{
+				fprintf(stderr, "Parsing failed\n");
+				free_tokens(shell.token_list);
+				free(shell.user_input);
+				shell.token_list = NULL;
+				shell.user_input = NULL;
+				continue ;
+			}
 		}
 		print_tokens(shell.token_list);
 		print_ast(shell.parser_tree, 0);
