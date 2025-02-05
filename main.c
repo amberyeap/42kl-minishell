@@ -776,7 +776,6 @@ void	main_parse(t_minishell *shell)
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
-		// continue ;
 	}
 	shell->parser_tree = parse(shell->parser, shell->token_list);
 	if (!shell->parser_tree)
@@ -786,7 +785,6 @@ void	main_parse(t_minishell *shell)
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
-		// continue ;
 	}
 }
 
