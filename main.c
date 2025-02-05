@@ -1,11 +1,11 @@
 #include "minishell.h"
 
 // current checklist for parser:
-// - syntax error -> what if too many redir or pipes
+// - syntax error
 //   - tokens DONE
-//   - parser
+//   - parser -> extra redir or pipes doesn't call syntax error
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
-// - empty input -> results in "Parsing failed"
+// - empty input -> results in "Parsing failed" DONE
 // - functions too long
 
 // - handle expansion
@@ -49,6 +49,14 @@ typedef enum s_ast_type
 	NODE_APPEND
 }	t_ast_type;
 
+typedef struct s_parser
+{
+	t_token		*current_token;
+	t_token		*token_list;
+	int			error;
+	char		*error_msg;
+}	t_parser;
+
 typedef struct s_ast
 {
 	t_ast_type		type;
@@ -58,14 +66,6 @@ typedef struct s_ast
 	struct s_ast	*left;
 	struct s_ast	*right;
 }	t_ast;
-
-typedef struct s_parser
-{
-	t_token		*current_token;
-	t_token		*token_list;
-	int			error;
-	char		*error_msg;
-}	t_parser;
 
 typedef struct s_minishell
 {
@@ -311,23 +311,22 @@ t_ast	*parse_pipeline(t_parser *parser)
 	return (left);
 }
 
-t_ast	*parse(t_token *token_list)
+t_ast	*parse(t_parser *parser, t_token *token_list)
 {
-	t_parser	*parser;
 	t_ast		*root;
 
 	if (!token_list)
 		return (NULL);
-	parser = init_parser(token_list);
+	// parser = init_parser(token_list);
 	root = parse_pipeline(parser);
-	if (parser->error)
-	{
-		if (root)
-			free_ast_node(root);
-		root = NULL;
-	}
-	if (parser->error_msg)
-		free(parser->error_msg);
+	// if (parser->error)
+	// {
+	// 	if (root)
+	// 		free_ast_node(root);
+	// 	root = NULL;
+	// }
+	// if (parser->error_msg)
+	// 	free(parser->error_msg);
 	free(parser);
 	return (root);
 }
@@ -723,10 +722,10 @@ void print_ast(t_ast *node, int depth)
 /*                                                                            */
 /* ************************************************************************** */
 
-void	ft_error(char *msg)
+void	ft_error(t_minishell *shell, char *msg)
 {
 	printf("%s\n", msg);
-	exit(1);
+	free_tokens(shell->token_list);
 }
 
 void	init_shell(t_minishell *shell, char **env)
@@ -748,33 +747,6 @@ void reset_main(t_minishell *shell)
 	shell->user_input = NULL;
 }
 
-// int main(int argc, char **argv, char **envp)
-// {
-// 	char		*line;
-// 	t_minishell	shell;
-
-// 	(void)argv;
-// 	if (argc != 1)
-// 		return(printf("Program does not accept arguments.\n"), 1);
-// 	init_shell(&shell, envp);
-// 	while (1)
-// 	{
-// 		line = readline("minishell$ ");
-// 		if (!line)
-// 			break ;
-// 		// add_history(line);
-// 		shell.user_input = line;
-// 		shell.token_list = tokenize(shell.user_input);
-// 		shell.parser_tree = parse(shell.token_list);
-// 		if (!shell.parser->error)
-// 			ft_error("Parsing failed");
-// 		print_tokens(shell.token_list);
-// 		print_ast(shell.parser_tree, 0);
-// 		reset_main(&shell);
-// 	}
-// 	return (0);
-// }
-
 int	check_token_error(t_minishell *shell)
 {
 	t_token	*current;
@@ -794,6 +766,40 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
+void	main_parse(t_minishell *shell)
+{
+	shell->parser = init_parser(shell->token_list);
+	if (!shell->parser)
+	{
+		fprintf(stderr, "Failed to initialize parser\n");
+		free_tokens(shell->token_list);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+		// continue ;
+	}
+	shell->parser_tree = parse(shell->parser, shell->token_list);
+	if (!shell->parser_tree)
+	{
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
+		free_tokens(shell->token_list);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+		// continue ;
+	}
+}
+
+void cleanup(t_minishell *shell)
+{
+	free_ast_node(shell->parser_tree);
+	free_tokens(shell->token_list);
+	free(shell->user_input);
+	shell->parser_tree = NULL;
+	shell->token_list = NULL;
+	shell->user_input = NULL;
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	char		*line;
@@ -808,6 +814,11 @@ int main(int argc, char **argv, char **envp)
 		line = readline("minishell$ ");
 		if (!line)
 			break ;
+		if (!*line)
+		{
+			free(line);
+			continue ;
+		}
 		// add_history(line);
 		shell.user_input = line;
 		shell.token_list = tokenize(shell.user_input);
@@ -818,26 +829,10 @@ int main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		else
-		{
-			shell.parser_tree = parse(shell.token_list);
-			if (!shell.parser_tree)
-			{
-				fprintf(stderr, "Parsing failed\n");
-				free_tokens(shell.token_list);
-				free(shell.user_input);
-				shell.token_list = NULL;
-				shell.user_input = NULL;
-				continue ;
-			}
-		}
+			main_parse(&shell);
 		print_tokens(shell.token_list);
 		print_ast(shell.parser_tree, 0);
-		free_ast_node(shell.parser_tree);
-		free_tokens(shell.token_list);
-		free(shell.user_input);
-		shell.parser_tree = NULL;
-		shell.token_list = NULL;
-		shell.user_input = NULL;
+		cleanup(&shell);
 	}
 	return (0);
 }
