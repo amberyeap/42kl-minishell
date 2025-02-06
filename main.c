@@ -3,12 +3,13 @@
 // current checklist for parser:
 // - syntax error
 //   - tokens DONE
-//   - parser -> extra redir or pipes doesn't call syntax error
+//   - parser DONE-ish -> calls error but not the same error message as actual bash
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
-// - empty input -> results in "Parsing failed" DONE
+// - empty input DONE
 // - functions too long
 
-// - handle expansion
+// - handle expansion -> done in execution section
+// - handle exit codes 
 // - handle signals
 // - handle history
 
@@ -73,7 +74,7 @@ typedef struct s_minishell
 	char		**env;
 	t_token		*token_list; // pointer to the head of the token list
 	t_ast		*parser_tree; // pointer to the root of the tree
-	t_parser	*parser;
+	t_parser	*parser; // pointer to the parser - used to pass to the parse function
 }	t_minishell;
 
 /* ************************************************************************** */
@@ -237,52 +238,115 @@ t_ast	*parse_redirection(t_parser *parser, t_ast *cmd_node)
 	return (redir_node);
 }
 
+static void cleanup_command(t_token **words, t_ast *node)
+{
+    if (words)
+        free(words);
+    if (node)
+        free_ast_node(node);
+}
+
 t_ast	*parse_simple_command(t_parser *parser)
 {
-	t_ast	*node;
-	t_token	*start_token;
-	int		arg_count;
-	int		i;
-	
-	node = NULL;
-	start_token = parser->current_token;
-	arg_count = 0;
-	i = 0;
-	while (parser->current_token && parser->current_token->type == TOKEN_WORD)
-	{
-		arg_count++;
-		consume_token(parser);
-	}
-	if (arg_count == 0)
-		return (NULL);
-	node = create_ast_node(NODE_COMMAND);
-	if (!node)
-		return (NULL);
-	node->args = malloc(sizeof(char *) * (arg_count + 1));
-	if (!node->args)
-		return (free(node), NULL);
-	parser->current_token = start_token;
-	while (i < arg_count)
-	{
-		node->args[i] = ft_strdup(parser->current_token->value);
-		if (!node->args[i])
-		{
-			free(node->args);
-			free(node);
-			return (NULL);
-		}
-		consume_token(parser);
-		i++;
-	}
-	node->args[i] = NULL;
-	while (parser->current_token && is_redir_token(parser->current_token->type))
-	{
-		node = parse_redirection(parser, node);
-		if (!node)
-			return (NULL);
-	}
-	return (node);
+    t_ast	*node = NULL;
+    t_token	**words = malloc(sizeof(t_token *) * 100);
+    int		word_count = 0;
+    
+    if (!words)
+        return (NULL);
+    
+    // Process tokens
+    while (parser->current_token)
+    {
+        if (is_redir_token(parser->current_token->type))
+        {
+            if (!node && !(node = create_ast_node(NODE_COMMAND)))
+				cleanup_command(words, node);
+            if (!(node = parse_redirection(parser, node)))
+				cleanup_command(words, node);
+        }
+        else if (parser->current_token->type == TOKEN_WORD)
+        {
+            words[word_count++] = parser->current_token;
+            consume_token(parser);
+        }
+        else
+            break;
+    }
+
+    // Handle empty command case
+    if (word_count == 0 && !node)
+		cleanup_command(words, node);
+
+    // Create node if not already created
+    if (!node && !(node = create_ast_node(NODE_COMMAND)))
+		cleanup_command(words, node);
+
+    // Process arguments if any exist
+    if (word_count > 0)
+    {
+        node->args = malloc(sizeof(char *) * (word_count + 1));
+        if (!node->args)
+        {
+            cleanup_command(words, node);
+            return (NULL);
+        }
+        
+        for (int i = 0; i < word_count; i++)
+            node->args[i] = ft_strdup(words[i]->value);
+        node->args[word_count] = NULL;
+    }
+    
+    free(words);
+    return (node);
 }
+
+// t_ast	*parse_simple_command(t_parser *parser)
+// {
+// 	t_ast	*node;
+// 	t_token	*start_token;
+// 	int		arg_count;
+// 	int		i;
+	
+// 	node = NULL;
+// 	start_token = parser->current_token;
+// 	arg_count = 0;
+// 	i = 0;
+// 	while (parser->current_token && parser->current_token->type == TOKEN_WORD)
+// 	{
+// 		arg_count++;
+// 		consume_token(parser);
+// 	}
+// 	if (arg_count == 0)
+// 		return (NULL);
+// 	node = create_ast_node(NODE_COMMAND);
+// 	if (!node)
+// 		return (NULL);
+// 	node->args = malloc(sizeof(char *) * (arg_count + 1));
+// 	if (!node->args)
+// 		return (free(node), NULL);
+// 	parser->current_token = start_token;
+// 	while (i < arg_count)
+// 	{
+// 		node->args[i] = ft_strdup(parser->current_token->value);
+// 		if (!node->args[i])
+// 		{
+// 			free(node->args);
+// 			free(node);
+// 			return (NULL);
+// 		}
+// 		consume_token(parser);
+// 		i++;
+// 	}
+// 	node->args[i] = NULL;
+// 	while (parser->current_token && is_redir_token(parser->current_token->type))
+// 	{
+// 		node = parse_redirection(parser, node);
+// 		if (!node)
+// 			return (NULL);
+// 	}
+// 	return (node);
+// }
 
 t_ast	*parse_pipeline(t_parser *parser)
 {
@@ -317,7 +381,6 @@ t_ast	*parse(t_parser *parser, t_token *token_list)
 
 	if (!token_list)
 		return (NULL);
-	// parser = init_parser(token_list);
 	root = parse_pipeline(parser);
 	// if (parser->error)
 	// {
@@ -442,17 +505,13 @@ char	*handle_quotes(t_tokenizer *tokenizer)
 	if (peek(tokenizer) != quote)
 		return (NULL);
 	word = ft_substr(tokenizer->user_input, start, len);
-	// if (!word)
-	// {
-	// 	tokenizer->error = 1;
-	// 	tokenizer->error_msg = ft_strdup("Memory allocation failed");
-	// 	return (NULL);
-	// }
 	next_char(tokenizer);
 	return (word);
 }
 
 // creates a word token
+/* 1. if the current char is a quote, it will call handle_quotes() (34 is double quote, 39 is single quote)
+*/
 t_token *create_word_token(t_tokenizer *tokenizer)
 {
 	int		start;
@@ -465,9 +524,6 @@ t_token *create_word_token(t_tokenizer *tokenizer)
 		word = handle_quotes(tokenizer);
 		if (!word)
 			return (create_token(TOKEN_ERROR, "Unterminated quote"));
-		token = create_token(TOKEN_WORD, word);
-		free(word);
-		return (token);
 	}
 	else
 	{
@@ -476,12 +532,9 @@ t_token *create_word_token(t_tokenizer *tokenizer)
 			next_char(tokenizer);
 		len = tokenizer->position - start;
 		word = ft_substr(tokenizer->user_input, start, len);
-		// if (!word)
-		// {
-		// 	tokenizer->error = 1;
-		// 	tokenizer->error_msg = ft_strdup("Memory allocation failed");
-		// 	return (NULL);
-		// }
+	}
+	if (word)
+	{
 		token = create_token(TOKEN_WORD, word);
 		free(word);
 		return (token);
@@ -782,6 +835,7 @@ void	main_parse(t_minishell *shell)
 	{
 		fprintf(stderr, "%s\n", shell->parser->error_msg);
 		free_tokens(shell->token_list);
+		free(shell->parser->error_msg);
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
