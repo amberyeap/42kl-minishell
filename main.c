@@ -43,6 +43,7 @@ typedef struct s_tokenizer
 typedef enum s_ast_type
 {
 	NODE_COMMAND,
+	NODE_ARG,
 	NODE_PIPE,
 	NODE_REDIR_IN,
 	NODE_REDIR_OUT,
@@ -76,6 +77,7 @@ typedef struct s_minishell
 	t_ast		*parser_tree; // pointer to the root of the tree
 	t_parser	*parser; // pointer to the parser - used to pass to the parse function
 }	t_minishell;
+
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -238,67 +240,26 @@ t_ast	*parse_redirection(t_parser *parser, t_ast *cmd_node)
 	return (redir_node);
 }
 
-static void cleanup_command(t_token **words, t_ast *node)
+t_ast	*parse_prefix(t_parser *parser)
 {
-    if (words)
-        free(words);
-    if (node)
-        free_ast_node(node);
+	if (is_redir_token(parser->current_token->type))
+		return (parse_redirection(parser, NULL));
+	return (NULL);
+}
+
+t_ast	*parse_command(t_parser *parser)
+{
+	t_ast *node;
+
 }
 
 t_ast	*parse_simple_command(t_parser *parser)
 {
-    t_ast	*node = NULL;
-    t_token	**words = malloc(sizeof(t_token *) * 100);
-    int		word_count = 0;
-    
-    if (!words)
-        return (NULL);
-    
-    // Process tokens
-    while (parser->current_token)
-    {
-        if (is_redir_token(parser->current_token->type))
-        {
-            if (!node && !(node = create_ast_node(NODE_COMMAND)))
-				cleanup_command(words, node);
-            if (!(node = parse_redirection(parser, node)))
-				cleanup_command(words, node);
-        }
-        else if (parser->current_token->type == TOKEN_WORD)
-        {
-            words[word_count++] = parser->current_token;
-            consume_token(parser);
-        }
-        else
-            break;
-    }
+	t_ast	*prefix;
+	t_ast	*cmd_node;
 
-    // Handle empty command case
-    if (word_count == 0 && !node)
-		cleanup_command(words, node);
-
-    // Create node if not already created
-    if (!node && !(node = create_ast_node(NODE_COMMAND)))
-		cleanup_command(words, node);
-
-    // Process arguments if any exist
-    if (word_count > 0)
-    {
-        node->args = malloc(sizeof(char *) * (word_count + 1));
-        if (!node->args)
-        {
-            cleanup_command(words, node);
-            return (NULL);
-        }
-        
-        for (int i = 0; i < word_count; i++)
-            node->args[i] = ft_strdup(words[i]->value);
-        node->args[word_count] = NULL;
-    }
-    
-    free(words);
-    return (node);
+	prefix = parse_prefix(parser);
+	cmd_node = parse_command(parser);
 }
 
 // t_ast	*parse_simple_command(t_parser *parser)
@@ -347,6 +308,60 @@ t_ast	*parse_simple_command(t_parser *parser)
 // 	}
 // 	return (node);
 // }
+
+static void cleanup_command(t_token **words, t_ast *node)
+{
+    if (words)
+        free(words);
+    if (node)
+        free_ast_node(node);
+}
+
+t_ast	*parse_simple_command(t_parser *parser)
+{
+    t_ast	*node = NULL;
+    t_token	**words = malloc(sizeof(t_token *) * 100);
+    int		word_count = 0;
+    
+    if (!words)
+        return (NULL);
+    while (parser->current_token)
+    {
+        if (is_redir_token(parser->current_token->type))
+        {
+            if (!node)
+				node = create_ast_node(NODE_COMMAND);
+			node = parse_redirection(parser, node);
+            if (!node)
+				cleanup_command(words, node);
+        }
+        else if (parser->current_token->type == TOKEN_WORD)
+        {
+            words[word_count++] = parser->current_token;
+            consume_token(parser);
+        }
+        else
+            break;
+    }
+    // if (word_count == 0 && !node)
+	// 	cleanup_command(words, node);
+    // if (!node && !(node = create_ast_node(NODE_COMMAND)))
+	// 	cleanup_command(words, node);
+    if (word_count > 0)
+    {
+        node->args = malloc(sizeof(char *) * (word_count + 1));
+        if (!node->args)
+        {
+            cleanup_command(words, node);
+            return (NULL);
+        }
+        for (int i = 0; i < word_count; i++)
+            node->args[i] = ft_strdup(words[i]->value);
+        node->args[word_count] = NULL;
+    }
+    free(words);
+    return (node);
+}
 
 t_ast	*parse_pipeline(t_parser *parser)
 {
@@ -663,7 +678,8 @@ void print_ast(t_ast *node, int depth)
         case NODE_COMMAND:
             printf("COMMAND: ");
             i = 0;
-            while (node->args && node->args[i])
+            printf("Args: ");
+			while (node->args && node->args[i])
             {
                 printf("%s ", node->args[i]);
                 i++;

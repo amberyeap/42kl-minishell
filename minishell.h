@@ -34,32 +34,5 @@
 # include "library/get_next_line/get_next_line.h"
 # include "library/get_next_line/get_next_line_bonus.h"
 
-// # define MAX_TOKENS 100
-
-// # define DELIMITERS " \t\n"
-// # define PIPE "|"
-// # define REDIR_IN "<"
-// # define REDIR_HEREDOC "<<"
-// # define REDIR_OUT ">"
-// # define REDIR_APPEND ">>"
-
-// typedef enum e_token_type
-// {
-// 	WORD, // commands like 'echo', 'ls', 'cat', etc.
-// 	PIPE, // '|'
-// 	REDIR_IN, // '<'
-// 	HEREDOC, // '<<'
-// 	REDIR_OUT, // '>'
-// 	APPEND, // '>>'
-// }	t_token_type;
-
-// typedef struct s_lexer
-// {
-// 	char *value;
-// 	t_token_type *type;
-// 	struct s_lexer *next;
-// }	t_lexer;
-
-
 
 #endif
