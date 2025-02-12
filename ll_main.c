@@ -3,7 +3,7 @@
 // current checklist for parser:
 // - syntax error
 //   - tokens DONE
-//   - parser DONE-ish -> calls error but not the same error message as actual bash
+//   - parser -> multiple consecutive pipes failed, heredoc with no delim failed, 
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
 // - empty input DONE
 // - functions too long
@@ -87,7 +87,7 @@ typedef struct s_minishell
 	t_parser	*parser; // pointer to the parser - used to pass to the parse function
 }	t_minishell;
 
-t_node	*parse_simple_command(t_parser *parser, t_node *head);
+t_node	*parse_simple_command(t_parser *parser, t_node **head);
 
 void print_tokens(t_token *head);
 void print_nodes(t_node *head);
@@ -135,13 +135,16 @@ void	set_parser_error(t_parser *parser, char *msg)
 	parser->error_msg = ft_strdup(msg);
 }
 
-void	add_node_to_back(t_node *head, t_node *new_node)
+void	add_node_to_back(t_node **head, t_node *new_node)
 {
 	t_node	*current;
 
-	if (!head)
+	if (!*head)
+	{
+		*head = new_node;
 		return ;
-	current = head;
+	}
+	current = *head;
 	while (current->next)
 		current = current->next;
 	current->next = new_node;
@@ -235,7 +238,7 @@ t_node	*create_redir_node(t_token_type type)
 	return (redir_node);
 }
 
-void	parse_redirection(t_parser *parser, t_node *head)
+void	parse_redirection(t_parser *parser, t_node **head)
 {
 	t_node			*redir_node;
 	t_token_type	redir_type;
@@ -266,14 +269,24 @@ void	parse_redirection(t_parser *parser, t_node *head)
 	add_node_to_back(head, redir_node);
 }
 
-void	parse_pipe(t_parser *parser, t_node *head)
+void parse_pipe(t_parser *parser, t_node **head)
 {
-	t_node	*pipe_node;
+	t_node *pipe_node;
 
 	pipe_node = create_node(NODE_PIPE);
+	if (!pipe_node)
+	{
+		set_parser_error(parser, "Failed to create pipe node");
+		return ;
+	}
 	add_node_to_back(head, pipe_node);
 	consume_token(parser);
-	parse_simple_command(parser, pipe_node);
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	{
+		set_parser_error(parser, "Expected command after pipe");
+		return ;
+	}
+	parse_simple_command(parser, head);
 }
 
 // this adds arguments to the command node as multiple strings
@@ -300,20 +313,6 @@ void	add_arg_to_command(char *arg, t_node *cmd_node)
 	cmd_node->arg = new_args;
 }
 
-// void	parse_arguments(t_parser *parser, t_node *head)
-// {
-// 	t_node	*arg_node;
-
-// 	arg_node = create_node(NODE_ARG);
-// 	if (!arg_node)
-// 	{
-// 		set_parser_error(parser, "Failed to create argument node");
-// 		return ;
-// 	}
-// 	arg_node->arg = ft_strdup(parser->current_token->value);
-// 	add_node_to_back(head, arg_node);
-// }
-
 t_node	*create_command_node(char *cmd, t_node_type type)
 {
 	t_node	*node;
@@ -325,29 +324,44 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 	return (node);
 }
 
-t_node	*parse_simple_command(t_parser *parser, t_node *head)
+t_node	*parse_simple_command(t_parser *parser, t_node **head)
 {
 	t_node	*first_node;
 
+	first_node = NULL;
 	if (!parser->current_token)
 		return (NULL);
-	if (is_redir_token(parser->current_token->type))
-		parse_redirection(parser, head);
-	else if (parser->current_token->type == TOKEN_WORD)
+	while (parser->current_token)
 	{
-		first_node = create_command_node(parser->current_token->value, NODE_COMMAND);
-		add_node_to_back(head, first_node);
-		consume_token(parser);
-		while (parser->current_token && parser->current_token->type == TOKEN_WORD)
-		{
-			add_arg_to_command(parser->current_token->value, first_node);
-			// parse_arguments(parser, head);
-			consume_token(parser);
-		}
-		if (parser->current_token->type == TOKEN_PIPE)
-			parse_pipe(parser, head);
 		if (is_redir_token(parser->current_token->type))
+		{
 			parse_redirection(parser, head);
+			if (parser->error)
+				return (NULL);
+		}
+		else if (parser->current_token->type == TOKEN_WORD)
+		{
+			if (!first_node)
+			{
+				first_node = create_command_node(parser->current_token->value, NODE_COMMAND);
+				add_node_to_back(head, first_node);
+				consume_token(parser);
+			}
+			else
+			{
+				add_arg_to_command(parser->current_token->value, first_node);
+				consume_token(parser);
+			}
+		}
+		else if (parser->current_token->type == TOKEN_PIPE)
+		{
+			parse_pipe(parser, head);
+			if (parser->error)
+				return (NULL);
+			break ;
+		}
+		else
+			break ;
 	}
 	return (first_node);
 }
@@ -359,7 +373,12 @@ t_node	*parse(t_parser *parser)
 	head = NULL;
 	if (!parser->token_list)
 		return (NULL);
-	head = parse_simple_command(parser, head);
+	while (parser->current_token && !parser->error)
+	{
+		parse_simple_command(parser, &head);
+		if (parser->error)
+			break ;
+	}
 	return (head);
 }
 
