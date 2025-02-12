@@ -3,7 +3,7 @@
 // current checklist for parser:
 // - syntax error
 //   - tokens DONE
-//   - parser -> multiple consecutive pipes failed, heredoc with no delim failed, 
+//   - parser DONE
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
 // - empty input DONE
 // - functions too long
@@ -251,15 +251,13 @@ void	parse_redirection(t_parser *parser, t_node **head)
 		return ;
 	}
 	consume_token(parser); // move to the next token
-	if (redir_type == TOKEN_HEREDOC && parser->current_token->type != TOKEN_WORD)
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
 	{
-		set_parser_error(parser, "Expected delimiter after heredoc redirection");
-		return;
-	}
-	else if (parser->current_token->type != TOKEN_WORD)
-	{
-		set_parser_error(parser, "Expected filename after redirection");
-		return;
+		if (redir_type == TOKEN_HEREDOC)
+			set_parser_error(parser, "Expected delimiter after heredoc redirection");
+		else
+			set_parser_error(parser, "Expected filename after redirection");
+		return ;
 	}
 	if (redir_type == TOKEN_HEREDOC)
 		redir_node->heredoc_delim = ft_strdup(parser->current_token->value);
@@ -329,8 +327,6 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 	t_node	*first_node;
 
 	first_node = NULL;
-	if (!parser->current_token)
-		return (NULL);
 	while (parser->current_token)
 	{
 		if (is_redir_token(parser->current_token->type))
@@ -672,6 +668,15 @@ void	main_parse(t_minishell *shell)
 		shell->user_input = NULL;
 	}
 	shell->parser_list = parse(shell->parser);
+	if (shell->parser->error)
+	{
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
+		free_tokens(shell->token_list);
+		free(shell->parser->error_msg);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+	}
 	if (!shell->parser_list)
 	{
 		fprintf(stderr, "%s\n", shell->parser->error_msg);
@@ -723,8 +728,8 @@ int main(int argc, char **argv, char **envp)
 		}
 		else
 			main_parse(&shell);
-		print_tokens(shell.token_list);
-		print_nodes(shell.parser_list);
+		// print_tokens(shell.token_list);
+		// print_nodes(shell.parser_list);
 		cleanup(&shell);
 	}
 	return (0);
