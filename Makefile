@@ -19,6 +19,7 @@ NAME = minishell
 LIBFT = library/libft.a
 
 SRC = main.c
+# SRC = test.c
 OBJ = $(SRC:.c=.o)
 
 $(NAME): $(OBJ) $(LIBFT)

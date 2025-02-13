@@ -3,9 +3,9 @@
 // current checklist for parser:
 // - syntax error
 //   - tokens DONE
-//   - parser DONE-ish -> calls error but not the same error message as actual bash
+//   - parser DONE
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
-// - empty input DONE
+// - empty input -> prints (null) DONE
 // - functions too long
 
 // - handle expansion -> done in execution section
@@ -40,15 +40,23 @@ typedef struct s_tokenizer
 	char	*error_msg;
 }	t_tokenizer;
 
-typedef enum s_ast_type
+typedef enum s_node_type
 {
 	NODE_COMMAND,
+	// NODE_ARG,
 	NODE_PIPE,
 	NODE_REDIR_IN,
 	NODE_REDIR_OUT,
 	NODE_HEREDOC,
-	NODE_APPEND
-}	t_ast_type;
+	NODE_APPEND,
+	NODE_EOF
+}	t_node_type;
+
+typedef enum e_direction
+{
+	INPUT,
+	OUTPUT
+}	t_direction;
 
 typedef struct s_parser
 {
@@ -58,24 +66,30 @@ typedef struct s_parser
 	char		*error_msg;
 }	t_parser;
 
-typedef struct s_ast
+typedef struct s_node
 {
-	t_ast_type		type;
-	char			**args;
+	t_node_type		type;
+	char			*cmd;
+	char			**arg;
 	char			*heredoc_delim;
 	char			*redir_file;
-	struct s_ast	*left;
-	struct s_ast	*right;
-}	t_ast;
+	t_direction		redir_direction; // the direction of the redir token
+	struct s_node	*next;
+}	t_node;
 
 typedef struct s_minishell
 {
 	char		*user_input;
 	char		**env;
 	t_token		*token_list; // pointer to the head of the token list
-	t_ast		*parser_tree; // pointer to the root of the tree
+	t_node		*parser_list; // pointer to the first node of the list
 	t_parser	*parser; // pointer to the parser - used to pass to the parse function
 }	t_minishell;
+
+t_node	*parse_simple_command(t_parser *parser, t_node **head);
+
+void print_tokens(t_token *head);
+void print_nodes(t_node *head);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -101,19 +115,38 @@ int	is_operator(char c)
 /*                                                                            */
 /* ************************************************************************** */
 
-// "consumes" the current token by moving to the next token
+int is_redir_token(t_token_type type)
+{
+	if (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT || type == TOKEN_HEREDOC || type == TOKEN_APPEND)
+		return (1);
+	return (0);
+}
+
 void	consume_token(t_parser *parser)
 {
 	if (parser->current_token)
 		parser->current_token = parser->current_token->next;
 }
 
-// matches the current token with the expected type
-int	match_token(t_parser *parser, t_token_type type)
+void	set_parser_error(t_parser *parser, char *msg)
 {
-	if (parser->current_token && parser->current_token->type == type)
-		return (1);
-	return (0);
+	parser->error = 1;
+	parser->error_msg = ft_strdup(msg);
+}
+
+void	add_node_to_back(t_node **head, t_node *new_node)
+{
+	t_node	*current;
+
+	if (!*head)
+	{
+		*head = new_node;
+		return ;
+	}
+	current = *head;
+	while (current->next)
+		current = current->next;
+	current->next = new_node;
 }
 
 // initializes the parser
@@ -131,16 +164,35 @@ t_parser	*init_parser(t_token *token_list)
 	return (parser);
 }
 
-// checks if the token is a redirection token
-int	is_redir_token(t_token_type type)
+void free_nodes(t_node *head)
 {
-	return (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT || type == TOKEN_HEREDOC || type == TOKEN_APPEND);
-}
+	t_node	*current;
+	t_node	*next;
+	int		i;
 
-void	set_parser_error(t_parser *parser, char *msg)
-{
-	parser->error = 1;
-	parser->error_msg = ft_strdup(msg);
+	current = head;
+	while (current)
+	{
+		next = current->next;
+		if (current->cmd)
+			free(current->cmd);
+		if (current->arg)
+		{
+			i = 0;
+			while (current->arg[i])
+			{
+				free(current->arg[i]);
+				i++;
+			}
+			free(current->arg);
+		}
+		if (current->heredoc_delim)
+			free(current->heredoc_delim);
+		if (current->redir_file)
+			free(current->redir_file);
+		free(current);
+		current = next;
+	}
 }
 
 /* ************************************************************************** */
@@ -149,249 +201,189 @@ void	set_parser_error(t_parser *parser, char *msg)
 /*                                                                            */
 /* ************************************************************************** */
 
-// initialises a new AST node
-t_ast	*create_ast_node(t_ast_type type)
+t_node	*create_node(t_node_type type)
 {
-	t_ast	*node;
+	t_node	*node;
 
-	node = malloc(sizeof(t_ast));
+	node = malloc(sizeof(t_node));
 	if (!node)
 		return (NULL);
 	node->type = type;
-	node->args = NULL;
+	node->cmd = NULL;
+	node->arg = NULL;
 	node->heredoc_delim = NULL;
 	node->redir_file = NULL;
-	node->left = NULL;
-	node->right = NULL;
+	node->redir_direction = -1;
+	node->next = NULL;
 	return (node);
 }
 
-// frees the AST node
-void	free_ast_node(t_ast *node)
+t_node	*create_redir_node(t_token_type type)
 {
-	int	i;
+	t_node	*redir_node;
 
-	if (!node)
-		return ;
-	if (node->args)
+	redir_node = NULL;
+	if (type == TOKEN_APPEND)
 	{
-		i = 0;
-		while (node->args[i])
-			free(node->args[i++]);
-		free(node->args);
+		redir_node = create_node(NODE_APPEND);
+		redir_node->redir_direction = OUTPUT;
 	}
-	if (node->heredoc_delim)
-		free(node->heredoc_delim);
-	if (node->redir_file)
-		free(node->redir_file);
-	free_ast_node(node->left);
-	free_ast_node(node->right);
-	free(node);
-}
-
-// creates a new AST node based on the token type
-t_ast	*check_node_type(t_token_type type)
-{
-	t_ast	*node;
-
-	node = NULL;
-	if (type == TOKEN_PIPE)
-		node = create_ast_node(NODE_PIPE);
 	else if (type == TOKEN_REDIR_IN)
-		node = create_ast_node(NODE_REDIR_IN);
+	{
+		redir_node = create_node(NODE_REDIR_IN);
+		redir_node->redir_direction = INPUT;
+	}
 	else if (type == TOKEN_REDIR_OUT)
-		node = create_ast_node(NODE_REDIR_OUT);
+	{
+		redir_node = create_node(NODE_REDIR_OUT);
+		redir_node->redir_direction = OUTPUT;
+	}
 	else if (type == TOKEN_HEREDOC)
-		node = create_ast_node(NODE_HEREDOC);
-	else if (type == TOKEN_APPEND)
-		node = create_ast_node(NODE_APPEND);
-	return (node);
+	{
+		redir_node = create_node(NODE_HEREDOC);
+		redir_node->redir_direction = INPUT;
+	}
+	return (redir_node);
 }
 
-// parses a redirection node
-/* 1. from the parse_simple_command() function, if it's the redir token, it will enter this function
-** 2. it will "consume" and move to the next token and check if it's a WORD. if not a WORD, it will set error*/
-t_ast	*parse_redirection(t_parser *parser, t_ast *cmd_node)
+void	parse_redirection(t_parser *parser, t_node **head)
 {
-	t_ast			*redir_node;
+	t_node			*redir_node;
 	t_token_type	redir_type;
 
-	redir_type = parser->current_token->type;
-	consume_token(parser);
-	if (!match_token(parser, TOKEN_WORD))
-	{
-		set_parser_error(parser, "Expected filename after redirection");
-		return (NULL);
-	}
-	redir_node = check_node_type(redir_type);
+	redir_type = parser->current_token->type; // store the type of redirection
+	redir_node = create_redir_node(redir_type);
 	if (!redir_node)
 	{
 		set_parser_error(parser, "Failed to create redirection node");
-		return (NULL);
+		return ;
+	}
+	consume_token(parser); // move to the next token
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	{
+		if (redir_type == TOKEN_HEREDOC)
+			set_parser_error(parser, "Expected delimiter after heredoc redirection");
+		else
+			set_parser_error(parser, "Expected filename after redirection");
+		return ;
 	}
 	if (redir_type == TOKEN_HEREDOC)
 		redir_node->heredoc_delim = ft_strdup(parser->current_token->value);
 	else
 		redir_node->redir_file = ft_strdup(parser->current_token->value);
-	redir_node->left = cmd_node;
 	consume_token(parser);
-	return (redir_node);
+	add_node_to_back(head, redir_node);
 }
 
-static void cleanup_command(t_token **words, t_ast *node)
+void parse_pipe(t_parser *parser, t_node **head)
 {
-    if (words)
-        free(words);
-    if (node)
-        free_ast_node(node);
-}
+	t_node *pipe_node;
 
-t_ast	*parse_simple_command(t_parser *parser)
-{
-    t_ast	*node = NULL;
-    t_token	**words = malloc(sizeof(t_token *) * 100);
-    int		word_count = 0;
-    
-    if (!words)
-        return (NULL);
-    
-    // Process tokens
-    while (parser->current_token)
-    {
-        if (is_redir_token(parser->current_token->type))
-        {
-            if (!node && !(node = create_ast_node(NODE_COMMAND)))
-				cleanup_command(words, node);
-            if (!(node = parse_redirection(parser, node)))
-				cleanup_command(words, node);
-        }
-        else if (parser->current_token->type == TOKEN_WORD)
-        {
-            words[word_count++] = parser->current_token;
-            consume_token(parser);
-        }
-        else
-            break;
-    }
-
-    // Handle empty command case
-    if (word_count == 0 && !node)
-		cleanup_command(words, node);
-
-    // Create node if not already created
-    if (!node && !(node = create_ast_node(NODE_COMMAND)))
-		cleanup_command(words, node);
-
-    // Process arguments if any exist
-    if (word_count > 0)
-    {
-        node->args = malloc(sizeof(char *) * (word_count + 1));
-        if (!node->args)
-        {
-            cleanup_command(words, node);
-            return (NULL);
-        }
-        
-        for (int i = 0; i < word_count; i++)
-            node->args[i] = ft_strdup(words[i]->value);
-        node->args[word_count] = NULL;
-    }
-    
-    free(words);
-    return (node);
-}
-
-// t_ast	*parse_simple_command(t_parser *parser)
-// {
-// 	t_ast	*node;
-// 	t_token	*start_token;
-// 	int		arg_count;
-// 	int		i;
-	
-// 	node = NULL;
-// 	start_token = parser->current_token;
-// 	arg_count = 0;
-// 	i = 0;
-// 	while (parser->current_token && parser->current_token->type == TOKEN_WORD)
-// 	{
-// 		arg_count++;
-// 		consume_token(parser);
-// 	}
-// 	if (arg_count == 0)
-// 		return (NULL);
-// 	node = create_ast_node(NODE_COMMAND);
-// 	if (!node)
-// 		return (NULL);
-// 	node->args = malloc(sizeof(char *) * (arg_count + 1));
-// 	if (!node->args)
-// 		return (free(node), NULL);
-// 	parser->current_token = start_token;
-// 	while (i < arg_count)
-// 	{
-// 		node->args[i] = ft_strdup(parser->current_token->value);
-// 		if (!node->args[i])
-// 		{
-// 			free(node->args);
-// 			free(node);
-// 			return (NULL);
-// 		}
-// 		consume_token(parser);
-// 		i++;
-// 	}
-// 	node->args[i] = NULL;
-// 	while (parser->current_token && is_redir_token(parser->current_token->type))
-// 	{
-// 		node = parse_redirection(parser, node);
-// 		if (!node)
-// 			return (NULL);
-// 	}
-// 	return (node);
-// }
-
-t_ast	*parse_pipeline(t_parser *parser)
-{
-	t_ast	*left;
-	t_ast	*pipe_node;
-
-	left = parse_simple_command(parser);
-	if (!left)
-		return (NULL);
-	while (match_token(parser, TOKEN_PIPE))
+	pipe_node = create_node(NODE_PIPE);
+	if (!pipe_node)
 	{
-		pipe_node = create_ast_node(NODE_PIPE);
-		if (!pipe_node)
-			return (NULL);
-		pipe_node->left = left;
-		consume_token(parser);
-		pipe_node->right = parse_simple_command(parser);
-		if (!pipe_node->right)
-		{
-			set_parser_error(parser, "Expected command after pipe");
-			free_ast_node(pipe_node);
-			return (NULL);
-		}
-		left = pipe_node;
+		set_parser_error(parser, "Failed to create pipe node");
+		return ;
 	}
-	return (left);
+	add_node_to_back(head, pipe_node);
+	consume_token(parser);
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	{
+		set_parser_error(parser, "Expected command after pipe");
+		return ;
+	}
+	parse_simple_command(parser, head);
 }
 
-t_ast	*parse(t_parser *parser, t_token *token_list)
+// this adds arguments to the command node as multiple strings
+void	add_arg_to_command(char *arg, t_node *cmd_node)
 {
-	t_ast		*root;
+	int		i;
+	char	**new_args;
 
-	if (!token_list)
+	i = 0;
+	while (cmd_node->arg && cmd_node->arg[i])
+		i++;
+	new_args = malloc(sizeof(char *) * (i + 2));
+	if (!new_args)
+		return ;
+	i = 0;
+	while (cmd_node->arg && cmd_node->arg[i])
+	{
+		new_args[i] = ft_strdup(cmd_node->arg[i]);
+		i++;
+	}
+	new_args[i] = ft_strdup(arg);
+	new_args[i + 1] = NULL;
+	free(cmd_node->arg);
+	cmd_node->arg = new_args;
+}
+
+t_node	*create_command_node(char *cmd, t_node_type type)
+{
+	t_node	*node;
+
+	node = create_node(type);
+	if (!node)
 		return (NULL);
-	root = parse_pipeline(parser);
-	// if (parser->error)
-	// {
-	// 	if (root)
-	// 		free_ast_node(root);
-	// 	root = NULL;
-	// }
-	// if (parser->error_msg)
-	// 	free(parser->error_msg);
-	free(parser);
-	return (root);
+	node->cmd = ft_strdup(cmd);
+	return (node);
+}
+
+t_node	*parse_simple_command(t_parser *parser, t_node **head)
+{
+	t_node	*first_node;
+
+	first_node = NULL;
+	while (parser->current_token)
+	{
+		if (is_redir_token(parser->current_token->type))
+		{
+			parse_redirection(parser, head);
+			if (parser->error)
+				return (NULL);
+		}
+		else if (parser->current_token->type == TOKEN_WORD)
+		{
+			if (!first_node)
+			{
+				first_node = create_command_node(parser->current_token->value, NODE_COMMAND);
+				add_node_to_back(head, first_node);
+				consume_token(parser);
+			}
+			else
+			{
+				add_arg_to_command(parser->current_token->value, first_node);
+				consume_token(parser);
+			}
+		}
+		else if (parser->current_token->type == TOKEN_PIPE)
+		{
+			parse_pipe(parser, head);
+			if (parser->error)
+				return (NULL);
+			break ;
+		}
+		else
+			break ;
+	}
+	return (first_node);
+}
+
+t_node	*parse(t_parser *parser)
+{
+	t_node *head;
+
+	head = NULL;
+	if (!parser->token_list)
+		return (NULL);
+	while (parser->current_token && !parser->error)
+	{
+		parse_simple_command(parser, &head);
+		if (parser->error)
+			break ;
+	}
+	return (head);
 }
 
 /* ************************************************************************** */
@@ -598,7 +590,7 @@ t_token	*tokenize(char *input)
 	while (peek(tokenizer))
 	{
 		skip_whitespace(tokenizer);
-		if (peek(tokenizer) == '\0')
+		if (peek(tokenizer) == '\0' || peek(tokenizer) == '\n')
 			break ;
 		if (is_operator(peek(tokenizer)))
 			new_token = create_op_token(tokenizer);
@@ -624,6 +616,194 @@ t_token	*tokenize(char *input)
 
 /* ************************************************************************** */
 /*                                                                            */
+/*                                        main.c                              */
+/*                                                                            */
+/* ************************************************************************** */
+
+void	ft_error(t_minishell *shell, char *msg)
+{
+	printf("%s\n", msg);
+	free_tokens(shell->token_list);
+}
+
+void	init_shell(t_minishell *shell, char **env)
+{
+	shell->user_input = NULL;
+	shell->env = env;
+	shell->token_list = NULL;
+	shell->parser_list = NULL;
+	shell->parser = NULL;
+}
+
+// void cleanup(t_minishell *shell)
+// {
+// 	if (shell->token_list)
+// 	{
+// 		free_tokens(shell->token_list);
+// 		shell->token_list = NULL;
+// 	}
+// 	if (shell->parser->error_msg)
+// 	{
+// 		free(shell->parser->error_msg);
+// 		shell->parser->error_msg = NULL;
+// 	}
+// 	if (shell->user_input)
+// 	{
+// 		free(shell->user_input);
+// 		shell->user_input = NULL;
+// 	}
+// 	if (shell->parser)
+// 	{
+// 		free(shell->parser);
+// 		shell->parser = NULL;
+// 	}
+// 	if (shell->parser_list)
+// 	{
+// 		free_nodes(shell->parser_list);
+// 		shell->parser_list = NULL;
+// 	}
+// }
+
+void reset_main(t_minishell *shell)
+{
+	free_tokens(shell->token_list);
+	free(shell->user_input);
+	shell->parser_list = NULL;
+	shell->token_list = NULL;
+	shell->user_input = NULL;
+}
+
+int	check_token_error(t_minishell *shell)
+{
+	t_token	*current;
+
+	current = shell->token_list;
+	while (current)
+	{
+		if (current->type == TOKEN_ERROR)
+		{
+			printf("%s\n", current->value);
+			free_tokens(shell->token_list);
+			shell->token_list = NULL;
+			return (1);
+		}
+		current = current->next;
+	}
+	return (0);
+}
+
+// void cleanup_parser(t_minishell *shell)
+// {
+// 	free_tokens(shell->token_list);
+// 	free(shell->parser->error_msg);
+// 	free(shell->user_input);
+// 	// free(shell->parser);
+// 	// free_nodes(shell->parser_list);
+// 	shell->token_list = NULL;
+// 	// shell->parser->error_msg = NULL;
+// 	shell->user_input = NULL;
+// }
+
+void	main_parse(t_minishell *shell)
+{
+	shell->parser = init_parser(shell->token_list);
+	if (!shell->parser)
+	{
+		fprintf(stderr, "Failed to initialize parser\n");
+		free_tokens(shell->token_list);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+		// cleanup_parser(shell);
+	}
+	shell->parser_list = parse(shell->parser);
+	if (shell->parser->error)
+	{
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
+		free_tokens(shell->token_list);
+		free(shell->parser->error_msg);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+		// cleanup_parser(shell);
+	}
+	if (!shell->parser_list)
+	{
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
+		free_tokens(shell->token_list);
+		free(shell->parser->error_msg);
+		free(shell->user_input);
+		shell->token_list = NULL;
+		shell->user_input = NULL;
+		// cleanup_parser(shell);
+	}
+}
+
+// gets the user input and also enables the use of arrow keys to navigate the input
+char *get_user_input(char **line)
+{
+	*line = readline("minishell$ ");
+	if (!*line) // for Ctrl+D signal - to exit the program cleanly
+	{
+		printf("exit\n");
+		exit(1); // exit status is wrong though
+	}
+	if (!**line)
+	{
+		free(*line);
+		*line = NULL;
+		return (NULL);
+	}
+	add_history(*line);
+	return (*line);
+}
+
+// handles Ctrl+C signal
+void signal_handler(int signum)
+{
+	if (signum == SIGINT)
+	{
+		printf("\n");
+		rl_on_new_line();
+		rl_redisplay();
+	}
+}
+
+int main(int argc, char **argv, char **envp)
+{
+	char		*line;
+	t_minishell	shell;
+
+	(void)argv;
+	if (argc != 1)
+		return(printf("Program does not accept arguments.\n"), 1);
+	init_shell(&shell, envp);
+	signal(SIGINT, signal_handler);
+	while (1)
+	{
+		line = NULL;
+		if (!get_user_input(&line))
+			continue;
+		shell.user_input = line;
+		shell.token_list = tokenize(shell.user_input);
+		if (check_token_error(&shell))
+		{
+			free(shell.user_input);
+			shell.user_input = NULL;
+			continue ;
+		}
+		else
+			main_parse(&shell);
+		// print_tokens(shell.token_list);
+		// print_nodes(shell.parser_list);
+		reset_main(&shell);
+	}
+	return (0);
+}
+
+
+/* ************************************************************************** */
+/*                                                                            */
 /*                                        test.c                              */
 /*                                                                            */
 /* ************************************************************************** */
@@ -646,52 +826,52 @@ void print_tokens(t_token *head)
     }
 }
 
-void print_ast(t_ast *node, int depth)
+void print_nodes(t_node *head)
 {
-    int i;
+	t_node	*current;
 
-    if (!node)
-        return;
-
-    // Print indentation
-    for (i = 0; i < depth; i++)
-        printf("  ");
-
-    // Print node type
-    switch (node->type)
-    {
-        case NODE_COMMAND:
-            printf("COMMAND: ");
-            i = 0;
-            while (node->args && node->args[i])
-            {
-                printf("%s ", node->args[i]);
-                i++;
-            }
-            printf("\n");
-            break;
-        case NODE_PIPE:
-            printf("PIPE\n");
-            break;
-        case NODE_REDIR_IN:
-            printf("REDIR_IN: %s\n", node->redir_file);
-            break;
-        case NODE_REDIR_OUT:
-            printf("REDIR_OUT: %s\n", node->redir_file);
-            break;
-        case NODE_HEREDOC:
-            printf("HEREDOC: %s\n", node->heredoc_delim);
-            break;
-        case NODE_APPEND:
-            printf("APPEND: %s\n", node->redir_file);
-            break;
-    }
-
-    // Recursively print children
-    if (node->left)
-        print_ast(node->left, depth + 1);
-    if (node->right)
-        print_ast(node->right, depth + 1);
+	current = head;
+	// while (current)
+	// {
+	// 	if (current->type == NODE_COMMAND)
+	// 		printf("Command: %s\n", current->cmd);
+	// 	// else if (current->type == NODE_ARG)
+	// 	// 	printf("Arg: %s\n", current->arg);
+	// 	else if (current->type == NODE_PIPE)
+	// 		printf("Pipe\n");
+	// 	else if (current->type == NODE_REDIR_IN)
+	// 		printf("Redir in: %s\n", current->redir_file);
+	// 	else if (current->type == NODE_REDIR_OUT)
+	// 		printf("Redir out: %s\n", current->redir_file);
+	// 	else if (current->type == NODE_HEREDOC)
+	// 		printf("Heredoc: %s\n", current->heredoc_delim);
+	// 	else if (current->type == NODE_APPEND)
+	// 		printf("Append: %s\n", current->redir_file);
+	// 	current = current->next;
+	// }
+	while (current)
+	{
+		if (current->type == NODE_COMMAND)
+		{
+			printf("Command: %s\n", current->cmd);
+			if (current->arg)
+			{
+				for (int i = 0; current->arg[i]; i++)
+					printf("Arg: %s\n", current->arg[i]);
+			}
+		}
+		else if (current->type == NODE_PIPE)
+			printf("Pipe\n");
+		else if (current->type == NODE_REDIR_IN)
+			printf("Redir in: %s\n", current->redir_file);
+		else if (current->type == NODE_REDIR_OUT)
+			printf("Redir out: %s\n", current->redir_file);
+		else if (current->type == NODE_HEREDOC)
+			printf("Heredoc: %s\n", current->heredoc_delim);
+		else if (current->type == NODE_APPEND)
+			printf("Append: %s\n", current->redir_file);
+		current = current->next;
+	}
 }
 
 /* Test cases */
@@ -768,123 +948,3 @@ void print_ast(t_ast *node, int depth)
 //     test_parser();
 //     return 0;
 // }
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                        main.c                              */
-/*                                                                            */
-/* ************************************************************************** */
-
-void	ft_error(t_minishell *shell, char *msg)
-{
-	printf("%s\n", msg);
-	free_tokens(shell->token_list);
-}
-
-void	init_shell(t_minishell *shell, char **env)
-{
-	shell->user_input = NULL;
-	shell->env = env;
-	shell->token_list = NULL;
-	shell->parser_tree = NULL;
-	shell->parser = NULL;
-}
-
-void reset_main(t_minishell *shell)
-{
-	free_tokens(shell->token_list);
-	free_ast_node(shell->parser_tree);
-	free(shell->user_input);
-	shell->token_list = NULL;
-	shell->parser_tree = NULL;
-	shell->user_input = NULL;
-}
-
-int	check_token_error(t_minishell *shell)
-{
-	t_token	*current;
-
-	current = shell->token_list;
-	while (current)
-	{
-		if (current->type == TOKEN_ERROR)
-		{
-			printf("%s\n", current->value);
-			free_tokens(shell->token_list);
-			shell->token_list = NULL;
-			return (1);
-		}
-		current = current->next;
-	}
-	return (0);
-}
-
-void	main_parse(t_minishell *shell)
-{
-	shell->parser = init_parser(shell->token_list);
-	if (!shell->parser)
-	{
-		fprintf(stderr, "Failed to initialize parser\n");
-		free_tokens(shell->token_list);
-		free(shell->user_input);
-		shell->token_list = NULL;
-		shell->user_input = NULL;
-	}
-	shell->parser_tree = parse(shell->parser, shell->token_list);
-	if (!shell->parser_tree)
-	{
-		fprintf(stderr, "%s\n", shell->parser->error_msg);
-		free_tokens(shell->token_list);
-		free(shell->parser->error_msg);
-		free(shell->user_input);
-		shell->token_list = NULL;
-		shell->user_input = NULL;
-	}
-}
-
-void cleanup(t_minishell *shell)
-{
-	free_ast_node(shell->parser_tree);
-	free_tokens(shell->token_list);
-	free(shell->user_input);
-	shell->parser_tree = NULL;
-	shell->token_list = NULL;
-	shell->user_input = NULL;
-}
-
-int main(int argc, char **argv, char **envp)
-{
-	char		*line;
-	t_minishell	shell;
-
-	(void)argv;
-	if (argc != 1)
-		return(printf("Program does not accept arguments.\n"), 1);
-	init_shell(&shell, envp);
-	while (1)
-	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (!*line)
-		{
-			free(line);
-			continue ;
-		}
-		// add_history(line);
-		shell.user_input = line;
-		shell.token_list = tokenize(shell.user_input);
-		if (check_token_error(&shell))
-		{
-			free(shell.user_input);
-			shell.user_input = NULL;
-			continue ;
-		}
-		else
-			main_parse(&shell);
-		print_tokens(shell.token_list);
-		print_ast(shell.parser_tree, 0);
-		cleanup(&shell);
-	}
-	return (0);
-}

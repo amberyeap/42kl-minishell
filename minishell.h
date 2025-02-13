@@ -14,7 +14,7 @@
 # define MINISHELL_H
 
 # include <readline/readline.h> // readline, add_history, rl_clear_history, rl_on_new_line, rl_replace_line, rl_redisplay
-// # include <readline/history.h>
+# include <readline/history.h>
 # include <stdio.h> // printf, perror
 # include <stdlib.h> // malloc, free, exit
 # include <unistd.h> // write, access, open, read, close, fork, pipe, isatty, ttyname, ttyslot, getcwd, chdir, unlink, execve, dup, dup2 
@@ -33,33 +33,6 @@
 # include "library/ft_printf/inc/ft_printf.h"
 # include "library/get_next_line/get_next_line.h"
 # include "library/get_next_line/get_next_line_bonus.h"
-
-// # define MAX_TOKENS 100
-
-// # define DELIMITERS " \t\n"
-// # define PIPE "|"
-// # define REDIR_IN "<"
-// # define REDIR_HEREDOC "<<"
-// # define REDIR_OUT ">"
-// # define REDIR_APPEND ">>"
-
-// typedef enum e_token_type
-// {
-// 	WORD, // commands like 'echo', 'ls', 'cat', etc.
-// 	PIPE, // '|'
-// 	REDIR_IN, // '<'
-// 	HEREDOC, // '<<'
-// 	REDIR_OUT, // '>'
-// 	APPEND, // '>>'
-// }	t_token_type;
-
-// typedef struct s_lexer
-// {
-// 	char *value;
-// 	t_token_type *type;
-// 	struct s_lexer *next;
-// }	t_lexer;
-
 
 
 #endif
