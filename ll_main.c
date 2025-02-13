@@ -5,7 +5,7 @@
 //   - tokens DONE
 //   - parser DONE
 // - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
-// - empty input DONE
+// - empty input -> prints (null)
 // - functions too long
 
 // - handle expansion -> done in execution section
@@ -43,7 +43,7 @@ typedef struct s_tokenizer
 typedef enum s_node_type
 {
 	NODE_COMMAND,
-	NODE_ARG,
+	// NODE_ARG,
 	NODE_PIPE,
 	NODE_REDIR_IN,
 	NODE_REDIR_OUT,
@@ -70,8 +70,7 @@ typedef struct s_node
 {
 	t_node_type		type;
 	char			*cmd;
-	// char			*arg;
-	char			**arg; // if NODE_ARG is not used, then this is not needed
+	char			**arg;
 	char			*heredoc_delim;
 	char			*redir_file;
 	t_direction		redir_direction; // the direction of the redir token
@@ -165,10 +164,11 @@ t_parser	*init_parser(t_token *token_list)
 	return (parser);
 }
 
-void free_ast(t_node *head)
+void free_nodes(t_node *head)
 {
 	t_node	*current;
 	t_node	*next;
+	int		i;
 
 	current = head;
 	while (current)
@@ -177,7 +177,15 @@ void free_ast(t_node *head)
 		if (current->cmd)
 			free(current->cmd);
 		if (current->arg)
+		{
+			i = 0;
+			while (current->arg[i])
+			{
+				free(current->arg[i]);
+				i++;
+			}
 			free(current->arg);
+		}
 		if (current->heredoc_delim)
 			free(current->heredoc_delim);
 		if (current->redir_file)
@@ -582,7 +590,7 @@ t_token	*tokenize(char *input)
 	while (peek(tokenizer))
 	{
 		skip_whitespace(tokenizer);
-		if (peek(tokenizer) == '\0')
+		if (peek(tokenizer) == '\0' || peek(tokenizer) == '\n')
 			break ;
 		if (is_operator(peek(tokenizer)))
 			new_token = create_op_token(tokenizer);
@@ -627,13 +635,41 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
+// void cleanup(t_minishell *shell)
+// {
+// 	if (shell->token_list)
+// 	{
+// 		free_tokens(shell->token_list);
+// 		shell->token_list = NULL;
+// 	}
+// 	if (shell->parser->error_msg)
+// 	{
+// 		free(shell->parser->error_msg);
+// 		shell->parser->error_msg = NULL;
+// 	}
+// 	if (shell->user_input)
+// 	{
+// 		free(shell->user_input);
+// 		shell->user_input = NULL;
+// 	}
+// 	if (shell->parser)
+// 	{
+// 		free(shell->parser);
+// 		shell->parser = NULL;
+// 	}
+// 	if (shell->parser_list)
+// 	{
+// 		free_nodes(shell->parser_list);
+// 		shell->parser_list = NULL;
+// 	}
+// }
+
 void reset_main(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
-	// free_ast_node(shell->parser_tree);
 	free(shell->user_input);
-	shell->token_list = NULL;
 	shell->parser_list = NULL;
+	shell->token_list = NULL;
 	shell->user_input = NULL;
 }
 
@@ -656,6 +692,18 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
+// void cleanup_parser(t_minishell *shell)
+// {
+// 	free_tokens(shell->token_list);
+// 	free(shell->parser->error_msg);
+// 	free(shell->user_input);
+// 	// free(shell->parser);
+// 	// free_nodes(shell->parser_list);
+// 	shell->token_list = NULL;
+// 	// shell->parser->error_msg = NULL;
+// 	shell->user_input = NULL;
+// }
+
 void	main_parse(t_minishell *shell)
 {
 	shell->parser = init_parser(shell->token_list);
@@ -666,6 +714,7 @@ void	main_parse(t_minishell *shell)
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
+		// cleanup_parser(shell);
 	}
 	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error)
@@ -676,6 +725,7 @@ void	main_parse(t_minishell *shell)
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
+		// cleanup_parser(shell);
 	}
 	if (!shell->parser_list)
 	{
@@ -685,17 +735,27 @@ void	main_parse(t_minishell *shell)
 		free(shell->user_input);
 		shell->token_list = NULL;
 		shell->user_input = NULL;
+		// cleanup_parser(shell);
 	}
 }
 
-void cleanup(t_minishell *shell)
+// gets the user input and also enables the use of arrow keys to navigate the input
+char *get_user_input(char **line)
 {
-	// free_ast_node(shell->parser_list);
-	free_tokens(shell->token_list);
-	free(shell->user_input);
-	shell->parser_list = NULL;
-	shell->token_list = NULL;
-	shell->user_input = NULL;
+	*line = readline("minishell$ ");
+	if (!*line) // for Ctrl+D signal - to exit the program cleanly
+	{
+		printf("exit\n");
+		exit(1); // exit status is wrong though
+	}
+	if (!**line)
+	{
+		free(*line);
+		*line = NULL;
+		return (NULL);
+	}
+	add_history(*line);
+	return (*line);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -709,15 +769,9 @@ int main(int argc, char **argv, char **envp)
 	init_shell(&shell, envp);
 	while (1)
 	{
-		line = readline("minishell$ ");
-		if (!line)
-			break ;
-		if (!*line)
-		{
-			free(line);
-			continue ;
-		}
-		// add_history(line);
+		line = NULL;
+		if (!get_user_input(&line))
+			continue;
 		shell.user_input = line;
 		shell.token_list = tokenize(shell.user_input);
 		if (check_token_error(&shell))
@@ -730,7 +784,7 @@ int main(int argc, char **argv, char **envp)
 			main_parse(&shell);
 		// print_tokens(shell.token_list);
 		// print_nodes(shell.parser_list);
-		cleanup(&shell);
+		reset_main(&shell);
 	}
 	return (0);
 }
