@@ -133,6 +133,8 @@ void	consume_token(t_parser *parser)
 
 void	set_parser_error(t_parser *parser, char *msg)
 {
+	if (parser->error_msg)
+		free(parser->error_msg);
 	parser->error = 1;
 	parser->error_msg = ft_strdup(msg);
 }
@@ -359,9 +361,9 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 // 4. if the current token is not a word token, it will break out of the loop
 t_node	*parse_simple_command(t_parser *parser, t_node **head)
 {
-	t_node	*first_node;
+	t_node	*cmd_node;
 
-	first_node = NULL;
+	cmd_node = NULL;
 	while (parser->current_token)
 	{
 		if (is_redir_token(parser->current_token->type))
@@ -372,17 +374,14 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 		}
 		else if (parser->current_token->type == TOKEN_WORD)
 		{
-			if (!first_node)
+			if (!cmd_node)
 			{
-				first_node = create_command_node(parser->current_token->value, NODE_COMMAND);
-				add_node_to_back(head, first_node);
-				consume_token(parser);
+				cmd_node = create_command_node(parser->current_token->value, NODE_COMMAND);
+				add_node_to_back(head, cmd_node);
 			}
 			else
-			{
-				add_arg_to_command(parser->current_token->value, first_node);
-				consume_token(parser);
-			}
+				add_arg_to_command(parser->current_token->value, cmd_node);
+			consume_token(parser);
 		}
 		else if (parser->current_token->type == TOKEN_PIPE)
 		{
@@ -394,7 +393,7 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 		else
 			break ;
 	}
-	return (first_node);
+	return (cmd_node);
 }
 
 // while the current token is not NULL and there is no error, it will keep parsing the tokens
@@ -556,20 +555,19 @@ char	*append_and_free(char *base, char *append)
 	return (new_str);
 }
 
+// creates a word token
 t_token	*create_word_token(t_tokenizer *tokenizer)
 {
 	char	*word;
 	char	*quoted_word;
 	char	*unquoted_word;
-	char	quote;
 
 	word = ft_strdup("");
 	while (peek(tokenizer))
 	{
 		if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 		{
-			quote = peek(tokenizer);
-			quoted_word = handle_quotes(tokenizer, quote);
+			quoted_word = handle_quotes(tokenizer, peek(tokenizer));
 			if (!quoted_word)
 				return (create_token(TOKEN_ERROR, "Unterminated quote"));
 			word = append_and_free(word, quoted_word);
@@ -586,42 +584,9 @@ t_token	*create_word_token(t_tokenizer *tokenizer)
 	}
 	if (word)
 		return (create_token(TOKEN_WORD, word));
+	free(word);
 	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
 }
-
-// creates a word token
-/* 1. if the current char is a quote, it will call handle_quotes() (34 is double quote, 39 is single quote)
-*/
-// t_token	*create_word_token(t_tokenizer *tokenizer)
-// {
-// 	int		start;
-// 	int		len;
-// 	char	*word;
-// 	t_token	*token;
-
-// 	word = ft_strdup("");
-// 	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
-// 	{
-// 		word = handle_quotes(tokenizer, word);
-// 		if (!word)
-// 			return (create_token(TOKEN_ERROR, "Unterminated quote"));
-// 	}
-// 	else
-// 	{
-// 		start = tokenizer->position;
-// 		while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
-// 			next_char(tokenizer);
-// 		len = tokenizer->position - start;
-// 		word = ft_substr(tokenizer->user_input, start, len);
-// 	}
-// 	if (word)
-// 	{
-// 		token = create_token(TOKEN_WORD, word);
-// 		free(word);
-// 		return (token);
-// 	}
-// 	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
-// }
 
 // creates an operator token
 t_token	*create_op_token(t_tokenizer *tokenizer)
@@ -724,13 +689,56 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
+void	free_node(t_node *node)
+{
+	int	i;
+	
+	i = 0;
+	if (!node)
+		return ;
+	if (node->cmd)
+		free(node->cmd);
+	if (node->arg)
+	{
+		while (node->arg[i])
+		{
+			free(node->arg[i]);
+			i++;
+		}
+		free(node->arg);
+	}
+	if (node->heredoc_delim)
+		free(node->heredoc_delim);
+	if (node->redir_file)
+		free(node->redir_file);
+	free(node);
+}
+
+void	free_command_nodes(t_node *head)
+{
+	t_node	*current;
+
+	while (head)
+	{
+		current = head->next;
+		free_node(head);
+		head = current;
+	}
+}
+
 void	reset_main(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
 	free(shell->user_input);
-	shell->parser_list = NULL;
-	shell->token_list = NULL;
-	shell->user_input = NULL;
+	if (shell->parser->error_msg)
+		free(shell->parser->error_msg);
+	free_command_nodes(shell->parser_list);
+	// shell->parser->error = 0;
+	// shell->parser->error_msg = NULL;
+	// shell->parser_list = NULL;
+	// shell->token_list = NULL;
+	// shell->user_input = NULL;
+	free(shell->parser);
 }
 
 int	check_token_error(t_minishell *shell)
@@ -752,17 +760,17 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
-// void cleanup_parser(t_minishell *shell)
-// {
-// 	free_tokens(shell->token_list);
-// 	free(shell->parser->error_msg);
-// 	free(shell->user_input);
-// 	// free(shell->parser);
-// 	// free_nodes(shell->parser_list);
-// 	shell->token_list = NULL;
-// 	// shell->parser->error_msg = NULL;
-// 	shell->user_input = NULL;
-// }
+void	cleanup_parser(t_minishell *shell)
+{
+	free_tokens(shell->token_list);
+	free(shell->user_input);
+	if (shell->parser->error_msg)
+		free(shell->parser->error_msg);
+	free(shell->parser);
+	shell->parser_list = NULL;
+	shell->token_list = NULL;
+	shell->user_input = NULL;
+}
 
 void	main_parse(t_minishell *shell)
 {
@@ -770,32 +778,18 @@ void	main_parse(t_minishell *shell)
 	if (!shell->parser)
 	{
 		ft_putstr_fd("Failed to initialize parser\n", 2);
-		free_tokens(shell->token_list);
-		free(shell->user_input);
-		shell->token_list = NULL;
-		shell->user_input = NULL;
-		// cleanup_parser(shell);
+		cleanup_parser(shell);
 	}
 	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error)
 	{
 		ft_putstr_fd(shell->parser->error_msg, 2);
-		free_tokens(shell->token_list);
-		free(shell->parser->error_msg);
-		free(shell->user_input);
-		shell->token_list = NULL;
-		shell->user_input = NULL;
-		// cleanup_parser(shell);
+		cleanup_parser(shell);
 	}
 	if (!shell->parser_list)
 	{
 		ft_putstr_fd(shell->parser->error_msg, 2);
-		free_tokens(shell->token_list);
-		free(shell->parser->error_msg);
-		free(shell->user_input);
-		shell->token_list = NULL;
-		shell->user_input = NULL;
-		// cleanup_parser(shell);
+		cleanup_parser(shell);
 	}
 }
 
