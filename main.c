@@ -4,15 +4,13 @@
 // - syntax error
 //   - tokens DONE
 //   - parser DONE
-// - handle quotes DONE
+// - handle quotes DONE-ish -> need to handle words that are joined to the quoted word (eg: "hello"world)
 // - empty input -> prints (null) DONE
 // - functions too long
-// - need to handle escape characters (\)
 
 // - handle expansion -> done in execution section
 // - handle exit codes 
 // - handle signals
-//		- Ctrl + \ ??
 // - handle history
 
 typedef enum e_token_type
@@ -45,7 +43,6 @@ typedef struct s_tokenizer
 typedef enum s_node_type
 {
 	NODE_COMMAND,
-	// NODE_ARG,
 	NODE_PIPE,
 	NODE_REDIR_IN,
 	NODE_REDIR_OUT,
@@ -117,14 +114,13 @@ int	is_operator(char c)
 /*                                                                            */
 /* ************************************************************************** */
 
-int	is_redir_token(t_token_type type)
+int is_redir_token(t_token_type type)
 {
 	if (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT || type == TOKEN_HEREDOC || type == TOKEN_APPEND)
 		return (1);
 	return (0);
 }
 
-// moves to the next token
 void	consume_token(t_parser *parser)
 {
 	if (parser->current_token)
@@ -133,8 +129,6 @@ void	consume_token(t_parser *parser)
 
 void	set_parser_error(t_parser *parser, char *msg)
 {
-	if (parser->error_msg)
-		free(parser->error_msg);
 	parser->error = 1;
 	parser->error_msg = ft_strdup(msg);
 }
@@ -169,8 +163,7 @@ t_parser	*init_parser(t_token *token_list)
 	return (parser);
 }
 
-// need to check if this is freeing the nodes properly
-void	free_nodes(t_node *head)
+void free_nodes(t_node *head)
 {
 	t_node	*current;
 	t_node	*next;
@@ -224,7 +217,6 @@ t_node	*create_node(t_node_type type)
 	return (node);
 }
 
-// to check the type of redirection and create the appropriate node
 t_node	*create_redir_node(t_token_type type)
 {
 	t_node	*redir_node;
@@ -253,14 +245,6 @@ t_node	*create_redir_node(t_token_type type)
 	return (redir_node);
 }
 
-// parses the redirection
-// 1. creates a redirection node
-// 2. adds the redirection node to the list
-// 3. consumes the token
-// 4. checks if the next token is a word token
-//	- if it is, it will set the redir_file or heredoc_delim
-//	- if it is not, it will set the parser error
-// grammar: there will always be a filename after the redirection token
 void	parse_redirection(t_parser *parser, t_node **head)
 {
 	t_node			*redir_node;
@@ -290,17 +274,9 @@ void	parse_redirection(t_parser *parser, t_node **head)
 	add_node_to_back(head, redir_node);
 }
 
-// parses the pipe
-// 1. creates a pipe node
-// 2. adds the pipe node to the list
-// 3. consumes the token
-// 4. checks if the next token is a word token
-//	- if it is, it will call parse_simple_command()
-//	- if it is not, it will set the parser error
-// grammar: there will always be a command after the pipe token
-void	parse_pipe(t_parser *parser, t_node **head)
+void parse_pipe(t_parser *parser, t_node **head)
 {
-	t_node	*pipe_node;
+	t_node *pipe_node;
 
 	pipe_node = create_node(NODE_PIPE);
 	if (!pipe_node)
@@ -342,7 +318,6 @@ void	add_arg_to_command(char *arg, t_node *cmd_node)
 	cmd_node->arg = new_args;
 }
 
-// creates a command node and copies the command into the node
 t_node	*create_command_node(char *cmd, t_node_type type)
 {
 	t_node	*node;
@@ -354,16 +329,23 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 	return (node);
 }
 
-// parses the command
-// 1. if the current token is a redirection token, it will call parse_redirection()
-// 2. if the current token is a word token, it will create a command node and add it to the list
-// 3. if the current token is a pipe token, it will call parse_pipe()
-// 4. if the current token is not a word token, it will break out of the loop
+void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
+{
+	if (!*first_node)
+	{
+		*first_node = create_command_node(parser->current_token->value, NODE_COMMAND);
+		add_node_to_back(head, *first_node);
+	}
+	else
+		add_arg_to_command(parser->current_token->value, *first_node);
+	consume_token(parser);
+}
+
 t_node	*parse_simple_command(t_parser *parser, t_node **head)
 {
-	t_node	*cmd_node;
+	t_node	*first_node;
 
-	cmd_node = NULL;
+	first_node = NULL;
 	while (parser->current_token)
 	{
 		if (is_redir_token(parser->current_token->type))
@@ -373,16 +355,7 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 				return (NULL);
 		}
 		else if (parser->current_token->type == TOKEN_WORD)
-		{
-			if (!cmd_node)
-			{
-				cmd_node = create_command_node(parser->current_token->value, NODE_COMMAND);
-				add_node_to_back(head, cmd_node);
-			}
-			else
-				add_arg_to_command(parser->current_token->value, cmd_node);
-			consume_token(parser);
-		}
+			handle_word_token(parser, head, &first_node);
 		else if (parser->current_token->type == TOKEN_PIPE)
 		{
 			parse_pipe(parser, head);
@@ -393,14 +366,12 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 		else
 			break ;
 	}
-	return (cmd_node);
+	return (first_node);
 }
 
-// while the current token is not NULL and there is no error, it will keep parsing the tokens
-// if there is an error, it will break out of the loop
 t_node	*parse(t_parser *parser)
 {
-	t_node	*head;
+	t_node *head;
 
 	head = NULL;
 	if (!parser->token_list)
@@ -509,116 +480,80 @@ void	add_token(t_token **head, t_token *new_token)
 	current->next = new_token;
 }
 
-int	is_quote(char c)
-{
-	return (c == 34 || c == 39);
-}
-
-char	*handle_quotes(t_tokenizer *tokenizer, char quote)
-{
-	int		start;
-	int		len;
-	char	*quoted_word;
-
-	next_char(tokenizer); // skip the opening quote
-	start = tokenizer->position;
-	while (peek(tokenizer) && peek(tokenizer) != quote)
-		next_char(tokenizer);
-	if (peek(tokenizer) != quote)
-		return (NULL);
-	len = tokenizer->position - start;
-	quoted_word = ft_substr(tokenizer->user_input, start, len);
-	next_char(tokenizer); // skip the closing quote
-	return (quoted_word);
-}
-
-char	*handle_word(t_tokenizer *tokenizer)
+char	*handle_quotes(t_tokenizer *tokenizer)
 {
 	int		start;
 	int		len;
 	char	*word;
+	char	quote;
 
+	quote = peek(tokenizer);
+	next_char(tokenizer);
 	start = tokenizer->position;
-	while (!is_whitespace(peek(tokenizer)) && !is_quote(peek(tokenizer)) && peek(tokenizer))
+	while (peek(tokenizer) != quote && peek(tokenizer))
 		next_char(tokenizer);
 	len = tokenizer->position - start;
+	if (peek(tokenizer) != quote)
+		return (NULL);
 	word = ft_substr(tokenizer->user_input, start, len);
+	next_char(tokenizer);
 	return (word);
 }
 
-char	*append_and_free(char *base, char *append)
-{
-	char	*new_str;
-
-	new_str = ft_strjoin(base, append);
-	free(base);
-	return (new_str);
-}
-
 // creates a word token
-t_token	*create_word_token(t_tokenizer *tokenizer)
+/* 1. if the current char is a quote, it will call handle_quotes() (34 is double quote, 39 is single quote)
+*/
+t_token *create_word_token(t_tokenizer *tokenizer)
 {
+	int		start;
+	int		len;
 	char	*word;
-	char	*quoted_word;
-	char	*unquoted_word;
 
-	word = ft_strdup("");
-	while (peek(tokenizer))
+	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 	{
-		if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
-		{
-			quoted_word = handle_quotes(tokenizer, peek(tokenizer));
-			if (!quoted_word)
-				return (create_token(TOKEN_ERROR, "Unterminated quote"));
-			word = append_and_free(word, quoted_word);
-			free(quoted_word);
-		}
-		else if (is_whitespace(peek(tokenizer)) || is_operator(peek(tokenizer)))
-			break ;
-		else
-		{
-			unquoted_word = handle_word(tokenizer);
-			word = append_and_free(word, unquoted_word);
-			free(unquoted_word);
-		}
+		word = handle_quotes(tokenizer);
+		if (!word)
+			return (create_token(TOKEN_ERROR, "Unterminated quote"));
+	}
+	else
+	{
+		start = tokenizer->position;
+		while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
+			next_char(tokenizer);
+		len = tokenizer->position - start;
+		word = ft_substr(tokenizer->user_input, start, len);
 	}
 	if (word)
 		return (create_token(TOKEN_WORD, word));
-	free(word);
 	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
 }
 
 // creates an operator token
 t_token	*create_op_token(t_tokenizer *tokenizer)
 {
-	if (peek(tokenizer) == '|')
-	{
-		next_char(tokenizer);
+	char	op;
+
+	op = peek(tokenizer);
+	next_char(tokenizer);
+	if (op == '|')
 		return (create_token(TOKEN_PIPE, NULL));
-	}
-	else if (peek(tokenizer) == '<')
+	else if (op == '<' || op == '>')
 	{
-		next_char(tokenizer);
-		if (peek(tokenizer) == '<')
+		if (peek(tokenizer) == op)
 		{
 			next_char(tokenizer);
-			return (create_token(TOKEN_HEREDOC, NULL));
-		}
-		else
-			return (create_token(TOKEN_REDIR_IN, NULL));
-	}
-	else if (peek(tokenizer) == '>')
-	{
-		next_char(tokenizer);
-		if (peek(tokenizer) == '>')
-		{
-			next_char(tokenizer);
+			if (op == '<')
+				return (create_token(TOKEN_HEREDOC, NULL));
 			return (create_token(TOKEN_APPEND, NULL));
 		}
 		else
+		{
+			if (op == '<')
+				return (create_token(TOKEN_REDIR_IN, NULL));
 			return (create_token(TOKEN_REDIR_OUT, NULL));
+		}
 	}
-	return (create_token(TOKEN_ERROR, "Unrecognized operator")); // most likely will not reach here?
+	return (create_token(TOKEN_ERROR, "Unrecognized operator"));
 }
 
 // main tokenize function
@@ -644,7 +579,7 @@ t_token	*tokenize(char *input)
 	while (peek(tokenizer))
 	{
 		skip_whitespace(tokenizer);
-		if (peek(tokenizer) == '\0')
+		if (peek(tokenizer) == '\0' || peek(tokenizer) == '\n')
 			break ;
 		if (is_operator(peek(tokenizer)))
 			new_token = create_op_token(tokenizer);
@@ -689,56 +624,13 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
-void	free_node(t_node *node)
-{
-	int	i;
-	
-	i = 0;
-	if (!node)
-		return ;
-	if (node->cmd)
-		free(node->cmd);
-	if (node->arg)
-	{
-		while (node->arg[i])
-		{
-			free(node->arg[i]);
-			i++;
-		}
-		free(node->arg);
-	}
-	if (node->heredoc_delim)
-		free(node->heredoc_delim);
-	if (node->redir_file)
-		free(node->redir_file);
-	free(node);
-}
-
-void	free_command_nodes(t_node *head)
-{
-	t_node	*current;
-
-	while (head)
-	{
-		current = head->next;
-		free_node(head);
-		head = current;
-	}
-}
-
-void	reset_main(t_minishell *shell)
+void reset_main(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
 	free(shell->user_input);
-	if (shell->parser->error_msg)
-		free(shell->parser->error_msg);
-	free_command_nodes(shell->parser_list);
-	// shell->parser->error = 0;
-	// shell->parser->error_msg = NULL;
-	// shell->parser_list = NULL;
-	// shell->token_list = NULL;
-	// shell->user_input = NULL;
-	free(shell->parser);
+	shell->parser_list = NULL;
+	shell->token_list = NULL;
+	shell->user_input = NULL;
 }
 
 int	check_token_error(t_minishell *shell)
@@ -760,15 +652,16 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
-void	cleanup_parser(t_minishell *shell)
+void cleanup_parser(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
-	free(shell->user_input);
 	if (shell->parser->error_msg)
 		free(shell->parser->error_msg);
-	free(shell->parser);
-	shell->parser_list = NULL;
+	free(shell->user_input);
+	// free(shell->parser);
+	// free_nodes(shell->parser_list);
 	shell->token_list = NULL;
+	shell->parser->error_msg = NULL;
 	shell->user_input = NULL;
 }
 
@@ -777,24 +670,24 @@ void	main_parse(t_minishell *shell)
 	shell->parser = init_parser(shell->token_list);
 	if (!shell->parser)
 	{
-		ft_putstr_fd("Failed to initialize parser\n", 2);
+		fprintf(stderr, "Failed to initialize parser\n");
 		cleanup_parser(shell);
 	}
 	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error)
 	{
-		ft_putstr_fd(shell->parser->error_msg, 2);
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
 		cleanup_parser(shell);
 	}
 	if (!shell->parser_list)
 	{
-		ft_putstr_fd(shell->parser->error_msg, 2);
+		fprintf(stderr, "%s\n", shell->parser->error_msg);
 		cleanup_parser(shell);
 	}
 }
 
 // gets the user input and also enables the use of arrow keys to navigate the input
-char	*get_user_input(char **line)
+char *get_user_input(char **line)
 {
 	*line = readline("minishell$ ");
 	if (!*line) // for Ctrl+D signal - to exit the program cleanly
@@ -813,7 +706,7 @@ char	*get_user_input(char **line)
 }
 
 // handles Ctrl+C signal
-void	signal_handler(int signum)
+void signal_handler(int signum)
 {
 	if (signum == SIGINT)
 	{
@@ -823,7 +716,7 @@ void	signal_handler(int signum)
 	}
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
 	char		*line;
 	t_minishell	shell;
@@ -865,19 +758,19 @@ int	main(int argc, char **argv, char **envp)
 /* Debug function to print tokens */
 void print_tokens(t_token *head)
 {
-	t_token *current = head;
-	const char *type_strings[] = {
-		"WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
-		"HEREDOC", "APPEND", "ERROR", "EOF"
-	};
+    t_token *current = head;
+    const char *type_strings[] = {
+        "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
+        "HEREDOC", "APPEND", "ERROR", "EOF"
+    };
 
-	while (current) {
-		printf("Type: %-10s", type_strings[current->type]);
-		if (current->value)
-			printf(" Value: '%s'", current->value);
-		printf("\n");
-		current = current->next;
-	}
+    while (current) {
+        printf("Type: %-10s", type_strings[current->type]);
+        if (current->value)
+            printf(" Value: '%s'", current->value);
+        printf("\n");
+        current = current->next;
+    }
 }
 
 void print_nodes(t_node *head)
@@ -885,6 +778,24 @@ void print_nodes(t_node *head)
 	t_node	*current;
 
 	current = head;
+	// while (current)
+	// {
+	// 	if (current->type == NODE_COMMAND)
+	// 		printf("Command: %s\n", current->cmd);
+	// 	// else if (current->type == NODE_ARG)
+	// 	// 	printf("Arg: %s\n", current->arg);
+	// 	else if (current->type == NODE_PIPE)
+	// 		printf("Pipe\n");
+	// 	else if (current->type == NODE_REDIR_IN)
+	// 		printf("Redir in: %s\n", current->redir_file);
+	// 	else if (current->type == NODE_REDIR_OUT)
+	// 		printf("Redir out: %s\n", current->redir_file);
+	// 	else if (current->type == NODE_HEREDOC)
+	// 		printf("Heredoc: %s\n", current->heredoc_delim);
+	// 	else if (current->type == NODE_APPEND)
+	// 		printf("Append: %s\n", current->redir_file);
+	// 	current = current->next;
+	// }
 	while (current)
 	{
 		if (current->type == NODE_COMMAND)
