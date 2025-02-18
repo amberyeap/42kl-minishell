@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/18 19:13:19 by ayeap             #+#    #+#             */
+/*   Updated: 2025/02/18 19:13:19 by ayeap            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 // current checklist for parser:
@@ -12,10 +24,6 @@
 // - handle exit codes 
 // - handle signals
 // - handle history
-
-
-
-t_node	*parse_simple_command(t_parser *parser, t_node **head);
 
 void print_tokens(t_token *head);
 void print_nodes(t_node *head);
