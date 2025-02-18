@@ -65,6 +65,7 @@ void free_nodes(t_node *head)
 {
 	t_node	*current;
 	t_node	*next;
+	int		i;
 
 	current = head;
 	while (current)
@@ -74,6 +75,7 @@ void free_nodes(t_node *head)
 			free(current->cmd);
 		if (current->arg)
 		{
+			i = 0;
 			while (current->arg[i++])
 				free(current->arg[i]);
 			free(current->arg);
