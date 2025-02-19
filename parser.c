@@ -57,6 +57,12 @@ t_node	*create_redir_node(t_token_type type)
 	return (redir_node);
 }
 
+static void redir_error(t_parser *parser, char *msg, t_node *redir_node)
+{
+	set_parser_error(parser, msg);
+	free_node(redir_node);
+}
+
 void	parse_redirection(t_parser *parser, t_node **head)
 {
 	t_node			*redir_node;
@@ -73,9 +79,11 @@ void	parse_redirection(t_parser *parser, t_node **head)
 	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
 	{
 		if (redir_type == TOKEN_HEREDOC)
-			set_parser_error(parser, "Expected delimiter after heredoc redirection");
+			// set_parser_error(parser, "Expected delimiter after heredoc redirection");
+			redir_error(parser, "Expected delimiter after heredoc redirection", redir_node);
 		else
-			set_parser_error(parser, "Expected filename after redirection");
+			// set_parser_error(parser, "Expected filename after redirection");
+			redir_error(parser, "Expected filename after redirection", redir_node);
 		return ;
 	}
 	if (redir_type == TOKEN_HEREDOC)
@@ -138,6 +146,11 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 	if (!node)
 		return (NULL);
 	node->cmd = ft_strdup(cmd);
+	if (!node->cmd)
+	{
+		free(node);
+		return (NULL);
+	}
 	return (node);
 }
 
@@ -153,7 +166,7 @@ void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 	consume_token(parser);
 }
 
-t_node	*parse_simple_command(t_parser *parser, t_node **head)
+void	parse_simple_command(t_parser *parser, t_node **head)
 {
 	t_node	*first_node;
 
@@ -163,22 +176,22 @@ t_node	*parse_simple_command(t_parser *parser, t_node **head)
 		if (is_redir_token(parser->current_token->type))
 		{
 			parse_redirection(parser, head);
-			if (parser->error)
-				return (NULL);
+			// if (parser->error)
+			// 	return (NULL);
 		}
 		else if (parser->current_token->type == TOKEN_WORD)
 			handle_word_token(parser, head, &first_node);
 		else if (parser->current_token->type == TOKEN_PIPE)
 		{
 			parse_pipe(parser, head);
-			if (parser->error)
-				return (NULL);
+			// if (parser->error)
+			// 	return (NULL);
 			break ;
 		}
 		else
 			break ;
 	}
-	return (first_node);
+	// return (first_node);
 }
 
 t_node	*parse(t_parser *parser)
