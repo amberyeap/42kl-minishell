@@ -26,13 +26,15 @@
 // - handle history
 // - handle escape characters
 
+// as of 19/2, unterminated quotes not working
+
 void print_tokens(t_token *head);
 void print_nodes(t_node *head);
 
 void	ft_error(t_minishell *shell, char *msg)
 {
 	printf("%s\n", msg);
-	free_tokens(shell->token_list);
+	free_token_list(shell->token_list);
 }
 
 void	init_shell(t_minishell *shell, char **env)
@@ -46,7 +48,7 @@ void	init_shell(t_minishell *shell, char **env)
 
 void	reset_main(t_minishell *shell)
 {
-	free_tokens(shell->token_list);
+	free_token_list(shell->token_list);
 	free(shell->user_input);
 	if (shell->parser_list)
 		free_nodes_list(shell->parser_list);
@@ -65,7 +67,7 @@ int	check_token_error(t_minishell *shell)
 		if (current->type == TOKEN_ERROR)
 		{
 			printf("%s\n", current->value);
-			free_tokens(shell->token_list);
+			free_token_list(shell->token_list);
 			shell->token_list = NULL;
 			return (1);
 		}
@@ -76,7 +78,7 @@ int	check_token_error(t_minishell *shell)
 
 void	cleanup_parser(t_minishell *shell)
 {
-	free_tokens(shell->token_list);
+	free_token_list(shell->token_list);
 	if (shell->parser->error_msg)
 		free(shell->parser->error_msg);
 	free(shell->user_input);
@@ -123,17 +125,6 @@ char	*get_user_input(char **line)
 	}
 	add_history(*line);
 	return (*line);
-}
-
-// handles Ctrl+C signal
-void	signal_handler(int signum)
-{
-	if (signum == SIGINT)
-	{
-		printf("\n");
-		rl_on_new_line();
-		rl_redisplay();
-	}
 }
 
 int main(int argc, char **argv, char **envp)

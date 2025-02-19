@@ -41,12 +41,12 @@ t_tokenizer	*init_tokenizer(char *input)
 		return (NULL);
 	tokenizer->user_input = input;
 	tokenizer->position = 0;
-	tokenizer->error = 0;
-	tokenizer->error_msg = NULL;
+	// tokenizer->error = 0;
+	// tokenizer->error_msg = NULL;
 	return (tokenizer);
 }
 
-void	free_tokens(t_token *head)
+void	free_token_list(t_token *head)
 {
 	t_token	*current;
 	t_token	*next;

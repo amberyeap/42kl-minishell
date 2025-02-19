@@ -26,7 +26,7 @@ t_token	*create_token(t_token_type type, char *value)
 		token->value = NULL;
 	token->type = type;
 	token->next = NULL;
-	free(value);
+	// free(value);
 	return (token);
 }
 
@@ -66,14 +66,27 @@ char	*handle_quotes(t_tokenizer *tokenizer)
 	return (word);
 }
 
+char *handle_no_quotes(t_tokenizer *tokenizer)
+{
+	int		start;
+	int		len;
+	char	*word;
+
+	start = tokenizer->position;
+	while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
+		next_char(tokenizer);
+	len = tokenizer->position - start;
+	word = ft_substr(tokenizer->user_input, start, len);
+	return (word);
+}
+
 // creates a word token
 /* 1. if the current char is a quote, it will call handle_quotes() (34 is double quote, 39 is single quote)
 */
 t_token *create_word_token(t_tokenizer *tokenizer)
 {
-	int		start;
-	int		len;
 	char	*word;
+	t_token	*token;
 
 	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 	{
@@ -82,15 +95,13 @@ t_token *create_word_token(t_tokenizer *tokenizer)
 			return (create_token(TOKEN_ERROR, "Unterminated quote"));
 	}
 	else
-	{
-		start = tokenizer->position;
-		while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
-			next_char(tokenizer);
-		len = tokenizer->position - start;
-		word = ft_substr(tokenizer->user_input, start, len);
-	}
+		word = handle_no_quotes(tokenizer);
 	if (word)
-		return (create_token(TOKEN_WORD, word));
+	{
+		token = create_token(TOKEN_WORD, word);
+		free(word);
+		return (token);
+	}
 	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
 }
 
@@ -153,18 +164,6 @@ t_token	*tokenize(char *input)
 			new_token = create_word_token(tokenizer);
 		add_token(&head, new_token);
 	}
-	// if (!tokenizer->error)
-	// {
-	// 	new_token = create_token(TOKEN_EOF, NULL);
-	// 	add_token(&head, new_token);
-	// }
-	// if (tokenizer->error)
-	// {
-	// 	if (tokenizer->error_msg)
-	// 		free(tokenizer->error_msg);
-	// 	free_tokens(head);
-	// 	head = NULL;
-	// }
 	free(tokenizer);
 	return (head);
 }
