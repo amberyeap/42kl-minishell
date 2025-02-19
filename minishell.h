@@ -119,18 +119,18 @@ typedef struct s_minishell
 }	t_minishell;
 
 // main.c
-void	ft_error(t_minishell *shell, char *msg);
-void	init_shell(t_minishell *shell, char **envp);
-void	reset_main(t_minishell *shell);
-int		check_token_error(t_minishell *shell);
-void	cleanup_parser(t_minishell *shell);
-void	main_parse(t_minishell *shell);
-char	*get_user_input(char **line);
-void	signal_handler(int signum);
+void		ft_error(t_minishell *shell, char *msg);
+void		init_shell(t_minishell *shell, char **envp);
+void		reset_main(t_minishell *shell);
+int			check_token_error(t_minishell *shell);
+void		cleanup_parser(t_minishell *shell);
+void		main_parse(t_minishell *shell);
+char		*get_user_input(char **line);
+void		signal_handler(int signum);
 
 // utils.c
-int		is_whitespace(char c);
-int		is_operator(char c);
+int			is_whitespace(char c);
+int			is_operator(char c);
 
 // tokenizer.c
 t_token		*create_token(t_token_type type, char *value);
@@ -155,7 +155,7 @@ void		parse_pipe(t_parser *parser, t_node **head);
 void		add_arg_to_command(char *arg, t_node *command);
 t_node		*create_command_node(char *cmd, t_node_type type);
 void		handle_word_token(t_parser *parser, t_node **head, t_node **first_node);
-t_node		*parse_simple_command(t_parser *parser, t_node **head);
+void		parse_simple_command(t_parser *parser, t_node **head);
 t_node		*parse(t_parser *parser);
 
 // parser_utils.c
@@ -164,6 +164,7 @@ void		consume_token(t_parser *parser);
 void		set_parser_error(t_parser *parser, char *msg);
 void		add_node_to_back(t_node **head, t_node *new_node);
 t_parser	*init_parser(t_token *token_list);
-void		free_nodes(t_node *head);
+void		free_node(t_node *head);
+void		free_nodes_list(t_node *head);
 
 #endif

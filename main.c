@@ -24,6 +24,7 @@
 // - handle exit codes 
 // - handle signals
 // - handle history
+// - handle escape characters
 
 void print_tokens(t_token *head);
 void print_nodes(t_node *head);
@@ -43,10 +44,12 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
-void reset_main(t_minishell *shell)
+void	reset_main(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
 	free(shell->user_input);
+	if (shell->parser_list)
+		free_nodes_list(shell->parser_list);
 	shell->parser_list = NULL;
 	shell->token_list = NULL;
 	shell->user_input = NULL;
@@ -71,14 +74,12 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
-void cleanup_parser(t_minishell *shell)
+void	cleanup_parser(t_minishell *shell)
 {
 	free_tokens(shell->token_list);
 	if (shell->parser->error_msg)
 		free(shell->parser->error_msg);
 	free(shell->user_input);
-	// free(shell->parser);
-	// free_nodes(shell->parser_list);
 	shell->token_list = NULL;
 	shell->parser->error_msg = NULL;
 	shell->user_input = NULL;
@@ -106,7 +107,7 @@ void	main_parse(t_minishell *shell)
 }
 
 // gets the user input and also enables the use of arrow keys to navigate the input
-char *get_user_input(char **line)
+char	*get_user_input(char **line)
 {
 	*line = readline("minishell$ ");
 	if (!*line) // for Ctrl+D signal - to exit the program cleanly
@@ -125,7 +126,7 @@ char *get_user_input(char **line)
 }
 
 // handles Ctrl+C signal
-void signal_handler(int signum)
+void	signal_handler(int signum)
 {
 	if (signum == SIGINT)
 	{
@@ -160,8 +161,8 @@ int main(int argc, char **argv, char **envp)
 		}
 		else
 			main_parse(&shell);
-		print_tokens(shell.token_list);
-		print_nodes(shell.parser_list);
+		// print_tokens(shell.token_list);
+		// print_nodes(shell.parser_list);
 		reset_main(&shell);
 	}
 	return (0);
