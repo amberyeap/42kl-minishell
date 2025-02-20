@@ -13,11 +13,13 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <readline/readline.h> // readline, add_history, rl_clear_history, rl_on_new_line, rl_replace_line, rl_redisplay
+# include <readline/readline.h> // readline, add_history, rl_clear_history, 
+							// rl_on_new_line, rl_replace_line, rl_redisplay
 # include <readline/history.h>
 # include <stdio.h> // printf, perror
 # include <stdlib.h> // malloc, free, exit
-# include <unistd.h> // write, access, open, read, close, fork, pipe, isatty, ttyname, ttyslot, getcwd, chdir, unlink, execve, dup, dup2 
+# include <unistd.h> // write, access, open, read, close, fork, pipe, isatty, 
+				// ttyname, ttyslot, getcwd, chdir, unlink, execve, dup, dup2 
 # include <fcntl.h> // open
 # include <signal.h> // signal, sigaction, sigemptyset, sigaddset, kill
 # include <sys/types.h> // pid_t
@@ -59,7 +61,7 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
-typedef struct s_tokenizer 
+typedef struct s_tokenizer
 {
 	char	*user_input;
 	int		position;
@@ -105,7 +107,7 @@ typedef struct s_node
 	char			**arg;
 	char			*heredoc_delim;
 	char			*redir_file;
-	t_direction		redir_direction; // the direction of the redir token
+	t_direction		redir_direction;
 	struct s_node	*next;
 }	t_node;
 
@@ -113,9 +115,9 @@ typedef struct s_minishell
 {
 	char		*user_input;
 	char		**env;
-	t_token		*token_list; // pointer to the head of the token list
-	t_node		*parser_list; // pointer to the first node of the list
-	t_parser	*parser; // pointer to the parser - used to pass to the parse function
+	t_token		*token_list;
+	t_node		*parser_list;
+	t_parser	*parser;
 }	t_minishell;
 
 // main.c
@@ -154,7 +156,8 @@ void		parse_redirection(t_parser *parser, t_node **head);
 void		parse_pipe(t_parser *parser, t_node **head);
 void		add_arg_to_command(char *arg, t_node *command);
 t_node		*create_command_node(char *cmd, t_node_type type);
-void		handle_word_token(t_parser *parser, t_node **head, t_node **first_node);
+void		handle_word_token(t_parser *parser, t_node **head,
+				t_node **first_node);
 void		parse_simple_command(t_parser *parser, t_node **head);
 t_node		*parse(t_parser *parser);
 

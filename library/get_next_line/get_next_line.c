@@ -44,7 +44,7 @@ char	*get_line(char *stash)
 char	*read_fd(int fd, char *stash)
 {
 	char	*buffer;
-	int		byte_read; // ssize_t
+	int		byte_read;
 	char	*temp;
 
 	if (!stash)
@@ -81,28 +81,4 @@ char	*get_next_line(int fd)
 	line = get_line(stash);
 	stash = new_stash(stash);
 	return (line);
-}
-
-#include <stdio.h>
-#include <fcntl.h>
-
-int main()
-{
-    int fd;
-    char *line = NULL;
-
-    fd = open("input.txt", O_RDONLY);
-    if (fd < 0)
-    {
-        printf("Error opening file\n");
-        return 1;
-    }
-
-    while ((line = get_next_line(fd)) != NULL)
-    {
-        printf("%s", line);
-        free(line);
-    }
-    close(fd);
-    return 0;
 }
