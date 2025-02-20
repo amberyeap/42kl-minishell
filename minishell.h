@@ -63,8 +63,6 @@ typedef struct s_tokenizer
 {
 	char	*user_input;
 	int		position;
-	// int		error;
-	// char	*error_msg;
 }	t_tokenizer;
 
 /* ************************************************************************** */
@@ -154,7 +152,7 @@ t_node		*create_node(t_node_type type);
 t_node		*create_redir_node(t_token_type type);
 void		parse_redirection(t_parser *parser, t_node **head);
 void		parse_pipe(t_parser *parser, t_node **head);
-void		add_arg_to_command(char *arg, t_node *command);
+// void		add_arg_to_command(char *arg, t_node *command);
 t_node		*create_command_node(char *cmd, t_node_type type);
 void		handle_word_token(t_parser *parser, t_node **head, t_node **first_node);
 void		parse_simple_command(t_parser *parser, t_node **head);

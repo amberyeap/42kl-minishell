@@ -26,7 +26,9 @@
 // - handle history
 // - handle escape characters
 
-// as of 19/2, unterminated quotes not working
+// as of 19/2, 
+// - unterminated quotes not working FIXED
+// - leaks when echo "hello"test
 
 void print_tokens(t_token *head);
 void print_nodes(t_node *head);
@@ -82,6 +84,8 @@ void	cleanup_parser(t_minishell *shell)
 	if (shell->parser->error_msg)
 		free(shell->parser->error_msg);
 	free(shell->user_input);
+	// free(shell->parser);
+	// shell->parser = NULL;
 	shell->token_list = NULL;
 	shell->parser->error_msg = NULL;
 	shell->user_input = NULL;

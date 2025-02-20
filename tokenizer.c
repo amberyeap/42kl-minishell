@@ -66,7 +66,7 @@ char	*handle_quotes(t_tokenizer *tokenizer)
 	return (word);
 }
 
-char *handle_no_quotes(t_tokenizer *tokenizer)
+char	*handle_no_quotes(t_tokenizer *tokenizer)
 {
 	int		start;
 	int		len;
