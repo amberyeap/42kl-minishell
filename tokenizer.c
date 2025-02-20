@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 18:37:53 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/20 11:43:32 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/20 16:57:29 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,16 +62,13 @@ t_token	*create_word_token(t_tokenizer *tokenizer)
 			return (create_token(TOKEN_ERROR, "Unterminated quote"));
 	}
 	else
-	{
-		start = tokenizer->position;
-		while (!is_whitespace(peek(tokenizer))
-			&& !is_operator(peek(tokenizer)) && peek(tokenizer))
-			next_char(tokenizer);
-		len = tokenizer->position - start;
-		word = ft_substr(tokenizer->user_input, start, len);
-	}
+		word = handle_no_quotes(tokenizer);
 	if (word)
-		return (create_token(TOKEN_WORD, word));
+	{
+		token = create_token(TOKEN_WORD, word);
+		free(word);
+		return (token);
+	}
 	return (create_token(TOKEN_ERROR, "Failed to create word token"));
 }
 

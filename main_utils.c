@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/20 14:22:03 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/20 15:08:46 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	init_shell(t_minishell *shell, char **env)
 
 void	reset_main(t_minishell *shell)
 {
-	free_tokens(shell->token_list);
+	free_token_list(shell->token_list);
 	free(shell->user_input);
 	if (shell->parser_list)
 		free_nodes_list(shell->parser_list);
@@ -42,7 +42,7 @@ int	check_token_error(t_minishell *shell)
 		if (current->type == TOKEN_ERROR)
 		{
 			printf("%s\n", current->value);
-			free_tokens(shell->token_list);
+			free_token_list(shell->token_list);
 			shell->token_list = NULL;
 			return (1);
 		}
@@ -53,7 +53,7 @@ int	check_token_error(t_minishell *shell)
 
 void	cleanup_parser(t_minishell *shell)
 {
-	free_tokens(shell->token_list);
+	free_token_list(shell->token_list);
 	if (shell->parser->error_msg)
 		free(shell->parser->error_msg);
 	free(shell->user_input);

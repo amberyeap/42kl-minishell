@@ -119,7 +119,6 @@ typedef struct s_minishell
 }	t_minishell;
 
 // main.c
-void		ft_error(t_minishell *shell, char *msg);
 void		init_shell(t_minishell *shell, char **envp);
 void		reset_main(t_minishell *shell);
 int			check_token_error(t_minishell *shell);
@@ -154,7 +153,7 @@ t_node		*create_node(t_node_type type);
 t_node		*create_redir_node(t_token_type type);
 void		parse_redirection(t_parser *parser, t_node **head);
 void		parse_pipe(t_parser *parser, t_node **head);
-// void		add_arg_to_command(char *arg, t_node *command);
+int			add_arg_to_command(char *arg, t_node *command);
 t_node		*create_command_node(char *cmd, t_node_type type);
 void		handle_word_token(t_parser *parser, t_node **head,
 				t_node **first_node);

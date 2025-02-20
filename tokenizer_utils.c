@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 18:37:31 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/18 18:37:31 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/20 16:58:10 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ t_tokenizer	*init_tokenizer(char *input)
 		return (NULL);
 	tokenizer->user_input = input;
 	tokenizer->position = 0;
-	// tokenizer->error = 0;
-	// tokenizer->error_msg = NULL;
 	return (tokenizer);
 }
 

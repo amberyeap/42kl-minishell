@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 11:43:16 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/20 11:43:35 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/20 16:55:26 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ t_token	*create_token(t_token_type type, char *value)
 		token->value = NULL;
 	token->type = type;
 	token->next = NULL;
-	free(value);
 	return (token);
 }
 
