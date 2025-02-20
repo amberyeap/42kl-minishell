@@ -72,17 +72,6 @@ char	*get_user_input(char **line)
 	return (*line);
 }
 
-// handles Ctrl+C signal
-void	signal_handler(int signum)
-{
-	if (signum == SIGINT)
-	{
-		printf("\n");
-		rl_on_new_line();
-		rl_redisplay();
-	}
-}
-
 int	main(int argc, char **argv, char **envp)
 {
 	char		*line;

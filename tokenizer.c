@@ -32,15 +32,28 @@ char	*handle_quotes(t_tokenizer *tokenizer)
 	return (word);
 }
 
+char	*handle_no_quotes(t_tokenizer *tokenizer)
+{
+	int		start;
+	int		len;
+	char	*word;
+
+	start = tokenizer->position;
+	while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
+		next_char(tokenizer);
+	len = tokenizer->position - start;
+	word = ft_substr(tokenizer->user_input, start, len);
+	return (word);
+}
+
 // creates a word token
 /* 1. if the current char is a quote, it will call handle_quotes() 
 ** (34 is double quote, 39 is single quote)
 */
 t_token	*create_word_token(t_tokenizer *tokenizer)
 {
-	int		start;
-	int		len;
 	char	*word;
+	t_token	*token;
 
 	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 	{
