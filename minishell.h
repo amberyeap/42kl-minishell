@@ -118,28 +118,50 @@ typedef struct s_minishell
 	t_parser	*parser;
 }	t_minishell;
 
-// main.c
-void		init_shell(t_minishell *shell, char **envp);
+// free_nodes.c
+void		free_node(t_node *head);
+void		free_nodes_list(t_node *head);
+
+// main_utils.c
+void		init_shell(t_minishell *shell, char **env);
 void		reset_main(t_minishell *shell);
 int			check_token_error(t_minishell *shell);
 void		cleanup_parser(t_minishell *shell);
+
+// main.c
 void		main_parse(t_minishell *shell);
 char		*get_user_input(char **line);
+
+// parse_redir.c
+t_node		*create_redir_node(t_token_type type);
+void		redir_error(t_parser *parser, char *msg, t_node *redir_node);
+void		parse_redirection(t_parser *parser, t_node **head);
+
+// parse_simple_command.c
+int			add_arg_to_command(char *arg, t_node *command);
+t_node		*create_command_node(char *cmd, t_node_type type);
+void		handle_word_token(t_parser *parser, t_node **head,
+				t_node **first_node);
+void		parse_simple_command(t_parser *parser, t_node **head);
+
+// parser_utils.c
+int			is_redir_token(t_token_type type);
+void		consume_token(t_parser *parser);
+void		set_parser_error(t_parser *parser, char *msg);
+void		add_node_to_back(t_node **head, t_node *new_node);
+t_parser	*init_parser(t_token *token_list);
+
+// parser.c
+t_node		*create_node(t_node_type type);
+void		parse_pipe(t_parser *parser, t_node **head);
+t_node		*parse(t_parser *parser);
 
 // signals.c
 void		signal_handler(int signum);
 
-// utils.c
-int			is_whitespace(char c);
-int			is_operator(char c);
-
-// tokenizer.c
+// tokenizer_create_tokens.c
 t_token		*create_token(t_token_type type, char *value);
 void		add_token(t_token **head, t_token *new_token);
-char		*handle_quotes(t_tokenizer *tokenizer);
-t_token		*create_word_token(t_tokenizer *tokenizer);
-t_token		*create_op_token(t_tokenizer *tokenizer);
-t_token		*tokenize(char *user_input);
 
 // tokenizer_utils.c
 char		peek(t_tokenizer *tokenizer);
@@ -148,25 +170,15 @@ void		skip_whitespace(t_tokenizer *tokenizer);
 t_tokenizer	*init_tokenizer(char *input);
 void		free_token_list(t_token *head);
 
-// parser.c
-t_node		*create_node(t_node_type type);
-t_node		*create_redir_node(t_token_type type);
-void		parse_redirection(t_parser *parser, t_node **head);
-void		parse_pipe(t_parser *parser, t_node **head);
-int			add_arg_to_command(char *arg, t_node *command);
-t_node		*create_command_node(char *cmd, t_node_type type);
-void		handle_word_token(t_parser *parser, t_node **head,
-				t_node **first_node);
-void		parse_simple_command(t_parser *parser, t_node **head);
-t_node		*parse(t_parser *parser);
+// tokenizer.c
+char		*handle_quotes(t_tokenizer *tokenizer);
+char		*handle_no_quotes(t_tokenizer *tokenizer);
+t_token		*create_word_token(t_tokenizer *tokenizer);
+t_token		*create_op_token(t_tokenizer *tokenizer);
+t_token		*tokenize(char *user_input);
 
-// parser_utils.c
-int			is_redir_token(t_token_type type);
-void		consume_token(t_parser *parser);
-void		set_parser_error(t_parser *parser, char *msg);
-void		add_node_to_back(t_node **head, t_node *new_node);
-t_parser	*init_parser(t_token *token_list);
-void		free_node(t_node *head);
-void		free_nodes_list(t_node *head);
+// utils.c
+int			is_whitespace(char c);
+int			is_operator(char c);
 
 #endif

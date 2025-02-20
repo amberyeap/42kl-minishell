@@ -40,7 +40,7 @@ t_node	*create_redir_node(t_token_type type)
 	return (redir_node);
 }
 
-static void	redir_error(t_parser *parser, char *msg, t_node *redir_node)
+void	redir_error(t_parser *parser, char *msg, t_node *redir_node)
 {
 	set_parser_error(parser, msg);
 	free_node(redir_node);
