@@ -18,16 +18,16 @@ int	add_arg_to_command(char *arg, t_node *cmd_node)
 	int		i;
 	char	**new_args;
 
-	if (!cmd_node->arg)
-		return (0);
+	// if (!cmd_node->arg)
+	// 	return (0);
 	i = 0;
-	while (cmd_node->arg[i])
+	while (cmd_node->arg && cmd_node->arg[i])
 		i++;
 	new_args = malloc(sizeof(char *) * (i + 2));
 	if (!new_args)
 		return (0);
 	i = 0;
-	while (cmd_node->arg[i])
+	while (cmd_node->arg && cmd_node->arg[i])
 	{
 		new_args[i] = ft_strdup(cmd_node->arg[i]);
 		i++;
@@ -64,7 +64,8 @@ void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 		add_node_to_back(head, *first_node);
 	}
 	else
-		if (add_arg_to_command(parser->current_token->value, *first_node))
+		// add_arg_to_command(parser->current_token->value, *first_node);
+		if (!add_arg_to_command(parser->current_token->value, *first_node))
 			set_parser_error(parser, "Failed to add argument to command");
 	consume_token(parser);
 }

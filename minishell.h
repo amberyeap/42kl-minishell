@@ -42,6 +42,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+typedef enum e_quote_type
+{
+	NO_QUOTE,
+	DOUBLE_QUOTE,
+	SINGLE_QUOTE,
+	UNTERMINATED_QUOTE
+}	t_quote_type;
+
 typedef enum e_token_type
 {
 	TOKEN_WORD,
@@ -58,6 +66,7 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
+	t_quote_type	quote;
 	struct s_token	*next;
 }	t_token;
 
@@ -171,7 +180,7 @@ t_tokenizer	*init_tokenizer(char *input);
 void		free_token_list(t_token *head);
 
 // tokenizer.c
-char		*handle_quotes(t_tokenizer *tokenizer);
+char		*handle_quotes(t_tokenizer *tokenizer, char quote);
 char		*handle_no_quotes(t_tokenizer *tokenizer);
 t_token		*create_word_token(t_tokenizer *tokenizer);
 t_token		*create_op_token(t_tokenizer *tokenizer);
