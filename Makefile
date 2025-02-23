@@ -19,7 +19,7 @@ NAME = minishell
 LIBFT = library/libft.a
 
 SRC = expansion.c free_nodes.c main_utils.c main.c \
-	parse_redir.c parse_simple_command.c parser_utils.c parser.c \ 
+	parse_redir.c parse_simple_command.c parser_utils.c parser.c \
 	signals.c tokenizer_create_tokens.c tokenizer_quotes.c tokenizer_unquoted.c \
 	tokenizer_utils.c tokenizer.c utils.c
 OBJ = $(SRC:.c=.o)
