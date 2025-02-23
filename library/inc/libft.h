@@ -20,18 +20,20 @@
 # include <stdarg.h>
 
 // ft_printf
-int		ft_printf(const char *format, ...);
-int		ft_print_char(char c);
-int		ft_print_str(char *str);
-int		ft_print_digit(long n, char *base);
-int		ft_print_lower_hex(unsigned int n, char *base);
-int		ft_print_upper_hex(unsigned int n, char *base);
-int		ft_print_ptr(void *ptr, char *base);
+int		ft_fprintf(int fd, const char *format, ...);
+int		ft_print_char(int fd, char c);
+int		ft_print_str(int fd, char *str);
+int		ft_print_digit(int fd, long n, char *base);
+int		ft_print_lower_hex(int fd, unsigned int n, char *base);
+int		ft_print_upper_hex(int fd, unsigned int n, char *base);
+int		ft_print_ptr(int fd, void *ptr, char *base);
 
 // get_next_line
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
+
+# define OPEN_MAX 256
 
 char	*get_next_line(int fd);
 char	*clear_line(char *stash);

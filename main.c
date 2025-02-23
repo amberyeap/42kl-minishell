@@ -41,13 +41,13 @@ void	main_parse(t_minishell *shell)
 	shell->parser = init_parser(shell->token_list);
 	if (!shell->parser)
 	{
-		fprintf(stderr, "Failed to initialize parser\n");
+		ft_fprintf(STDERR_FILENO, "Failed to initialize parser\n");
 		cleanup_parser(shell);
 	}
 	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error || !shell->parser_list)
 	{
-		fprintf(stderr, "%s\n", shell->parser->error_msg);
+		ft_fprintf(STDERR_FILENO, "%s\n", shell->parser->error_msg);
 		cleanup_parser(shell);
 	}
 }
