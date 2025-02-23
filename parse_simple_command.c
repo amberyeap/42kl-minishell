@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:03:09 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/20 16:50:36 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/23 21:24:38 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@ int	add_arg_to_command(char *arg, t_node *cmd_node)
 	int		i;
 	char	**new_args;
 
-	// if (!cmd_node->arg)
-	// 	return (0);
 	i = 0;
 	while (cmd_node->arg && cmd_node->arg[i])
 		i++;
@@ -53,49 +51,6 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 		return (NULL);
 	}
 	return (node);
-}
-
-char *get_env_var(char **value, char *var_start, char *result, int *i)
-{
-	char	*expanded_var;
-	char	*var_name;
-
-	(*value)++;
-	while (ft_isalnum(**value))
-		(*value)++;
-	var_name = ft_substr(*value, 0, *value - var_start);
-	expanded_var = getenv(var_name);
-	if (expanded_var)
-		*i += ft_strlcpy(result + (*i), expanded_var, ft_strlen(expanded_var) + 1);
-	free(var_name);
-	return (result);
-}
-
-char	*expand_var(char *value)
-{
-	char	*var_start;
-	char	*result;
-	int		i;
-
-	i = 0;
-	result = malloc(1024);
-	if (!result)
-		return (NULL);
-	var_start = ft_strchr(value, '$');
-	if (!var_start)
-		return (free(result), ft_strdup(value));
-	while (*value)
-	{
-		if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
-		{
-			if (!get_env_var(&value, var_start, result, &i))
-				return (free(result), NULL);
-		}
-		else
-			result[i++] = *value++;
-	}
-	result[i] = '\0';
-	return (result);
 }
 
 void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)

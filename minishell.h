@@ -129,6 +129,10 @@ typedef struct s_minishell
 	t_parser	*parser;
 }	t_minishell;
 
+// expansion.c
+char		*get_env_var(char **value, char *var_start, char *result, int *i);
+char		*expand_var(char *value);
+
 // free_nodes.c
 void		free_node(t_node *head);
 void		free_nodes_list(t_node *head);
@@ -140,6 +144,7 @@ int			check_token_error(t_minishell *shell);
 void		cleanup_parser(t_minishell *shell);
 
 // main.c
+void		minishell_loop(t_minishell *shell);
 void		main_parse(t_minishell *shell);
 char		*get_user_input(char **line);
 
@@ -174,6 +179,14 @@ void		signal_handler(int signum);
 t_token		*create_token(t_token_type type, char *value);
 void		add_token(t_token **head, t_token *new_token);
 
+// tokenizer_quotes.c
+t_token		*create_quote_token(t_tokenizer *tokenizer);
+char		*handle_quotes(t_tokenizer *tokenizer, char quote);
+
+// tokenizer_unquoted.c
+t_token		*create_unquoted_token(t_tokenizer *tokenizer);
+char		*handle_no_quotes(t_tokenizer *tokenizer);
+
 // tokenizer_utils.c
 char		peek(t_tokenizer *tokenizer);
 void		next_char(t_tokenizer *tokenizer);
@@ -182,8 +195,6 @@ t_tokenizer	*init_tokenizer(char *input);
 void		free_token_list(t_token *head);
 
 // tokenizer.c
-char		*handle_quotes(t_tokenizer *tokenizer, char quote);
-char		*handle_no_quotes(t_tokenizer *tokenizer);
 t_token		*create_word_token(t_tokenizer *tokenizer);
 t_token		*create_op_token(t_tokenizer *tokenizer);
 t_token		*tokenize(char *user_input);

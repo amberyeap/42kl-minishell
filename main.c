@@ -19,16 +19,16 @@
 // - handle quotes DONE-ish -> need to handle words that are 
 //		joined to the quoted word (eg: "hello"world)
 // - empty input -> prints (null) DONE
-// - functions too long
+// - functions too long DONE
 
-// - handle expansion -> done in execution section
+// - handle expansion DONE?
 // - handle exit codes 
 // - handle signals
 // - handle history
-// - handle escape characters
+// - handle escape characters NOT NEEDED BY SUBJECT.PDF
 
-void print_tokens(t_token *head);
-void print_nodes(t_node *head);
+// void	print_tokens(t_token *head);
+// void	print_nodes(t_node *head);
 
 void	main_parse(t_minishell *shell)
 {
@@ -38,7 +38,7 @@ void	main_parse(t_minishell *shell)
 		fprintf(stderr, "Failed to initialize parser\n");
 		cleanup_parser(shell);
 	}
-	shell->parser_list = parse(shell->parser, shell->env);
+	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error || !shell->parser_list)
 	{
 		fprintf(stderr, "%s\n", shell->parser->error_msg);
@@ -67,9 +67,33 @@ char	*get_user_input(char **line)
 	return (*line);
 }
 
+void	minishell_loop(t_minishell *shell)
+{
+	char	*line;
+
+	while (1)
+	{
+		line = NULL;
+		if (!get_user_input(&line))
+			continue ;
+		shell->user_input = line;
+		shell->token_list = tokenize(shell->user_input);
+		if (check_token_error(shell))
+		{
+			free(shell->user_input);
+			shell->user_input = NULL;
+			continue ;
+		}
+		else
+			main_parse(shell);
+		// print_tokens(shell->token_list);
+		// print_nodes(shell->parser_list);
+		reset_main(shell);
+	}
+}
+
 int	main(int argc, char **argv, char **envp)
 {
-	char		*line;
 	t_minishell	shell;
 
 	(void)argv;
@@ -77,25 +101,7 @@ int	main(int argc, char **argv, char **envp)
 		return (printf("Program does not accept arguments.\n"), 1);
 	init_shell(&shell, envp);
 	signal(SIGINT, signal_handler);
-	while (1)
-	{
-		line = NULL;
-		if (!get_user_input(&line))
-			continue ;
-		shell.user_input = line;
-		shell.token_list = tokenize(shell.user_input);
-		if (check_token_error(&shell))
-		{
-			free(shell.user_input);
-			shell.user_input = NULL;
-			continue ;
-		}
-		else
-			main_parse(&shell);
-		print_tokens(shell.token_list);
-		print_nodes(shell.parser_list);
-		reset_main(&shell);
-	}
+	minishell_loop(&shell);
 	return (0);
 }
 
@@ -106,59 +112,59 @@ int	main(int argc, char **argv, char **envp)
 /* ************************************************************************** */
 
 /* Debug function to print tokens */
-void print_tokens(t_token *head)
-{
-    t_token *current = head;
-    const char *type_strings[] = {
-        "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
-        "HEREDOC", "APPEND", "ERROR", "EOF"
-    };
-	const char *quote_strings[] = {
-		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
-	};
+// void print_tokens(t_token *head)
+// {
+//     t_token *current = head;
+//     const char *type_strings[] = {
+//         "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
+//         "HEREDOC", "APPEND", "ERROR", "EOF"
+//     };
+// 	const char *quote_strings[] = {
+// 		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
+// 	};
 
-    while (current) {
-        printf("Type: %-10s", type_strings[current->type]);
-        if (current->value)
-            printf(" Value: '%s'", current->value);
-		if (current->quote)
-			printf(" Quote: %s", quote_strings[current->quote]);
-		if (current->expand)
-			printf(" Expand: %d", current->expand);
-        printf("\n");
-        current = current->next;
-    }
-}
+//     while (current) {
+//         printf("Type: %-10s", type_strings[current->type]);
+//         if (current->value)
+//             printf(" Value: '%s'", current->value);
+// 		if (current->quote)
+// 			printf(" Quote: %s", quote_strings[current->quote]);
+// 		if (current->expand)
+// 			printf(" Expand: %d", current->expand);
+//         printf("\n");
+//         current = current->next;
+//     }
+// }
 
-void print_nodes(t_node *head)
-{
-	t_node	*current;
+// void print_nodes(t_node *head)
+// {
+// 	t_node	*current;
 
-	current = head;
-	while (current)
-	{
-		if (current->type == NODE_COMMAND)
-		{
-			printf("Command: %s\n", current->cmd);
-			if (current->arg)
-			{
-				for (int i = 0; current->arg[i]; i++)
-					printf("Arg: %s\n", current->arg[i]);
-			}
-		}
-		else if (current->type == NODE_PIPE)
-			printf("Pipe\n");
-		else if (current->type == NODE_REDIR_IN)
-			printf("Redir in: %s\n", current->redir_file);
-		else if (current->type == NODE_REDIR_OUT)
-			printf("Redir out: %s\n", current->redir_file);
-		else if (current->type == NODE_HEREDOC)
-			printf("Heredoc: %s\n", current->heredoc_delim);
-		else if (current->type == NODE_APPEND)
-			printf("Append: %s\n", current->redir_file);
-		current = current->next;
-	}
-}
+// 	current = head;
+// 	while (current)
+// 	{
+// 		if (current->type == NODE_COMMAND)
+// 		{
+// 			printf("Command: %s\n", current->cmd);
+// 			if (current->arg)
+// 			{
+// 				for (int i = 0; current->arg[i]; i++)
+// 					printf("Arg: %s\n", current->arg[i]);
+// 			}
+// 		}
+// 		else if (current->type == NODE_PIPE)
+// 			printf("Pipe\n");
+// 		else if (current->type == NODE_REDIR_IN)
+// 			printf("Redir in: %s\n", current->redir_file);
+// 		else if (current->type == NODE_REDIR_OUT)
+// 			printf("Redir out: %s\n", current->redir_file);
+// 		else if (current->type == NODE_HEREDOC)
+// 			printf("Heredoc: %s\n", current->heredoc_delim);
+// 		else if (current->type == NODE_APPEND)
+// 			printf("Append: %s\n", current->redir_file);
+// 		current = current->next;
+// 	}
+// }
 
 /* Test cases */
 // void test_parser(void)
@@ -185,7 +191,8 @@ void print_nodes(t_node *head)
 //         {"ls", "Single command"},
 //         {"", "Empty input"},
 // 		{"ls -l | grep foo | wc -l", "Multiple pipes"},
-// 		{"ls -l | grep foo | wc -l > output.txt", "Multiple pipes with redirection"},
+// 		{"ls -l | grep foo | wc -l > output.txt", 
+//				"Multiple pipes with redirection"},
 //         {NULL, NULL}
 //     };
 
