@@ -67,6 +67,7 @@ typedef struct s_token
 	char			*value;
 	t_token_type	type;
 	t_quote_type	quote;
+	int				expand;
 	struct s_token	*next;
 }	t_token;
 
@@ -105,6 +106,7 @@ typedef struct s_parser
 	t_token		*token_list;
 	int			error;
 	char		*error_msg;
+	char		**env;
 }	t_parser;
 
 typedef struct s_node

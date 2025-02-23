@@ -60,6 +60,8 @@ t_token	*create_quote_token(t_tokenizer *tokenizer)
 		token->quote = DOUBLE_QUOTE;
 	else
 		token->quote = SINGLE_QUOTE;
+	if (ft_strchr(word, '$') && token->quote == DOUBLE_QUOTE)
+		token->expand = 1;
 	free(word);
 	return (token);
 }
@@ -73,6 +75,8 @@ t_token	*create_unquoted_token(t_tokenizer *tokenizer)
 	if (!word)
 		return (create_token(TOKEN_ERROR, "Failed to create word token"));
 	token = create_token(TOKEN_WORD, word);
+	if (ft_strchr(word, '$'))
+		token->expand = 1;
 	free(word);
 	return (token);
 }
@@ -99,7 +103,6 @@ t_token	*create_word_token(t_tokenizer *tokenizer)
 			return (token);
 		return (token);
 	}
-	return (create_token(TOKEN_ERROR, "Failed to create word token"));
 }
 
 // creates an operator token
@@ -153,7 +156,7 @@ t_token	*tokenize(char *input)
 	while (peek(tokenizer))
 	{
 		skip_whitespace(tokenizer);
-		if (peek(tokenizer) == '\0' || peek(tokenizer) == '\n')
+		if (peek(tokenizer) == '\0')
 			break ;
 		if (is_operator(peek(tokenizer)))
 			new_token = create_op_token(tokenizer);

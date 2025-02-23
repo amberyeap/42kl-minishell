@@ -38,7 +38,7 @@ void	main_parse(t_minishell *shell)
 		fprintf(stderr, "Failed to initialize parser\n");
 		cleanup_parser(shell);
 	}
-	shell->parser_list = parse(shell->parser);
+	shell->parser_list = parse(shell->parser, shell->env);
 	if (shell->parser->error || !shell->parser_list)
 	{
 		fprintf(stderr, "%s\n", shell->parser->error_msg);
@@ -113,11 +113,18 @@ void print_tokens(t_token *head)
         "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
         "HEREDOC", "APPEND", "ERROR", "EOF"
     };
+	const char *quote_strings[] = {
+		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
+	};
 
     while (current) {
         printf("Type: %-10s", type_strings[current->type]);
         if (current->value)
             printf(" Value: '%s'", current->value);
+		if (current->quote)
+			printf(" Quote: %s", quote_strings[current->quote]);
+		if (current->expand)
+			printf(" Expand: %d", current->expand);
         printf("\n");
         current = current->next;
     }

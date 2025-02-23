@@ -26,6 +26,7 @@ t_token	*create_token(t_token_type type, char *value)
 		token->value = NULL;
 	token->type = type;
 	token->quote = NO_QUOTE;
+	token->expand = 0;
 	token->next = NULL;
 	return (token);
 }
