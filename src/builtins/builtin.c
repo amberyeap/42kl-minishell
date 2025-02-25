@@ -6,11 +6,20 @@
 /*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/02/25 08:00:29 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+=======
+/*   Updated: 2025/02/18 18:09:53 by muhabin-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include"../../minishell.h"
+
+>>>>>>> 35dc526e3e04258b65f4cd1ca924b608d2bf09e6
 
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
@@ -23,14 +32,18 @@ int	check_builtin(char *command)
 		return (1);
 	if (ft_strncmp(command, "env", 3) == 0)
 		return (1);
+<<<<<<< HEAD
 	if (ft_strncmp(command, "exit", 4) == 0)
 		return (1);
+=======
+>>>>>>> 35dc526e3e04258b65f4cd1ca924b608d2bf09e6
 	if (ft_strncmp(command, "export", 6) == 0)
 		return (1);
 	if (ft_strncmp(command, "unset", 5) == 0)
 		return (1);
 	return (0);
 }
+<<<<<<< HEAD
 
 //run the builtin after being check
 int	run_builtin(char **args, t_minishell *data)
@@ -74,3 +87,7 @@ int	run_builtin(char **args, t_minishell *data)
 // 	else
 // 		printf("not correct");
 // }
+=======
+//run the builtinafter being check
+int	run_builtin(char **args, t)
+>>>>>>> 35dc526e3e04258b65f4cd1ca924b608d2bf09e6
