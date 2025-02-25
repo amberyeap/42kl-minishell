@@ -123,10 +123,11 @@ typedef struct s_node
 typedef struct s_minishell
 {
 	char		*user_input;
-	char		**env;
+	char		**env; // can remove
 	t_token		*token_list;
 	t_node		*parser_list;
 	t_parser	*parser;
+	// int			exit_status;
 }	t_minishell;
 
 // expansion.c

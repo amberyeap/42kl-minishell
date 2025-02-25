@@ -24,8 +24,9 @@
 // - handle expansion DONE? waiting for execution to complete i think
 // - handle exit codes 
 // - handle signals -> what's the diff between interactive mode and non-interactive?
-// - handle history
+// - handle history DONE?
 // - handle escape characters NOT NEEDED BY SUBJECT.PDF
+// - handle auto-continue (aka tab)? NOT COMPULSORY I THINK
 
 /* as of 23 Feb
 	- unquoted words joined to quoted words (eg: "hi"world) -> also has LEAKS
