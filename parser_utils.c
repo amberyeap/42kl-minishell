@@ -6,15 +6,16 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 18:36:44 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/18 18:36:44 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/20 14:05:52 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int is_redir_token(t_token_type type)
+int	is_redir_token(t_token_type type)
 {
-	if (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT || type == TOKEN_HEREDOC || type == TOKEN_APPEND)
+	if (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT
+		|| type == TOKEN_HEREDOC || type == TOKEN_APPEND)
 		return (1);
 	return (0);
 }
@@ -59,32 +60,4 @@ t_parser	*init_parser(t_token *token_list)
 	parser->error = 0;
 	parser->error_msg = NULL;
 	return (parser);
-}
-
-void free_nodes(t_node *head)
-{
-	t_node	*current;
-	t_node	*next;
-	int		i;
-
-	current = head;
-	while (current)
-	{
-		next = current->next;
-		if (current->cmd)
-			free(current->cmd);
-		if (current->arg)
-		{
-			i = 0;
-			while (current->arg[i++])
-				free(current->arg[i]);
-			free(current->arg);
-		}
-		if (current->heredoc_delim)
-			free(current->heredoc_delim);
-		if (current->redir_file)
-			free(current->redir_file);
-		free(current);
-		current = next;
-	}
 }

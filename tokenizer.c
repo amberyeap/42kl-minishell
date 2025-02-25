@@ -6,91 +6,34 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 18:37:53 by ayeap             #+#    #+#             */
-/*   Updated: 2025/02/18 18:37:53 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/02/23 21:22:34 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// creates a new token
-t_token	*create_token(t_token_type type, char *value)
+// creates a word token
+/* 1. if the current char is a quote, it will call handle_quotes() 
+** (34 is double quote, 39 is single quote)
+*/
+t_token	*create_word_token(t_tokenizer *tokenizer)
 {
 	t_token	*token;
 
-	token = malloc(sizeof(t_token));
-	if (!token)
-		return (NULL);
-	if (value)
-		token->value = ft_strdup(value);
-	else
-		token->value = NULL;
-	token->type = type;
-	token->next = NULL;
-	return (token);
-}
-
-// adds a token to the end of the list
-void	add_token(t_token **head, t_token *new_token)
-{
-	t_token	*current;
-
-	if (!*head)
-	{
-		*head = new_token;
-		return ;
-	}
-	current = *head;
-	while (current->next)
-		current = current->next;
-	current->next = new_token;
-}
-
-char	*handle_quotes(t_tokenizer *tokenizer)
-{
-	int		start;
-	int		len;
-	char	*word;
-	char	quote;
-
-	quote = peek(tokenizer);
-	next_char(tokenizer);
-	start = tokenizer->position;
-	while (peek(tokenizer) != quote && peek(tokenizer))
-		next_char(tokenizer);
-	len = tokenizer->position - start;
-	if (peek(tokenizer) != quote)
-		return (NULL);
-	word = ft_substr(tokenizer->user_input, start, len);
-	next_char(tokenizer);
-	return (word);
-}
-
-// creates a word token
-/* 1. if the current char is a quote, it will call handle_quotes() (34 is double quote, 39 is single quote)
-*/
-t_token *create_word_token(t_tokenizer *tokenizer)
-{
-	int		start;
-	int		len;
-	char	*word;
-
 	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
 	{
-		word = handle_quotes(tokenizer);
-		if (!word)
-			return (create_token(TOKEN_ERROR, "Unterminated quote"));
+		token = create_quote_token(tokenizer);
+		if (token->type == TOKEN_ERROR)
+			return (token);
+		return (token);
 	}
 	else
 	{
-		start = tokenizer->position;
-		while (!is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)) && peek(tokenizer))
-			next_char(tokenizer);
-		len = tokenizer->position - start;
-		word = ft_substr(tokenizer->user_input, start, len);
+		token = create_unquoted_token(tokenizer);
+		if (token->type == TOKEN_ERROR)
+			return (token);
+		return (token);
 	}
-	if (word)
-		return (create_token(TOKEN_WORD, word));
-	return (create_token(TOKEN_ERROR, "Failed to create word token")); // most likely will not reach here?
 }
 
 // creates an operator token
@@ -122,17 +65,17 @@ t_token	*create_op_token(t_tokenizer *tokenizer)
 }
 
 // main tokenize function
-/* 1. skips whitespace
-** 2. checks the char in the user_input.
-**	- if it's a nul terminator, it will break out of the loop and create a EOF token
-**	- if it's an operator (|<>), it will create an operator token
-**	- else if it's a word, it will create a word token 
-** 3. check if there was any error encountered
-**	- if NO error, create EOF token
-**	- if there is error, free all malloc and set the head pointer to NULL 
-** 4. free tokenizer as the user_input has been tokenized
-** 5. return the head pointer, which is a pointer to a list of tokens
-*/
+// 1. skips whitespace
+// 2. checks the char in the user_input.
+//	- if it's a nul terminator, 
+//		it will break out of the loop and create a EOF token
+//	- if it's an operator (|<>), it will create an operator token
+//	- else if it's a word, it will create a word token 
+// 3. check if there was any error encountered
+//	- if NO error, create EOF token
+//	- if there is error, free all malloc and set the head pointer to NULL 
+// 4. free tokenizer as the user_input has been tokenized
+// 5. return the head pointer, which is a pointer to a list of tokens
 t_token	*tokenize(char *input)
 {
 	t_tokenizer	*tokenizer;
@@ -144,7 +87,7 @@ t_token	*tokenize(char *input)
 	while (peek(tokenizer))
 	{
 		skip_whitespace(tokenizer);
-		if (peek(tokenizer) == '\0' || peek(tokenizer) == '\n')
+		if (peek(tokenizer) == '\0')
 			break ;
 		if (is_operator(peek(tokenizer)))
 			new_token = create_op_token(tokenizer);
@@ -152,18 +95,6 @@ t_token	*tokenize(char *input)
 			new_token = create_word_token(tokenizer);
 		add_token(&head, new_token);
 	}
-	// if (!tokenizer->error)
-	// {
-	// 	new_token = create_token(TOKEN_EOF, NULL);
-	// 	add_token(&head, new_token);
-	// }
-	// if (tokenizer->error)
-	// {
-	// 	if (tokenizer->error_msg)
-	// 		free(tokenizer->error_msg);
-	// 	free_tokens(head);
-	// 	head = NULL;
-	// }
 	free(tokenizer);
 	return (head);
 }
