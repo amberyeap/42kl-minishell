@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/02/25 16:03:43 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/03/13 10:47:39 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	run_builtin(char **args, t_minishell *data)
 	if (ft_strcmp(args[0], "env") == 0)
 		result = env(args,data->env);
 	if (ft_strcmp(args[0], "export") == 0)
-		result = export(args, data->env, data->hidden_env);
+		result = export(args, data->env);
 	if (ft_strcmp(args[0], "unset") == 0)
 		result = unset(args, data);
 	if (ft_strcmp (args[0], "exit") == 0)
