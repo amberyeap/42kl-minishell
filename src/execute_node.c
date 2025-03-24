@@ -4,6 +4,7 @@ void execute_node(t_minishell *shell)
 {
 	t_node *current_node;
 
+	current_node = shell->parser_list;
 	if (current_node->type == NODE_PIPE)
 		setup_pipe();
 	else if (current_node->type == NODE_REDIR_IN)
