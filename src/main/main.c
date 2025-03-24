@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "inc/minishell.h"
 
 // current checklist for parser:
 // - syntax error

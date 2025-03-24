@@ -125,8 +125,8 @@ typedef struct s_minishell
 	char		*user_input;
 	char		**env; // can remove
 	t_token		*token_list;
-	t_node		*parser_list;
-	t_parser	*parser;
+	t_node		*parser_list; // pointer to the first node of the parser
+	t_parser	*parser; // 
 	// int			exit_status;
 }	t_minishell;
 
