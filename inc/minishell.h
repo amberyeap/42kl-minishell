@@ -32,7 +32,7 @@
 # include <sys/wait.h> // wait, waitpid, wait3, wait4
 # include <ctype.h>
 
-# include "library/inc/libft.h"
+# include "../library/inc/libft.h"
 // # include "library/ft_printf/inc/ft_printf.h"
 // # include "library/get_next_line/get_next_line.h"
 // # include "library/get_next_line/get_next_line_bonus.h"
@@ -138,7 +138,7 @@ typedef struct s_minishell
 	t_env		*env;
 	t_token		*token_list;
 	t_node		*parser_list; // pointer to the first node of the parser
-	t_parser	*parser; // 
+	t_parser	*parser; //
 	// int			exit_status;
 }	t_minishell;
 
@@ -243,4 +243,5 @@ void		free_array(char **array);
 //exec.c
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
+void		setup_pipe(t_minishell *data);
 #endif
