@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 10:03:51 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/13 11:20:18 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/03/20 06:38:00 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int	export(char **args, t_minishell *data)
 	i = 0;
 	if (!args[1])// if no argument, print export variable
 	{
-		//print_sorted_env(backup_env);
+		sort_print_env(data->env);
 		return (0);// if the print is a success should return 0
 	}
 	while (args[++i])// iterates through each argument skips 0
@@ -100,89 +100,89 @@ int	export(char **args, t_minishell *data)
 	return (0);
 }
 
-#include <stdio.h>
+// #include <stdio.h>
 
-void free_env(t_env *env)
-{
-    t_env *tmp;
+// void free_env(t_env *env)
+// {
+//     t_env *tmp;
 
-    while (env)
-    {
-        tmp = env;
-        env = env->next;
-        free(tmp->key);
-        free(tmp->value);
-        free(tmp);
-    }
-}
-void free_split(char **arr)
-{
-    int i;
+//     while (env)
+//     {
+//         tmp = env;
+//         env = env->next;
+//         free(tmp->key);
+//         free(tmp->value);
+//         free(tmp);
+//     }
+// }
+// void free_split(char **arr)
+// {
+//     int i;
 
-    i = 0;
-    while (arr[i])
-    {
-        free(arr[i]);
-        i++;
-    }
-    free(arr);
-}
-void print_env(t_env *env)
-{
-    while (env)
-    {
-        printf("%s=%s\n", env->key, env->value);
-        env = env->next;
-    }
-}
-void test_export(t_minishell *data, char *input)
-{
-    char **args;
-    int result;
+//     i = 0;
+//     while (arr[i])
+//     {
+//         free(arr[i]);
+//         i++;
+//     }
+//     free(arr);
+// }
+// void print_env(t_env *env)
+// {
+//     while (env)
+//     {
+//         printf("%s=%s\n", env->key, env->value);
+//         env = env->next;
+//     }
+// }
+// void test_export(t_minishell *data, char *input)
+// {
+//     char **args;
+//     int result;
 
-    // Simulate command-line arguments
-    args = ft_split(input, ' ');
-    if (!args)
-    {
-        printf("Error: Failed to split input\n");
-        return;
-    }
+//     // Simulate command-line arguments
+//     args = ft_split(input, ' ');
+//     if (!args)
+//     {
+//         printf("Error: Failed to split input\n");
+//         return;
+//     }
 
-    // Call the export function
-    result = export(args, data);
+//     // Call the export function
+//     result = export(args, data);
 
-    // Print the result
-    printf("Input: %s\n", input);
-    printf("Result: %d\n", result);
-    printf("Environment:\n");
-    print_env(data->env); // Assuming you have a function to print the environment
-    printf("\n");
+//     // Print the result
+//     printf("Input: %s\n", input);
+//     printf("Result: %d\n", result);
+//     printf("Environment:\n");
+//     print_env(data->env); // Assuming you have a function to print the environment
+//     printf("\n");
 
-    // Free allocated memory
-    free_split(args);
-}
+//     // Free allocated memory
+//     free_split(args);
+// }
 
-int main(void)
-{
-    t_minishell data;
+// int main(void)
+// {
+//     t_minishell data;
 
-    // Initialize the environment (you can add some default variables here)
-    data.env = NULL;
+//     // Initialize the environment (you can add some default variables here)
+//     data.env = NULL;
 
-    // Test cases
-    test_export(&data, "export");
-    test_export(&data, "export MY_VAR=123");
-    test_export(&data, "export MY_VAR");
-    test_export(&data, "export 1VAR=123");
-    test_export(&data, "export MY_VAR=456");
-    test_export(&data, "export MY_VAR=\"hello world\"");
-    test_export(&data, "export MY_VAR=123 ANOTHER_VAR=456");
-    test_export(&data, "export MY_VAR=123 1VAR=456");
-    test_export(&data, "export MY_VAR=");
-    test_export(&data, "export _MY_VAR=123");
+//     // Test cases
+//     test_export(&data, "export");
+//     test_export(&data, "export MY_VAR=123");
+//     test_export(&data, "export MY_VAR");
+//     test_export(&data, "export 1VAR=123");
+//     test_export(&data, "export MY_VAR=456");
+//     test_export(&data, "export MY_VAR=\"hello world\"");
+//     test_export(&data, "export MY_VAR=123 ANOTHER_VAR=456");
+//     test_export(&data, "export MY_VAR=123 1VAR=456");
+//     test_export(&data, "export MY_VAR=");
+//     test_export(&data, "export _MY_VAR=123");
 
-    // Free the environment
-    free_env(data.env);
+//     // Free the environment
+//     free_env(data.env);
 
-    return 0;
-}
+//     return 0;
+// }

@@ -13,13 +13,13 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <readline/readline.h> // readline, add_history, rl_clear_history, 
+# include <readline/readline.h> // readline, add_history, rl_clear_history,
 							// rl_on_new_line, rl_replace_line, rl_redisplay
 # include <readline/history.h>
 # include <stdio.h> // printf, perror
 # include <stdlib.h> // malloc, free, exit
-# include <unistd.h> // write, access, open, read, close, fork, pipe, isatty, 
-				// ttyname, ttyslot, getcwd, chdir, unlink, execve, dup, dup2 
+# include <unistd.h> // write, access, open, read, close, fork, pipe, isatty,
+				// ttyname, ttyslot, getcwd, chdir, unlink, execve, dup, dup2
 # include <fcntl.h> // open
 # include <signal.h> // signal, sigaction, sigemptyset, sigaddset, kill
 # include <sys/types.h> // pid_t
@@ -30,8 +30,9 @@
 # include <termios.h> // tcsetattr, tcgetattr, ioctl
 # include <curses.h> // tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <sys/wait.h> // wait, waitpid, wait3, wait4
+# include <ctype.h>
 
-# include "library/inc/libft.h"
+# include "../library/inc/libft.h"
 // # include "library/ft_printf/inc/ft_printf.h"
 // # include "library/get_next_line/get_next_line.h"
 // # include "library/get_next_line/get_next_line_bonus.h"
@@ -120,13 +121,24 @@ typedef struct s_node
 	struct s_node	*next;
 }	t_node;
 
+typedef struct s_env
+{
+	char			*value;
+	char			*key;
+	struct s_env	*next;
+}				t_env;
+
 typedef struct s_minishell
 {
 	char		*user_input;
-	char		**env; // can remove
+	char		**sorted_env;
+	// char		**env; // can remove
+	int			exit;
+	int			ret;
+	t_env		*env;
 	t_token		*token_list;
 	t_node		*parser_list; // pointer to the first node of the parser
-	t_parser	*parser; // 
+	t_parser	*parser; //
 	// int			exit_status;
 }	t_minishell;
 
@@ -140,6 +152,7 @@ void		free_nodes_list(t_node *head);
 
 // main_utils.c
 void		init_shell(t_minishell *shell, char **env);
+int			init_env(t_minishell *data, char **envp);
 void		reset_main(t_minishell *shell);
 int			check_token_error(t_minishell *shell);
 void		cleanup_parser(t_minishell *shell);
@@ -204,4 +217,31 @@ t_token		*tokenize(char *user_input);
 int			is_whitespace(char c);
 int			is_operator(char c);
 
+//builtin.c
+int			run_builtin(char **args, t_minishell *data);
+int			check_builtin(char *command);
+// export.c
+int			valid_var_name(char *var_name);
+void		update_env_var(t_minishell *data, char *var_name, char *var_value);
+t_env		*create_new(char *var_name, char *var_value);
+void		add_env(t_minishell *data, t_env *new_var);
+void		sort_print_env(t_minishell *data);
+void		ft_memdel(void *ptr);
+
+// cd.c
+char		*get_env_value(t_env *env, char *key);
+void		update_oldpwd(t_minishell *data);
+void		update_pwd(t_minishell *data);
+int			change_directory(char *path);
+
+//env_sort.c
+void		sorting_env(char **array_env);
+char		**list_to_str(t_env *env);
+void		print_sort(char **sorted_env);
+void		free_array(char **array);
+
+//exec.c
+int			check_builtin(char *command);
+int			run_builtin(char **args, t_minishell *data);
+void		setup_pipe(t_minishell *data);
 #endif

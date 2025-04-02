@@ -24,7 +24,8 @@ LIBFT_SRC_FILES = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint
 			ft_lstnew.c ft_lstadd_front.c ft_lstsize.c ft_lstlast.c \
 			ft_lstadd_back.c ft_lstdelone.c ft_lstclear.c ft_lstiter.c ft_lstmap.c \
 			ft_print_char.c ft_print_digit.c ft_print_hex.c ft_print_ptr.c ft_print_str.c ft_printf.c \
-			get_next_line.c get_next_line_utils.c get_next_line_bonus.c get_next_line_utils_bonus.c
+			get_next_line.c get_next_line_utils.c get_next_line_bonus.c get_next_line_utils_bonus.c \
+			ft_strcmp.c ft_strndup.c ft_strncpy.c
 
 SRC_DIR = src
 LIBFT_SRC = $(addprefix $(SRC_DIR)/, $(LIBFT_SRC_FILES))
