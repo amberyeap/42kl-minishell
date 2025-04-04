@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 19:29:12 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/04 20:14:57 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	check_redirection(t_node *current_node)
 	int	fd;
 
 	if (current_node->type == NODE_REDIR_IN)
-		open =(current_node->filem)
+		open =(current_node->filem);
 	else if (current_node->type == NODE_REDIR_OUT)
 		setup_redir(current_node);
 	else if (current_node->type == NODE_APPEND)

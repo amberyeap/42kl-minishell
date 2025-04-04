@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 14:17:41 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/04 21:35:08 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
 {
+	printf("entered check_builtin\n");
 	if (ft_strncmp(command, "echo", 4) == 0)
 		return (1);
 	if (ft_strncmp(command, "cd ", 2) == 0)
@@ -33,12 +34,36 @@ int	check_builtin(char *command)
 }
 
 //run the builtin after being check
+// int	run_builtin(char **args, t_minishell *data)
+// {
+// 	int	result;
+
+// 	printf("entered run_builtin\n");
+// 	result = 0;
+// 	if (ft_strcmp(args[0], "echo") == 0)
+// 		result = ft_echo(args);
+// 	if (ft_strcmp(args[0], "cd") == 0)
+// 		result = cd(args, data);
+// 	if (ft_strcmp(args[0], "pwd") == 0)
+// 		result = pwd(args);
+// 	if (ft_strcmp(args[0], "env") == 0)
+// 		result = ft_env(args, data->env);
+// 	if (ft_strcmp(args[0], "export") == 0)
+// 		result = export(args, data);
+// 	if (ft_strcmp(args[0], "unset") == 0)
+// 		result = unset(args, data);
+// 	if (ft_strcmp (args[0], "exit") == 0)
+// 		ft_exit(data, args);
+// 	return (result);
+// }
+
 int	run_builtin(char **args, t_minishell *data)
 {
 	int	result;
 
+	printf("entered run_builtin\n");
 	result = 0;
-	if (ft_strcmp(args[0], "echo") == 0)
+	if (ft_strcmp(data->parser_list->cmd, "echo") == 0)
 		result = ft_echo(args);
 	if (ft_strcmp(args[0], "cd") == 0)
 		result = cd(args, data);
@@ -54,6 +79,7 @@ int	run_builtin(char **args, t_minishell *data)
 		ft_exit(data, args);
 	return (result);
 }
+
 // int ft_strncmp(const char *s1, const char *s2, size_t n)
 // {
 //     while (n && *s1 && (*s1 == *s2))

@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 13:54:40 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/04 21:38:10 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,15 +67,16 @@ int	ft_echo(char **args)
 	int	i;
 
 	newline = 10;
-	if (length(args) == 1)
-	{
-		printf("\n");
-		return (0);
-	}
+	// if (length(args) == 1)
+	// {
+	// 	printf("\n");
+	// 	return (0);
+	// }
 	i = skip_flags(args, &newline);
+	// i = 0;
 	while (args[i])
 	{
-		printf("%s", args[i]);
+		printf("%s\n", args[i]);
 		if (args[i +1])
 			printf(" ");
 		i++;
