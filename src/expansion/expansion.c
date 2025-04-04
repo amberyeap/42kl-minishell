@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../inc/minishell.h"
 
 char	*get_env_var(char **value, char *var_start, char *result, int *i)
 {

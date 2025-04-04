@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../inc/minishell.h"
 
 // this adds arguments to the command node as multiple strings
 int	add_arg_to_command(char *arg, t_node *cmd_node)

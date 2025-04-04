@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../inc/minishell.h"
 
 // returns a number (aka true) if the char is a whitespace
 int	is_whitespace(char c)

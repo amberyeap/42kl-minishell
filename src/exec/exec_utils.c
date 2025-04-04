@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 19:09:34 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/04 19:21:47 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	set_child(int in_fd, int out_fd, t_minishell *data, t_node *cmd)
 		dup2(out_fd, STDOUT_FILENO);
 		close(out_fd);
 	}
-	execute_fork(cmd, data);
+	execute_fork(data, cmd);
 	exit(data->exit);
 }
 static void	create_pipe(int pipefd[2])
