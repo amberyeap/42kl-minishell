@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 14:44:55 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/04 19:29:12 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,5 +96,5 @@ void	parent_execution(t_minishell *shell)
 			return ;
 		}
 	}
-	execute_fork(shell, current_node);
+	// execute_fork(shell, current_node);
 }
