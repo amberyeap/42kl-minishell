@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/13 11:54:02 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:49:52 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../../inc/minishell.h"
 
 /*
 	* so it look up the flag then it will check where 0(no args| ~) or 1(-)

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 10:05:07 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/02/19 12:58:31 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 17:55:27 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../../inc/minishell.h"
 
 // int	length(char **arg)
 // {
@@ -40,8 +40,10 @@ int	pwd(char **args)
 		return (0);
 	}
 	else
+	{
 		perror("pwd");
 		return (1);
+	}
 }
 
 // int main(void)

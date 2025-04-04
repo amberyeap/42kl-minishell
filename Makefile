@@ -18,25 +18,44 @@ RL = -lreadline
 NAME = minishell
 LIBFT = library/libft.a
 
-SRC = expansion.c free_nodes.c main_utils.c main.c \
-	parse_redir.c parse_simple_command.c parser_utils.c parser.c \
-	signals.c tokenizer_create_tokens.c tokenizer_quotes.c tokenizer_unquoted.c \
-	tokenizer_utils.c tokenizer.c utils.c
-OBJ = $(SRC:.c=.o)
+SRC_DIR = src
+SRC_FILES = builtins/builtin.c builtins/cd_utils.c builtins/cd.c builtins/echo.c \
+			builtins/env.c builtins/exit.c builtins/export.c builtins/pwd.c \
+			builtins/unset.c builtins/utils.c \
+			env/env_sort.c env/env.c \
+			expansion/expansion.c \
+			main/main_utils.c main/main.c \
+			parsing/free_nodes.c parsing/parse_redir.c parsing/parse_simple_command.c \
+			parsing/parser_utils.c parsing/parser.c \
+			signals/signals.c \
+			tokenization/tokenizer_create_tokens.c tokenization/tokenizer_quotes.c \
+			tokenization/tokenizer_unquoted.c tokenization/tokenizer_utils.c \
+			tokenization/tokenizer.c tokenization/utils.c
+SRC = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
+# SRC = $(wildcard $(SRC_DIR)/*/*.c) \
+# 	$(wildcard $(SRC_DIR)/*.c)
 
-$(NAME): $(OBJ) $(LIBFT)
+OBJ_DIR = obj
+OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+
+$(NAME): $(OBJ_DIR) $(OBJ) $(LIBFT)
 	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME) $(RL)
+
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
 
 $(LIBFT):
 	make -C library
 
-%.o:%.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(NAME)
 
 clean:
 	$(RM) $(OBJ)
+	$(RM) $(OBJ_DIR)
 	make clean -C library
 
 fclean: clean

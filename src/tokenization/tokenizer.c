@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../inc/minishell.h"
 
 // creates a word token
 /* 1. if the current char is a quote, it will call handle_quotes() 

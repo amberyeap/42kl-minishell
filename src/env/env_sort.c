@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   env_sort.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 13:31:10 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/21 17:30:50 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:09:47 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../../inc/minishell.h"
 
 void	print_sort(char **sorted_env)
 {

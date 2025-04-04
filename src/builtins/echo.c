@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/02/25 16:32:30 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 13:54:40 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../../inc/minishell.h"
 
 /*
  * @brief This function is to detect -n,tell echo not to print newline at EOL

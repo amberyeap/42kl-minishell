@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/25 00:19:43 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:17:41 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,17 @@ int	run_builtin(char **args, t_minishell *data)
 	if (ft_strcmp(args[0], "echo") == 0)
 		result = ft_echo(args);
 	if (ft_strcmp(args[0], "cd") == 0)
-		result = cd(args, data->env);
+		result = cd(args, data);
 	if (ft_strcmp(args[0], "pwd") == 0)
 		result = pwd(args);
 	if (ft_strcmp(args[0], "env") == 0)
-		result = env(args,data->env);
+		result = ft_env(args, data->env);
 	if (ft_strcmp(args[0], "export") == 0)
-		result = export(args, data->env);
+		result = export(args, data);
 	if (ft_strcmp(args[0], "unset") == 0)
 		result = unset(args, data);
 	if (ft_strcmp (args[0], "exit") == 0)
-		result = ft_exit(args, data);
+		ft_exit(data, args);
 	return (result);
 }
 // int ft_strncmp(const char *s1, const char *s2, size_t n)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/31 18:17:12 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:44:55 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ int	check_redirection(t_node *current_node)
 	if (current_node->type == NODE_REDIR_IN)
 		open =(current_node->filem)
 	else if (current_node->type == NODE_REDIR_OUT)
-	setup_redir(current_node);
+		setup_redir(current_node);
 	else if (current_node->type == NODE_APPEND)
-	setup_append(current_node);
+		setup_append(current_node);
 	else if (current_node->type == NODE_HEREDOC)
-	setup_heredoc(current_node);
+		setup_heredoc(current_node);
 	else if (current_node->type == NODE_PIPE)
 		setup_pipe(current_node);
 }
@@ -34,13 +34,13 @@ void	execute_node(t_node *current_node, t_minishell *data)
 	while (current_node)
 	{
 		if (current_node->type == NODE_REDIR_IN)
-		setup_redir(current_node);
+			setup_redir(current_node);
 		else if (current_node->type == NODE_REDIR_OUT)
-		setup_redir(current_node);
+			setup_redir(current_node);
 		else if (current_node->type == NODE_APPEND)
-		setup_append(current_node);
+			setup_append(current_node);
 		else if (current_node->type == NODE_HEREDOC)
-		setup_heredoc(current_node);
+			setup_heredoc(current_node);
 		else if (current_node->type == NODE_PIPE)
 			setup_pipe(current_node);
 		else

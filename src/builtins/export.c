@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 10:03:51 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/03/20 06:38:00 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:40:01 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../minishell.h"
+#include "../../inc/minishell.h"
 
 // if add new var with an empty value
 void add_var_empty(t_minishell *data, char *name, char *value)
@@ -80,7 +80,7 @@ int	export(char **args, t_minishell *data)
 	i = 0;
 	if (!args[1])// if no argument, print export variable
 	{
-		sort_print_env(data->env);
+		sort_print_env(data);
 		return (0);// if the print is a success should return 0
 	}
 	while (args[++i])// iterates through each argument skips 0

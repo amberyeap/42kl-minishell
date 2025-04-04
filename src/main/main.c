@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "inc/minishell.h"
+#include "../../inc/minishell.h"
 
 // current checklist for parser:
 // - syntax error
@@ -93,14 +93,15 @@ void	minishell_loop(t_minishell *shell)
 		}
 		else
 			main_parse(shell);
-		execution(shell);
+		// execution(shell);
+		run_builtin(shell->parser_list->arg, shell);
 			//do something later
 
 		// print_tokens(shell->token_list);
 		// print_nodes(shell->parser_list);
 		reset_main(shell);
 	}
-	free_nodes_list(shell);
+	free_nodes_list(shell->parser_list);
 }
 
 // int	main(int argc, char **argv, char **envp)

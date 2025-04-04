@@ -31,6 +31,7 @@
 # include <curses.h> // tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs
 # include <sys/wait.h> // wait, waitpid, wait3, wait4
 # include <ctype.h>
+# include <limits.h>
 
 # include "../library/inc/libft.h"
 // # include "library/ft_printf/inc/ft_printf.h"
@@ -220,7 +221,10 @@ int			is_operator(char c);
 //builtin.c
 int			run_builtin(char **args, t_minishell *data);
 int			check_builtin(char *command);
+
 // export.c
+int	export(char **args, t_minishell *data);
+
 int			valid_var_name(char *var_name);
 void		update_env_var(t_minishell *data, char *var_name, char *var_value);
 t_env		*create_new(char *var_name, char *var_value);
@@ -229,19 +233,38 @@ void		sort_print_env(t_minishell *data);
 void		ft_memdel(void *ptr);
 
 // cd.c
+int			cd(char **args, t_minishell *data);
+
 char		*get_env_value(t_env *env, char *key);
 void		update_oldpwd(t_minishell *data);
 void		update_pwd(t_minishell *data);
 int			change_directory(char *path);
 
-//env_sort.c
+// echo.c
+int	ft_echo(char **args);
+int	length(char **arg);
+
+// env.c
+int	ft_env(char **args, t_env *env);
+
+// exit.c 
+void	ft_exit(t_minishell *data, char **args);
+
+// pwd.c
+int	pwd(char **args);
+
+// unset.c
+int	unset(char **args, t_minishell *data);
+
+// env_sort.c
 void		sorting_env(char **array_env);
 char		**list_to_str(t_env *env);
 void		print_sort(char **sorted_env);
 void		free_array(char **array);
 
-//exec.c
+// exec.c
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
 void		setup_pipe(t_minishell *data);
+
 #endif

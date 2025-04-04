@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../inc/minishell.h"
 
 // need to add signals for the child processes -> if Ctrl+D to cancel running 
 // commands, it should not exit the parent process

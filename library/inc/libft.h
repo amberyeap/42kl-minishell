@@ -19,6 +19,9 @@
 # include <limits.h>
 # include <stdarg.h>
 
+// additional functions
+int	ft_strisnum(const char *str);
+
 // ft_printf
 int		ft_fprintf(int fd, const char *format, ...);
 int		ft_print_char(int fd, char c);
@@ -33,7 +36,7 @@ int		ft_print_ptr(int fd, void *ptr, char *base);
 #  define BUFFER_SIZE 42
 # endif
 
-// # define OPEN_MAX 256
+# define OPEN_MAX 256
 
 char	*get_next_line(int fd);
 char	*clear_line(char *stash);
