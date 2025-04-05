@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 21:35:08 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/05 21:48:51 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,17 +65,17 @@ int	run_builtin(char **args, t_minishell *data)
 	result = 0;
 	if (ft_strcmp(data->parser_list->cmd, "echo") == 0)
 		result = ft_echo(args);
-	if (ft_strcmp(args[0], "cd") == 0)
+	else if (ft_strcmp(args[0], "cd") == 0)
 		result = cd(args, data);
-	if (ft_strcmp(args[0], "pwd") == 0)
+	else if (ft_strcmp(args[0], "pwd") == 0)
 		result = pwd(args);
-	if (ft_strcmp(args[0], "env") == 0)
+	else if (ft_strcmp(args[0], "env") == 0)
 		result = ft_env(args, data->env);
-	if (ft_strcmp(args[0], "export") == 0)
+	else if (ft_strcmp(args[0], "export") == 0)
 		result = export(args, data);
-	if (ft_strcmp(args[0], "unset") == 0)
+	else if (ft_strcmp(args[0], "unset") == 0)
 		result = unset(args, data);
-	if (ft_strcmp (args[0], "exit") == 0)
+	else if (ft_strcmp (args[0], "exit") == 0)
 		ft_exit(data, args);
 	return (result);
 }

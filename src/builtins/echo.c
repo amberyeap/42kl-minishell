@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 21:38:10 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/05 22:00:24 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ static int	skip_flags(char **args, int *newline)
 	i = 1;
 	while (args[i] && ft_strncmp(args[i], "-n", 2) == 0)
 	{
+		printf("entered skip_flags\n");
 		j = 1;
 		if (args[i][j +1] != '\0' && args[i][j + 1] != 'n')
 			break;
@@ -41,6 +42,7 @@ static int	skip_flags(char **args, int *newline)
 	}
 	return (i);
 }
+
 /*
  @brief Used to count how many argument */
 int	length(char **arg)
@@ -48,10 +50,13 @@ int	length(char **arg)
 	int	i;
 
 	i = 0;
+	if (!arg)
+		return (0);
 	while (arg[i])
 		i++;
 	return (i);
 }
+
 /*
  * @brief Replicate the behavior of the shell echo command
  * @param args an array of strings that argument pass to echo
@@ -61,26 +66,30 @@ int	length(char **arg)
  * 	Example: Hello World
  * @return 0 in success
 */
+// [FIXED] BUG: only prints a newline when there is only one argument
+// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), works for echo ""
+// BUG: doesn't print "hello"world in one line, but as two separate strings
 int	ft_echo(char **args)
 {
 	int	newline;
 	int	i;
 
 	newline = 10;
-	// if (length(args) == 1)
-	// {
-	// 	printf("\n");
-	// 	return (0);
-	// }
+	if (length(args) < 1)
+	{
+		printf("\n");
+		return (0);
+	}
 	i = skip_flags(args, &newline);
-	// i = 0;
+	i = 0;
 	while (args[i])
 	{
-		printf("%s\n", args[i]);
-		if (args[i +1])
+		printf("%s", args[i]);
+		if (args[i + 1])
 			printf(" ");
 		i++;
 	}
+	printf("\n");
 	return (0);
 }
 
