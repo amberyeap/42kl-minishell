@@ -10,19 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../inc/libft.h"
 
 char *ft_strncpy(char *dst, const char *src, size_t size)
 {
 	size_t i = 0;
-	while (i < size)
+	if (!src || !dst)
+		return (NULL);
+	while (i < size && src[i])
 	{
-		if (src[i])
-			dst[i] = src[i];
-		else
-			dst[i] = '\0';
+		dst[i] = src[i];
 		i++;
 	}
+	while (i < size)
+		dst[i++] = '\0';
 	return (dst);
 }
 
