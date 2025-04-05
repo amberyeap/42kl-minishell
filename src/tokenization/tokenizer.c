@@ -16,24 +16,98 @@
 /* 1. if the current char is a quote, it will call handle_quotes() 
 ** (34 is double quote, 39 is single quote)
 */
+// t_token	*create_word_token(t_tokenizer *tokenizer)
+// {
+// 	t_token	*token;
+
+// 	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
+// 	{
+// 		token = create_quote_token(tokenizer);
+// 		if (token->type == TOKEN_ERROR)
+// 			return (token);
+// 		return (token);
+// 	}
+// 	else
+// 	{
+// 		token = create_unquoted_token(tokenizer);
+// 		if (token->type == TOKEN_ERROR)
+// 			return (token);
+// 		return (token);
+// 	}
+// }
+
+char *handle_no_quotes_until_quote_or_special(t_tokenizer *tokenizer)
+{
+	int start = tokenizer->position;
+	int len;
+	char *word;
+
+	while (peek(tokenizer) &&
+		   !is_whitespace(peek(tokenizer)) &&
+		   !is_operator(peek(tokenizer)) &&
+		   peek(tokenizer) != '\'' &&
+		   peek(tokenizer) != '"')
+	{
+		next_char(tokenizer);
+	}
+
+	len = tokenizer->position - start;
+	word = ft_substr(tokenizer->user_input, start, len);
+	return word;
+}
+
+
 t_token	*create_word_token(t_tokenizer *tokenizer)
 {
-	t_token	*token;
+	t_token *token;
+	char *chunk;
+	char *word = ft_strdup("");  // Start with an empty string
+	int expand = 0;
 
-	if (peek(tokenizer) == 34 || peek(tokenizer) == 39)
+	if (!word)
+		return (create_token(TOKEN_ERROR, "Memory allocation failed"));
+
+	while (peek(tokenizer) &&
+		   !is_whitespace(peek(tokenizer)) &&
+		   !is_operator(peek(tokenizer)))
 	{
-		token = create_quote_token(tokenizer);
-		if (token->type == TOKEN_ERROR)
-			return (token);
-		return (token);
+		if (peek(tokenizer) == 34 || peek(tokenizer) == 39)  // '"' or '\''
+		{
+			char quote = peek(tokenizer);
+			chunk = handle_quotes(tokenizer, quote);
+			if (!chunk)
+			{
+				free(word);
+				return (create_token(TOKEN_ERROR, "Unterminated quote"));
+			}
+			if (quote == 34 && ft_strchr(chunk, '$')) // double quote allows var expansion
+				expand = 1;
+		}
+		else
+		{
+			chunk = handle_no_quotes_until_quote_or_special(tokenizer);
+			if (!chunk)
+			{
+				free(word);
+				return (create_token(TOKEN_ERROR, "Failed to create word token"));
+			}
+			if (ft_strchr(chunk, '$'))
+				expand = 1;
+		}
+
+		char *tmp = ft_strjoin(word, chunk);
+		free(word);
+		free(chunk);
+		if (!tmp)
+			return (create_token(TOKEN_ERROR, "Memory allocation failed"));
+		word = tmp;
 	}
-	else
-	{
-		token = create_unquoted_token(tokenizer);
-		if (token->type == TOKEN_ERROR)
-			return (token);
-		return (token);
-	}
+
+	token = create_token(TOKEN_WORD, word);
+	if (expand)
+		token->expand = 1;
+	free(word);  // Assume create_token makes a copy of the word
+	return token;
 }
 
 // creates an operator token
