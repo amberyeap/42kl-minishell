@@ -34,9 +34,6 @@
 # include <limits.h>
 
 # include "../library/inc/libft.h"
-// # include "library/ft_printf/inc/ft_printf.h"
-// # include "library/get_next_line/get_next_line.h"
-// # include "library/get_next_line/get_next_line_bonus.h"
 
 /* ************************************************************************** */
 /*                                                                            */
