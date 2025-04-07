@@ -19,19 +19,19 @@ NAME = minishell
 LIBFT = library/libft.a
 
 SRC_DIR = src
-# SRC_FILES = builtins/builtin.c builtins/cd_utils.c builtins/cd.c builtins/echo.c \
-# 			builtins/env.c builtins/exit.c builtins/export.c builtins/pwd.c \
-# 			builtins/unset.c builtins/utils.c \
-# 			env/env_sort.c env/env.c \
-# 			expansion/expansion.c \
-# 			main/main_utils.c main/main.c \
-# 			parsing/free_nodes.c parsing/parse_redir.c parsing/parse_simple_command.c \
-# 			parsing/parser_utils.c parsing/parser.c \
-# 			signals/signals.c \
-# 			tokenization/tokenizer_create_tokens.c tokenization/tokenizer_quotes.c \
-# 			tokenization/tokenizer_unquoted.c tokenization/tokenizer_utils.c \
-# 			tokenization/tokenizer.c tokenization/utils.c
-SRC_FILES = ver2/main2.c
+SRC_FILES = builtins/builtin.c builtins/cd_utils.c builtins/cd.c builtins/echo.c \
+			builtins/env.c builtins/exit.c builtins/export.c builtins/pwd.c \
+			builtins/unset.c builtins/utils.c \
+			env/env_sort.c env/env.c \
+			expansion/expansion.c \
+			main/main_utils.c main/main.c \
+			parsing/free_nodes.c parsing/parse_redir.c parsing/parse_simple_command.c \
+			parsing/parser_utils.c parsing/parser.c \
+			signals/signals.c \
+			tokenization/tokenizer_create_tokens.c tokenization/tokenizer_quotes.c \
+			tokenization/tokenizer_unquoted.c tokenization/tokenizer_utils.c \
+			tokenization/tokenizer.c tokenization/utils.c
+# SRC_FILES = ver2/main2.c
 SRC = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 
 # exec/exec_utils.c exec/exec.c \

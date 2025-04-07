@@ -67,15 +67,38 @@ typedef enum e_direction {
 	OUTPUT
 }	t_direction;
 
-typedef struct s_parser_node {
-	t_node_type				type;
-	char					*cmd;
-	char					**args;
-	char					*heredoc_delim;
-	char					*redir_file;
-	t_direction				redir_direction;
-	struct s_parser_node	*next;
+// typedef struct s_parser_node {
+// 	t_node_type				type;
+// 	char					*cmd;
+// 	char					**args;
+// 	char					*heredoc_delim;
+// 	char					*redir_file;
+// 	t_direction				redir_direction;
+// 	int						error;
+// 	char					*error_msg;
+// 	struct s_parser_node	*next;
+// }	t_parser;
+
+typedef struct s_parser
+{
+	t_token		*current_token;
+	t_token		*token_list;
+	int			error;
+	char		*error_msg;
+	char		**env;
 }	t_parser;
+
+typedef struct s_node
+{
+	t_node_type		type;
+	char			*cmd;
+	char			**arg;
+	char			*heredoc_delim;
+	char			*redir_file;
+	t_direction		redir_direction;
+	struct s_node	*next;
+}	t_node;
+
 
 typedef struct s_env
 {
@@ -93,8 +116,11 @@ typedef struct s_minishell {
 	t_env		*env;
 
 	t_token		*token_list;
-	t_parser	*parser_list;
+	t_parser	*parser;
+	t_node		*parser_list;
 }	t_minishell;
+
+void	parse_pipe(t_parser *parser, t_node **head);
 
 /* ************************************************************************** */
 /*                                                                            */
@@ -124,6 +150,453 @@ void print_tokens(t_token *head)
         printf("\n");
         current = current->next;
     }
+}
+
+void print_nodes(t_node *head)
+{
+	t_node	*current;
+
+	current = head;
+	while (current)
+	{
+		if (current->type == NODE_CMD)
+		{
+			printf("Command: %s\n", current->cmd);
+			if (current->arg)
+			{
+				for (int i = 0; current->arg[i]; i++)
+					printf("Arg: %s\n", current->arg[i]);
+			}
+		}
+		else if (current->type == NODE_PIPE)
+			printf("Pipe\n");
+		else if (current->type == NODE_REDIR_IN)
+			printf("Redir in: %s\n", current->redir_file);
+		else if (current->type == NODE_REDIR_OUT)
+			printf("Redir out: %s\n", current->redir_file);
+		else if (current->type == NODE_HEREDOC)
+			printf("Heredoc: %s\n", current->heredoc_delim);
+		else if (current->type == NODE_APPEND)
+			printf("Append: %s\n", current->redir_file);
+		current = current->next;
+	}
+}
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                 expansion.c                                */
+/*                                                                            */
+/* ************************************************************************** */
+
+char	*get_env_var(char **value, char *var_start, char *result, int *i)
+{
+	char	*expanded_var;
+	char	*var_name;
+
+	(*value)++;
+	while (ft_isalnum(**value))
+		(*value)++;
+	var_name = ft_substr(*value, 0, *value - var_start);
+	expanded_var = getenv(var_name);
+	if (expanded_var)
+		*i += ft_strlcpy(result + (*i), expanded_var,
+				ft_strlen(expanded_var) + 1);
+	free(var_name);
+	return (result);
+}
+
+char	*expand_var(char *value)
+{
+	char	*var_start;
+	char	*result;
+	int		i;
+
+	i = 0;
+	result = malloc(1024);
+	if (!result)
+		return (NULL);
+	var_start = ft_strchr(value, '$');
+	if (!var_start)
+		return (free(result), ft_strdup(value));
+	while (*value)
+	{
+		if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
+		{
+			if (!get_env_var(&value, var_start, result, &i))
+				return (free(result), NULL);
+		}
+		else
+			result[i++] = *value++;
+	}
+	result[i] = '\0';
+	return (result);
+}
+
+// /* ************************************************************************** */
+// /*                                                                            */
+// /*                              parser_utils.c                                */
+// /*                                                                            */
+// /* ************************************************************************** */
+
+int	is_redir_token(t_token_type type)
+{
+	if (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT
+		|| type == TOKEN_HEREDOC || type == TOKEN_APPEND)
+		return (1);
+	return (0);
+}
+
+void	consume_token(t_parser *parser)
+{
+	if (parser->current_token)
+		parser->current_token = parser->current_token->next;
+}
+
+void	set_parser_error(t_parser *parser, char *msg)
+{
+	parser->error = 1;
+	parser->error_msg = ft_strdup(msg);
+}
+
+void	add_node_to_back(t_node **head, t_node *new_node)
+{
+	t_node	*current;
+
+	if (!*head)
+	{
+		*head = new_node;
+		return ;
+	}
+	current = *head;
+	while (current->next)
+		current = current->next;
+	current->next = new_node;
+}
+
+// /* ************************************************************************** */
+// /*                                                                            */
+// /*                                    parser.c                                */
+// /*                                                                            */
+// /* ************************************************************************** */
+
+// t_parser	*create_parser_node(t_node_type type)
+// {
+// 	t_parser	*parser;
+
+// 	parser->type = type;
+// 	parser->cmd = NULL;
+// 	parser->args = NULL;
+// 	parser->heredoc_delim = NULL;
+// 	parser->redir_file = NULL;
+// 	parser->redir_direction = -1;
+// 	parser->error = 0;
+// 	parser->error_msg = NULL;
+// 	parser->next = NULL;
+// 	return (parser);
+// }
+
+// t_parser	*create_redir_node(t_token_type type)
+// {
+// 	t_parser	*redir_node;
+
+// 	redir_node = NULL;
+// 	if (type == TOKEN_APPEND)
+// 	{
+// 		redir_node = create_parser_node(NODE_APPEND);
+// 		redir_node->redir_direction = OUTPUT;
+// 	}
+// 	else if (type == TOKEN_REDIR_IN)
+// 	{
+// 		redir_node = create_parser_node(NODE_REDIR_IN);
+// 		redir_node->redir_direction = INPUT;
+// 	}
+// 	else if (type == TOKEN_HEREDOC)
+// 	{
+// 		redir_node = create_parser_node(NODE_HEREDOC);
+// 		redir_node->redir_direction = INPUT;
+// 	}
+// 	else if (type == TOKEN_REDIR_OUT)
+// 	{
+// 		redir_node = create_parser_node(NODE_REDIR_OUT);
+// 		redir_node->redir_direction = OUTPUT;
+// 	}
+// 	return (redir_node);
+// }
+
+// void	parse_redirection(t_token *current_token, t_parser **head)
+// {
+// 	t_parser		*redir;
+// 	t_token_type	redir_type;
+
+// 	redir_type = current_token->type;
+// 	redir = create_redir_node(redir_type);
+// }
+
+// void	parse_simple_command(t_token *current_token, t_parser **head)
+// {
+// 	while (current_token)
+// 	{
+// 		if (is_redir_token(current_token->type))
+// 			parse_redirection(current_token, head);
+// 		else if (current_token->type == TOKEN_WORD)
+// 			handle_word_token(current_token, head);
+// 		else if (current_token->type == TOKEN_PIPE)
+// 		{
+// 			parse_pipe(current_token, head);
+// 			break ;
+// 		}
+// 	}
+// }
+
+// t_parser	*parse(t_minishell *shell)
+// {
+// 	// init_parser(shell);
+// 	t_token		*current_token;
+// 	t_parser	*head;
+
+// 	// create_parser_node(head);
+// 	if (!shell->token_list)
+// 		return (NULL);
+// 	current_token = shell->token_list;
+// 	while (current_token && !shell->parser_list->error)
+// 	{
+// 		parse_simple_command(current_token, &head);
+// 		if (shell->parser_list->error)
+// 			break ;
+// 	}
+// 	return (head);
+// }
+
+void	free_node(t_node *node)
+{
+	int		i;
+
+	if (!node)
+		return ;
+	if (node->cmd)
+		free(node->cmd);
+	if (node->heredoc_delim)
+		free(node->heredoc_delim);
+	if (node->redir_file)
+		free(node->redir_file);
+	i = 0;
+	if (node->arg)
+	{
+		while (node->arg[i])
+			free(node->arg[i++]);
+		free(node->arg);
+		node->arg = NULL;
+	}
+	free(node);
+	node = NULL;
+}
+
+void	free_nodes_list(t_node *head)
+{
+	t_node	*current;
+	t_node	*next;
+
+	current = head;
+	while (current)
+	{
+		next = current->next;
+		free_node(current);
+		current = next;
+	}
+}
+
+t_node	*create_node(t_node_type type)
+{
+	t_node	*node;
+
+	node = malloc(sizeof(t_node));
+	if (!node)
+		return (NULL);
+	node->type = type;
+	node->cmd = NULL;
+	node->arg = NULL;
+	node->heredoc_delim = NULL;
+	node->redir_file = NULL;
+	node->redir_direction = -1;
+	node->next = NULL;
+	return (node);
+}
+
+t_node	*create_redir_node(t_token_type type)
+{
+	t_node	*redir_node;
+
+	redir_node = NULL;
+	if (type == TOKEN_APPEND)
+	{
+		redir_node = create_node(NODE_APPEND);
+		redir_node->redir_direction = OUTPUT;
+	}
+	else if (type == TOKEN_REDIR_IN)
+	{
+		redir_node = create_node(NODE_REDIR_IN);
+		redir_node->redir_direction = INPUT;
+	}
+	else if (type == TOKEN_REDIR_OUT)
+	{
+		redir_node = create_node(NODE_REDIR_OUT);
+		redir_node->redir_direction = OUTPUT;
+	}
+	else if (type == TOKEN_HEREDOC)
+	{
+		redir_node = create_node(NODE_HEREDOC);
+		redir_node->redir_direction = INPUT;
+	}
+	return (redir_node);
+}
+
+void	redir_error(t_parser *parser, char *msg, t_node *redir_node)
+{
+	set_parser_error(parser, msg);
+	free_node(redir_node);
+}
+
+void	parse_redirection(t_parser *parser, t_node **head)
+{
+	t_node			*redir;
+	t_token_type	redir_type;
+
+	redir_type = parser->current_token->type;
+	redir = create_redir_node(redir_type);
+	if (!redir)
+	{
+		set_parser_error(parser, "Failed to create redirection node");
+		return ;
+	}
+	consume_token(parser);
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	{
+		if (redir_type == TOKEN_HEREDOC)
+			redir_error(parser, "Expected delimiter after '<<'", redir);
+		else
+			redir_error(parser, "Expected filename after redirection", redir);
+		return ;
+	}
+	if (redir_type == TOKEN_HEREDOC)
+		redir->heredoc_delim = ft_strdup(parser->current_token->value);
+	else
+		redir->redir_file = ft_strdup(parser->current_token->value);
+	consume_token(parser);
+	add_node_to_back(head, redir);
+}
+
+int	add_arg_to_command(char *arg, t_node *cmd_node)
+{
+	int		i;
+	char	**new_args;
+
+	i = 0;
+	while (cmd_node->arg && cmd_node->arg[i])
+		i++;
+	new_args = malloc(sizeof(char *) * (i + 2));
+	if (!new_args)
+		return (0);
+	i = 0;
+	while (cmd_node->arg && cmd_node->arg[i])
+	{
+		new_args[i] = ft_strdup(cmd_node->arg[i]);
+		i++;
+	}
+	new_args[i] = ft_strdup(arg);
+	new_args[i + 1] = NULL;
+	free(cmd_node->arg);
+	cmd_node->arg = new_args;
+	return (1);
+}
+
+t_node	*create_command_node(char *cmd, t_node_type type)
+{
+	t_node	*node;
+
+	node = create_node(type);
+	if (!node)
+		return (NULL);
+	node->cmd = ft_strdup(cmd);
+	if (!node->cmd)
+	{
+		free(node);
+		return (NULL);
+	}
+	return (node);
+}
+
+void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
+{
+	char	*expanded_arg;
+
+	expanded_arg = expand_var(parser->current_token->value);
+	if (!*first_node)
+	{
+		*first_node = create_command_node(expanded_arg, NODE_CMD);
+		add_node_to_back(head, *first_node);
+	}
+	else
+		if (!add_arg_to_command(expanded_arg, *first_node))
+			set_parser_error(parser, "Failed to add argument to command");
+	free(expanded_arg);
+	consume_token(parser);
+}
+
+void	parse_simple_command(t_parser *parser, t_node **head)
+{
+	t_node	*first_node;
+
+	first_node = NULL;
+	while (parser->current_token)
+	{
+		if (is_redir_token(parser->current_token->type))
+			parse_redirection(parser, head);
+		else if (parser->current_token->type == TOKEN_WORD)
+			handle_word_token(parser, head, &first_node);
+		else if (parser->current_token->type == TOKEN_PIPE)
+		{
+			parse_pipe(parser, head);
+			break ;
+		}
+		else
+			break ;
+	}
+}
+
+void	parse_pipe(t_parser *parser, t_node **head)
+{
+	t_node	*pipe_node;
+
+	pipe_node = create_node(NODE_PIPE);
+	if (!pipe_node)
+	{
+		set_parser_error(parser, "Failed to create pipe node");
+		return ;
+	}
+	add_node_to_back(head, pipe_node);
+	consume_token(parser);
+	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	{
+		set_parser_error(parser, "Expected command after pipe");
+		return ;
+	}
+	parse_simple_command(parser, head);
+}
+
+t_node	*parse(t_parser *parser)
+{
+	t_node	*head;
+
+	head = NULL;
+	if (!parser->token_list)
+		return (NULL);
+	while (parser->current_token && !parser->error)
+	{
+		parse_simple_command(parser, &head);
+		if (parser->error)
+			break ;
+	}
+	return (head);
 }
 
 /* ************************************************************************** */
@@ -375,9 +848,10 @@ void	init_shell(t_minishell *shell)
 	shell->token_list = malloc(sizeof(t_token));
 	if (!shell->token_list)
 		ft_error("Token list malloc failed");
-	shell->parser_list = malloc(sizeof(t_parser));
-	if (!shell->parser_list)
-		ft_error("Parser list malloc failed");
+	shell->parser = malloc(sizeof(t_parser));
+	if (!shell->parser)
+		ft_error("Parser struct malloc failed");
+	shell->parser_list = NULL;
 }
 
 /* ************************************************************************** */
@@ -397,14 +871,107 @@ void	get_user_input(char **line)
 	add_history(*line);
 }
 
+void	free_token_list(t_token *head)
+{
+	t_token	*current;
+	t_token	*next;
+
+	current = head;
+	while (current)
+	{
+		next = current->next;
+		if (current->value)
+			free(current->value);
+		free(current);
+		current = next;
+	}
+}
+
+int	check_token_error(t_minishell *shell)
+{
+	t_token	*current;
+
+	current = shell->token_list;
+	while (current)
+	{
+		if (current->type == TOKEN_ERROR)
+		{
+			printf("%s\n", current->value);
+			free_token_list(shell->token_list);
+			shell->token_list = NULL;
+			return (1);
+		}
+		current = current->next;
+	}
+	return (0);
+}
+
+void	cleanup_parser(t_minishell *shell)
+{
+	free_token_list(shell->token_list);
+	if (shell->parser->error_msg)
+		free(shell->parser->error_msg);
+	free(shell->user_input);
+	shell->token_list = NULL;
+	shell->parser->error_msg = NULL;
+	shell->user_input = NULL;
+}
+
+void	reset_main(t_minishell *shell)
+{
+	free_token_list(shell->token_list);
+	free(shell->user_input);
+	if (shell->parser_list)
+		free_nodes_list(shell->parser_list);
+	shell->parser_list = NULL;
+	shell->token_list = NULL;
+	shell->user_input = NULL;
+}
+
+t_parser	*init_parser(t_token *token_list)
+{
+	t_parser	*parser;
+
+	parser = malloc(sizeof(t_parser));
+	if (!parser)
+		return (NULL);
+	parser->token_list = token_list;
+	parser->current_token = token_list;
+	parser->error = 0;
+	parser->error_msg = NULL;
+	return (parser);
+}
+
 void	minishell_loop(t_minishell *shell)
 {
 	while (1)
 	{
 		get_user_input(&shell->user_input);
 		tokenize(shell->user_input);
+		if (check_token_error(shell))
+			free(shell->user_input);
+		// else
+		// {
+		// 	shell->parser = init_parser(shell->token_list);
+		// 	if (!shell->parser)
+		// 	{
+		// 		ft_fprintf(STDERR_FILENO, "Failed to initialize parser\n");
+		// 		cleanup_parser(shell);
+		// 	}
+		// 	shell->parser_list = parse(shell->parser);
+		// 	if (!shell->parser_list || shell->parser->error)
+		// 	{
+		// 		ft_fprintf(STDERR_FILENO, "%s\n", shell->parser->error_msg);
+		// 		cleanup_parser(shell);
+		// 	}
+		// }
+
 		print_tokens(shell->token_list);
+		// print_nodes(shell->parser_list);
+
+		reset_main(shell);
 	}
+	// free_nodes_list(shell->parser_list);
 }
 
 void	free_shell(t_minishell *shell)
