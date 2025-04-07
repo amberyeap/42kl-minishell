@@ -98,6 +98,36 @@ typedef struct s_minishell {
 
 /* ************************************************************************** */
 /*                                                                            */
+/*                                      test.c                               */
+/*                                                                            */
+/* ************************************************************************** */
+
+void print_tokens(t_token *head)
+{
+    t_token *current = head;
+    const char *type_strings[] = {
+        "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
+        "HEREDOC", "APPEND", "ERROR", "EOF"
+    };
+	const char *quote_strings[] = {
+		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
+	};
+
+    while (current) {
+        printf("Type: %-10s", type_strings[current->type]);
+        if (current->value)
+            printf(" Value: '%s'", current->value);
+		// if (current->quote)
+		// 	printf(" Quote: %s", quote_strings[current->quote]);
+		if (current->expand)
+			printf(" Expand: %d", current->expand);
+        printf("\n");
+        current = current->next;
+    }
+}
+
+/* ************************************************************************** */
+/*                                                                            */
 /*                                      utils.c                               */
 /*                                                                            */
 /* ************************************************************************** */
@@ -130,7 +160,7 @@ int	is_quote(char c)
 /* ************************************************************************** */
 
 char	peek(t_tokenizer *tokenizer)
-{
+{	
 	return (tokenizer->user_input[tokenizer->position]);
 }
 
@@ -170,6 +200,24 @@ void	add_token(t_token **head, t_token *new_token)
 	while (current->next)
 		current = current->next;
 	current->next = new_token;
+}
+
+t_tokenizer	*init_tokenizer(char *input)
+{
+	t_tokenizer	*tokenizer;
+
+	tokenizer = malloc(sizeof(t_tokenizer));
+	if (!tokenizer)
+		return (NULL);
+	tokenizer->user_input = input;
+	tokenizer->position = 0;
+	return (tokenizer);
+}
+
+void	skip_whitespace(t_tokenizer *tokenizer)
+{
+	while (peek(tokenizer) && is_whitespace(peek(tokenizer)))
+		next_char(tokenizer);
 }
 
 /* ************************************************************************** */
@@ -226,7 +274,7 @@ char	*get_word(t_tokenizer *tokenizer, int *expand)
 			quote = peek(tokenizer);
 			chunk = handle_quotes(tokenizer, quote);
 			if (!chunk)
-				return (free(word), create_token(TOKEN_ERROR, "Unterminated quote"));
+				return (free(word), NULL);
 			if (quote == 34 && ft_strchr(chunk, '$'))
 				*expand = 1;
 		}
@@ -234,13 +282,13 @@ char	*get_word(t_tokenizer *tokenizer, int *expand)
 		{
 			chunk = handle_no_quotes(tokenizer);
 			if (!chunk)
-				return (free(word), create_token(TOKEN_ERROR, "Failed to create word token"));
+				return (free(word), NULL);
 			if (ft_strchr(chunk, '$'))
-				expand = 1;
+				*expand = 1;
 		}
 		temp = ft_strjoin(word, chunk);
 		if (!temp)
-			return (create_token(TOKEN_ERROR, "Temp malloc failed"));
+			return (NULL);
 		free(word);
 		free(chunk);
 		word = temp;
@@ -338,23 +386,24 @@ void	init_shell(t_minishell *shell)
 /*                                                                            */
 /* ************************************************************************** */
 
-void	get_user_input(char *line)
+void	get_user_input(char **line)
 {
-	line = readline("minishell$ ");
-	if (!line)
+	*line = readline("minishell$ ");
+	if (!*line)
 	{
 		printf("exit\n");
 		exit(1);
 	}
-	add_history(line);
+	add_history(*line);
 }
 
 void	minishell_loop(t_minishell *shell)
 {
 	while (1)
 	{
-		get_user_input(shell->user_input);
+		get_user_input(&shell->user_input);
 		tokenize(shell->user_input);
+		print_tokens(shell->token_list);
 	}
 }
 
@@ -363,6 +412,16 @@ void	free_shell(t_minishell *shell)
 	free(shell->token_list);
 	free(shell->parser_list);
 	free(shell);
+}
+
+void	signal_handler(int signum)
+{
+	if (signum == SIGINT)
+	{
+		printf("\n");
+		rl_on_new_line();
+		rl_redisplay();
+	}
 }
 
 int	main(int argc, char **argv, char **env)
@@ -376,7 +435,7 @@ int	main(int argc, char **argv, char **env)
 	if (!shell)
 		return (ft_fprintf(2, "Shell malloc failed\n"), 1);
 	init_shell(shell);
-	// signal(SIGINT, signal_handler);
+	signal(SIGINT, signal_handler);
 	minishell_loop(shell);
 	free_shell(shell);
 	return (0);
