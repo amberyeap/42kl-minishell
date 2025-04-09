@@ -6,11 +6,21 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/05 21:48:51 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/09 15:05:11 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+// ECHO BUGS
+// [FIXED] BUG: only prints a newline when there is only one argument
+// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), works for echo ""
+// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, but as two separate strings
+// TO TEST: the skip_flags() 
+
+// CD BUGS
+// - 'cd ..' goes back to the home/USER path
+// - 'cd <path> doesn't work
 
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
@@ -65,17 +75,17 @@ int	run_builtin(char **args, t_minishell *data)
 	result = 0;
 	if (ft_strcmp(data->parser_list->cmd, "echo") == 0)
 		result = ft_echo(args);
-	else if (ft_strcmp(args[0], "cd") == 0)
+	else if (ft_strcmp(data->parser_list->cmd, "cd") == 0)
 		result = cd(args, data);
-	else if (ft_strcmp(args[0], "pwd") == 0)
+	else if (ft_strcmp(data->parser_list->cmd, "pwd") == 0)
 		result = pwd(args);
-	else if (ft_strcmp(args[0], "env") == 0)
+	else if (ft_strcmp(data->parser_list->cmd, "env") == 0)
 		result = ft_env(args, data->env);
-	else if (ft_strcmp(args[0], "export") == 0)
+	else if (ft_strcmp(data->parser_list->cmd, "export") == 0)
 		result = export(args, data);
-	else if (ft_strcmp(args[0], "unset") == 0)
+	else if (ft_strcmp(data->parser_list->cmd, "unset") == 0)
 		result = unset(args, data);
-	else if (ft_strcmp (args[0], "exit") == 0)
+	else if (ft_strcmp (data->parser_list->cmd, "exit") == 0)
 		ft_exit(data, args);
 	return (result);
 }

@@ -34,8 +34,8 @@
 		(eg: echo hi > input ls) -> should be correct or not? need to test more cases
 */
 
-void	print_tokens(t_token *head);
-void	print_nodes(t_node *head);
+// void	print_tokens(t_token *head);
+// void	print_nodes(t_node *head);
 
 void	main_parse(t_minishell *shell)
 {
@@ -87,7 +87,7 @@ void	parent_execution(t_minishell *shell)
 		if (check_builtin(current_node->cmd))
 		{
 			shell->exit = run_builtin(current_node->arg, shell);
-			printf("%d\n", shell->exit);
+			// printf("%d\n", shell->exit);
 			return ;
 		}
 	}
@@ -113,13 +113,13 @@ void	minishell_loop(t_minishell *shell)
 		}
 		else
 			main_parse(shell);
-		printf("parsing complete\n");
-		// parent_execution(shell);
+		// printf("parsing complete\n");
+		parent_execution(shell);
 		// run_builtin(shell->parser_list->arg, shell);
 			//do something later
 
-		print_tokens(shell->token_list);
-		print_nodes(shell->parser_list);
+		// print_tokens(shell->token_list);
+		// print_nodes(shell->parser_list);
 		reset_main(shell);
 	}
 	free_nodes_list(shell->parser_list);
@@ -146,59 +146,59 @@ int	main(int argc, char **argv, char **envp)
 /* ************************************************************************** */
 
 /* Debug function to print tokens */
-void print_tokens(t_token *head)
-{
-    t_token *current = head;
-    const char *type_strings[] = {
-        "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
-        "HEREDOC", "APPEND", "ERROR", "EOF"
-    };
-	const char *quote_strings[] = {
-		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
-	};
+// void print_tokens(t_token *head)
+// {
+//     t_token *current = head;
+//     const char *type_strings[] = {
+//         "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
+//         "HEREDOC", "APPEND", "ERROR", "EOF"
+//     };
+// 	const char *quote_strings[] = {
+// 		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
+// 	};
 
-    while (current) {
-        printf("Type: %-10s", type_strings[current->type]);
-        if (current->value)
-            printf(" Value: '%s'", current->value);
-		if (current->quote)
-			printf(" Quote: %s", quote_strings[current->quote]);
-		if (current->expand)
-			printf(" Expand: %d", current->expand);
-        printf("\n");
-        current = current->next;
-    }
-}
+//     while (current) {
+//         printf("Type: %-10s", type_strings[current->type]);
+//         if (current->value)
+//             printf(" Value: '%s'", current->value);
+// 		if (current->quote)
+// 			printf(" Quote: %s", quote_strings[current->quote]);
+// 		if (current->expand)
+// 			printf(" Expand: %d", current->expand);
+//         printf("\n");
+//         current = current->next;
+//     }
+// }
 
-void print_nodes(t_node *head)
-{
-	t_node	*current;
+// void print_nodes(t_node *head)
+// {
+// 	t_node	*current;
 
-	current = head;
-	while (current)
-	{
-		if (current->type == NODE_COMMAND)
-		{
-			printf("Command: %s\n", current->cmd);
-			if (current->arg)
-			{
-				for (int i = 0; current->arg[i]; i++)
-					printf("Arg: %s\n", current->arg[i]);
-			}
-		}
-		else if (current->type == NODE_PIPE)
-			printf("Pipe\n");
-		else if (current->type == NODE_REDIR_IN)
-			printf("Redir in: %s\n", current->redir_file);
-		else if (current->type == NODE_REDIR_OUT)
-			printf("Redir out: %s\n", current->redir_file);
-		else if (current->type == NODE_HEREDOC)
-			printf("Heredoc: %s\n", current->heredoc_delim);
-		else if (current->type == NODE_APPEND)
-			printf("Append: %s\n", current->redir_file);
-		current = current->next;
-	}
-}
+// 	current = head;
+// 	while (current)
+// 	{
+// 		if (current->type == NODE_COMMAND)
+// 		{
+// 			printf("Command: %s\n", current->cmd);
+// 			if (current->arg)
+// 			{
+// 				for (int i = 0; current->arg[i]; i++)
+// 					printf("Arg: %s\n", current->arg[i]);
+// 			}
+// 		}
+// 		else if (current->type == NODE_PIPE)
+// 			printf("Pipe\n");
+// 		else if (current->type == NODE_REDIR_IN)
+// 			printf("Redir in: %s\n", current->redir_file);
+// 		else if (current->type == NODE_REDIR_OUT)
+// 			printf("Redir out: %s\n", current->redir_file);
+// 		else if (current->type == NODE_HEREDOC)
+// 			printf("Heredoc: %s\n", current->heredoc_delim);
+// 		else if (current->type == NODE_APPEND)
+// 			printf("Append: %s\n", current->redir_file);
+// 		current = current->next;
+// 	}
+// }
 
 /* Test cases */
 // void test_parser(char **envp)

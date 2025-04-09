@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/05 22:00:24 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/09 15:24:44 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,6 @@ int	length(char **arg)
  * 	Example: Hello World
  * @return 0 in success
 */
-// [FIXED] BUG: only prints a newline when there is only one argument
-// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), works for echo ""
-// BUG: doesn't print "hello"world in one line, but as two separate strings
 int	ft_echo(char **args)
 {
 	int	newline;

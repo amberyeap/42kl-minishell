@@ -20,7 +20,7 @@ char	*handle_no_quotes(t_tokenizer *tokenizer)
 
 	start = tokenizer->position;
 	while (!is_whitespace(peek(tokenizer))
-		&& !is_operator(peek(tokenizer)) && peek(tokenizer))
+		&& !is_operator(peek(tokenizer)) && !is_quote(peek(tokenizer)) && peek(tokenizer))
 		next_char(tokenizer);
 	len = tokenizer->position - start;
 	word = ft_substr(tokenizer->user_input, start, len);

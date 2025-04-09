@@ -214,6 +214,7 @@ t_token		*tokenize(char *user_input);
 // utils.c
 int			is_whitespace(char c);
 int			is_operator(char c);
+int	is_quote(char c);
 
 //builtin.c
 int			run_builtin(char **args, t_minishell *data);

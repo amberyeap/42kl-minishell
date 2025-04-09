@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 13:49:52 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/09 15:23:50 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ int	cd(char **args, t_minishell *data)
 {
 	int	ret_val;
 
-	if (!args[1] || ft_strcmp(args[1], "~") == 0)
+	if (!args[0] || ft_strcmp(args[1], "~") == 0)
 		return (go_to_path(0, data));
-	if (ft_strcmp(args[1], "-") == 0)
+	if (ft_strcmp(args[1 ], "-") == 0)
 		return(go_to_path(1, data));
 	update_oldpwd(data);
 	ret_val = chdir(args[1]);

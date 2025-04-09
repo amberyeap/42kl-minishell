@@ -36,78 +36,63 @@
 // 	}
 // }
 
-char *handle_no_quotes_until_quote_or_special(t_tokenizer *tokenizer)
+int	is_quote(char c)
 {
-	int start = tokenizer->position;
-	int len;
-	char *word;
-
-	while (peek(tokenizer) &&
-		   !is_whitespace(peek(tokenizer)) &&
-		   !is_operator(peek(tokenizer)) &&
-		   peek(tokenizer) != '\'' &&
-		   peek(tokenizer) != '"')
-	{
-		next_char(tokenizer);
-	}
-
-	len = tokenizer->position - start;
-	word = ft_substr(tokenizer->user_input, start, len);
-	return word;
+	return (c == '\'' || c == '"');
 }
 
-
-t_token	*create_word_token(t_tokenizer *tokenizer)
+char	*get_word(t_tokenizer *tokenizer, int *expand)
 {
-	t_token *token;
-	char *chunk;
-	char *word = ft_strdup("");  // Start with an empty string
-	int expand = 0;
+	char	*chunk;
+	char	quote;
+	char	*word;
+	char	*temp;
 
-	if (!word)
-		return (create_token(TOKEN_ERROR, "Memory allocation failed"));
-
-	while (peek(tokenizer) &&
-		   !is_whitespace(peek(tokenizer)) &&
-		   !is_operator(peek(tokenizer)))
+	word = ft_strdup("");
+	while (peek(tokenizer) && !is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)))
 	{
-		if (peek(tokenizer) == 34 || peek(tokenizer) == 39)  // '"' or '\''
+		if (is_quote(peek(tokenizer)))
 		{
-			char quote = peek(tokenizer);
+			quote = peek(tokenizer);
 			chunk = handle_quotes(tokenizer, quote);
 			if (!chunk)
-			{
-				free(word);
-				return (create_token(TOKEN_ERROR, "Unterminated quote"));
-			}
-			if (quote == 34 && ft_strchr(chunk, '$')) // double quote allows var expansion
-				expand = 1;
+				return (free(word), NULL);
+			if (quote == 34 && ft_strchr(chunk, '$'))
+				*expand = 1;
 		}
 		else
 		{
-			chunk = handle_no_quotes_until_quote_or_special(tokenizer);
+			chunk = handle_no_quotes(tokenizer);
 			if (!chunk)
-			{
-				free(word);
-				return (create_token(TOKEN_ERROR, "Failed to create word token"));
-			}
+				return (free(word), NULL);
 			if (ft_strchr(chunk, '$'))
-				expand = 1;
+				*expand = 1;
 		}
-
-		char *tmp = ft_strjoin(word, chunk);
+		temp = ft_strjoin(word, chunk);
+		if (!temp)
+			return (NULL);
 		free(word);
 		free(chunk);
-		if (!tmp)
-			return (create_token(TOKEN_ERROR, "Memory allocation failed"));
-		word = tmp;
+		word = temp;
 	}
+	return (word);
+}
 
-	token = create_token(TOKEN_WORD, word);
+t_token	*create_word_token(t_tokenizer *tokenizer)
+{
+	t_token	*new_token;
+	char	*word;
+	int		expand;
+
+	expand = 0;
+	word = get_word(tokenizer, &expand);
+	if (!word)
+		return (create_token(TOKEN_ERROR, "Failed to get word"));
+	new_token = create_token(TOKEN_WORD, word);
 	if (expand)
-		token->expand = 1;
-	free(word);  // Assume create_token makes a copy of the word
-	return token;
+		new_token->expand = 1;
+	free(word);
+	return (new_token);
 }
 
 // creates an operator token
