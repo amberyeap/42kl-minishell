@@ -20,7 +20,7 @@ char	*get_env_var(char **value, char *var_start, char *result, int *i)
 	(*value)++;
 	while (ft_isalnum(**value))
 		(*value)++;
-	var_name = ft_substr(*value, 0, *value - var_start);
+	var_name = ft_substr(var_start + 1, 0, *value - (var_start + 1));
 	expanded_var = getenv(var_name);
 	if (expanded_var)
 		*i += ft_strlcpy(result + (*i), expanded_var,
@@ -29,7 +29,7 @@ char	*get_env_var(char **value, char *var_start, char *result, int *i)
 	return (result);
 }
 
-char	*expand_var(char *value, t_minishell *data)
+char	*expand_var(char *value)
 {
 	char	*var_start;
 	char	*result;

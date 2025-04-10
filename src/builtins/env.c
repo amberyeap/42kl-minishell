@@ -6,11 +6,36 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 21:45:45 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 13:55:03 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/10 14:41:36 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+// int ft_strlen(char *str)
+// {
+// 	int len = 0;
+
+// 	while (str[len])
+// 		len++;
+// 	return len;
+// }
+
+// void	ft_putendl_fd(char *s, int fd)
+// {
+// 	if (!s)
+// 		return ;
+// 	write (fd, s, ft_strlen(s));
+// 	write (fd, "\n", 1);
+// }
+
+// void	ft_putstr_fd(char *s, int fd)
+// {
+// 	if (!s)
+// 		return ;
+// 	write (fd, s, ft_strlen(s));
+// 	write (fd, "\n", 1);
+// }
 
 int	ft_env(char **args, t_env *env)
 {

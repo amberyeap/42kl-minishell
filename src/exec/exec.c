@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 12:09:48 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/10 15:33:42 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,14 @@
 
 void	execute_node(t_node *current_node, t_minishell *data)
 {
-	if (check_redir(current_node, data) == -1)
+	if (check_redir(current_node) == -1)
 		return ;
 	while (current_node)
 	{
 		if (current_node->type == NODE_PIPE)
-			setup_pipe(current_node);
-		else
-			execute_cmd(current_node, data);
+			set_pipe(current_node, data);
+		// else
+		// 	execute_cmd(current_node, data);
 		current_node = current_node->next;
 	}
 }
@@ -68,11 +68,11 @@ void	parent_execution(t_minishell *shell)
 		return ;
 	if (current_node->type == NODE_COMMAND)
 	{
-		if (check_builtin(current_node->arg[0]))
+		if (check_builtin(current_node->cmd))
 		{
 			shell->exit = run_builtin(current_node->arg, shell);
 			return ;
 		}
 	}
-	// execute_fork(shell, current_node);
+	execute_fork(current_node, shell);
 }

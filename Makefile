@@ -35,9 +35,6 @@ SRC_FILES = builtins/builtin.c builtins/cd_utils.c builtins/cd.c builtins/echo.c
 
 SRC = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 
-# exec/exec_utils.c exec/exec.c \
-
-
 OBJ_DIR = obj
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 

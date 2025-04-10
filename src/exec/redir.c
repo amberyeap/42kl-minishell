@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 10:31:33 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/10 16:11:59 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	apply_n_close(int fd, int std_fd)
 
 int	handle_out(t_node *node, int *fd_out)
 {
-	if (!*fd_out != -1)
+	if (*fd_out != -1)
 		close(*fd_out);
 	if (node->type == NODE_REDIR_OUT)
 		*fd_out = open(node->redir_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -39,7 +39,7 @@ int	handle_out(t_node *node, int *fd_out)
 
 int	handle_in(t_node *node, int *fd_in)
 {
-	if (!*fd_in != -1) //Closed previous redir input if exist before
+	if (*fd_in != -1) //Closed previous redir input if exist before
 		close(*fd_in);
 	if (node->type == NODE_REDIR_IN) //"<" cases
 		*fd_in = open(node->redir_file, O_RDONLY);

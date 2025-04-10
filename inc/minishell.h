@@ -41,6 +41,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+// unnecessary
 typedef enum e_quote_type
 {
 	NO_QUOTE,
@@ -263,6 +264,7 @@ void		free_array(char **array);
 // exec.c
 void	parent_execution(t_minishell *shell);
 void	execute_fork(t_node *current_node, t_minishell *data);
+int	check_redir(t_node *node);
 
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);

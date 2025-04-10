@@ -74,25 +74,25 @@ char	*get_user_input(char **line)
 	return (*line);
 }
 
-void	parent_execution(t_minishell *shell)
-{
-	t_node	*current_node;
+// void	parent_execution(t_minishell *shell)
+// {
+// 	t_node	*current_node;
 
-	current_node = shell->parser_list;
-	if (!current_node)
-		return ;
-	if (current_node->type == NODE_COMMAND)
-	{
-		printf("entered parent_execution\n");
-		if (check_builtin(current_node->cmd))
-		{
-			shell->exit = run_builtin(current_node->arg, shell);
-			// printf("%d\n", shell->exit);
-			return ;
-		}
-	}
-	// execute_fork(shell, current_node);
-}
+// 	current_node = shell->parser_list;
+// 	if (!current_node)
+// 		return ;
+// 	if (current_node->type == NODE_COMMAND)
+// 	{
+// 		printf("entered parent_execution\n");
+// 		if (check_builtin(current_node->cmd))
+// 		{
+// 			shell->exit = run_builtin(current_node->arg, shell);
+// 			// printf("%d\n", shell->exit);
+// 			return ;
+// 		}
+// 	}
+// 	// execute_fork(shell, current_node);
+// }
 
 void	minishell_loop(t_minishell *shell)
 {
