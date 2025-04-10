@@ -29,7 +29,7 @@ char	*get_env_var(char **value, char *var_start, char *result, int *i)
 	return (result);
 }
 
-char	*expand_var(char *value)
+char	*expand_var(char *value, t_minishell *data)
 {
 	char	*var_start;
 	char	*result;

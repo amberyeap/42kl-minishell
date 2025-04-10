@@ -30,8 +30,9 @@ SRC_FILES = builtins/builtin.c builtins/cd_utils.c builtins/cd.c builtins/echo.c
 			signals/signals.c \
 			tokenization/tokenizer_create_tokens.c tokenization/tokenizer_quotes.c \
 			tokenization/tokenizer_unquoted.c tokenization/tokenizer_utils.c \
-			tokenization/tokenizer.c tokenization/utils.c
-# SRC_FILES = ver2/main2.c
+			tokenization/tokenizer.c tokenization/utils.c \
+			exec/exec.c exec/exec_utils.c exec/heredoc.c exec/redir.c
+
 SRC = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 
 # exec/exec_utils.c exec/exec.c \

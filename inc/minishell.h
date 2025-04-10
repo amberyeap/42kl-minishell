@@ -245,7 +245,7 @@ int	length(char **arg);
 // env.c
 int	ft_env(char **args, t_env *env);
 
-// exit.c 
+// exit.c
 void	ft_exit(t_minishell *data, char **args);
 
 // pwd.c
@@ -266,6 +266,7 @@ void	execute_fork(t_node *current_node, t_minishell *data);
 
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
-void		setup_pipe(t_minishell *data);
+void		set_pipe(t_node *current_node, t_minishell *data);
+int			setup_heredoc(t_node *node);
 
 #endif
