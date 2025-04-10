@@ -3,45 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 14:44:55 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/09 15:42:06 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-int	check_redirection(t_node *current_node)
-{
-	int	fd;
 
-	if (current_node->type == NODE_REDIR_IN)
-		open =(current_node->filem)
-	else if (current_node->type == NODE_REDIR_OUT)
-		setup_redir(current_node);
-	else if (current_node->type == NODE_APPEND)
-		setup_append(current_node);
-	else if (current_node->type == NODE_HEREDOC)
-		setup_heredoc(current_node);
-	else if (current_node->type == NODE_PIPE)
-		setup_pipe(current_node);
-}
 void	execute_node(t_node *current_node, t_minishell *data)
 {
-	if (check_redirection(current_node) == -1)
+	if (check_redir(current_node, data) == -1)
 		return ;
 	while (current_node)
 	{
-		if (current_node->type == NODE_REDIR_IN)
-			setup_redir(current_node);
-		else if (current_node->type == NODE_REDIR_OUT)
-			setup_redir(current_node);
-		else if (current_node->type == NODE_APPEND)
-			setup_append(current_node);
-		else if (current_node->type == NODE_HEREDOC)
-			setup_heredoc(current_node);
-		else if (current_node->type == NODE_PIPE)
+		if (current_node->type == NODE_PIPE)
 			setup_pipe(current_node);
 		else
 			execute_cmd(current_node, data);
