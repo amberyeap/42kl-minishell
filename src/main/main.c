@@ -39,7 +39,7 @@
 
 void	main_parse(t_minishell *shell)
 {
-	shell->parser = init_parser(shell->token_list);
+	shell->parser = init_parser(shell);
 	if (!shell->parser)
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to initialize parser\n");

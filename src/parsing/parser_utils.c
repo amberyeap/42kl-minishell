@@ -48,16 +48,17 @@ void	add_node_to_back(t_node **head, t_node *new_node)
 }
 
 // initializes the parser
-t_parser	*init_parser(t_token *token_list)
+t_parser	*init_parser(t_minishell *shell)
 {
 	t_parser	*parser;
 
 	parser = malloc(sizeof(t_parser));
 	if (!parser)
 		return (NULL);
-	parser->token_list = token_list;
-	parser->current_token = token_list;
+	parser->token_list = shell->token_list;
+	parser->current_token = shell->token_list;
 	parser->error = 0;
 	parser->error_msg = NULL;
+	parser->shell = shell;
 	return (parser);
 }

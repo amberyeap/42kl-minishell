@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 16:27:39 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/12 16:16:25 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,17 +83,17 @@ int	run_builtin(char **args, t_minishell *data)
 	else if (ft_strcmp(data->parser_list->cmd, "pwd") == 0)
 		result = pwd(args);
 	else if (ft_strcmp(data->parser_list->cmd, "env") == 0)
-		printf("env\n");
-		// result = ft_env(args, data->env);
+		// printf("env\n");
+		result = ft_env(args, data->env);
 	else if (ft_strcmp(data->parser_list->cmd, "export") == 0)
-		printf("export\n");
-		// result = export(args, data);
+		// printf("export\n");
+		result = export(args, data);
 	else if (ft_strcmp(data->parser_list->cmd, "unset") == 0)
-		printf("unset\n");
-		// result = unset(args, data);
+		// printf("unset\n");
+		result = unset(args, data);
 	else if (ft_strcmp(data->parser_list->cmd, "exit") == 0)
-		printf("exit\n");
-		// ft_exit(data, args);
+		// printf("exit\n");
+		result = ft_exit(data, args);
 	return (result);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 13:55:44 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/12 17:25:28 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,31 @@
  * @note what should it handle?
  * @note need to specify...
 */
-void	ft_exit(t_minishell *data, char **args)
+int	ft_exit(t_minishell *data, char **args)
 {
 	data->exit = 1;// set exit to 1 first
 	ft_putstr_fd("exit ", STDERR_FILENO);
 	// handle with to many arguments
-	if (args[1] && args[2])
+	if (args[0] && args[1])
 	{
-		data->ret = 1;// set the return value to 1(error)
-		ft_putendl_fd("minishell: exit: too many arguments",STDERR_FILENO);
+		data->exit = 1;// set the return value to 1(error)
+		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
+		return (1);
 	}
 	//Handle for non-numeric arguments
-	else if (args[1] && ft_strisnum(args[1]) == 0)
+	else if (args[0] && !ft_strisnum(args[0]))
 	{
-		data->ret = 255;
-		ft_putstr_fd("minishell: exit: ",STDERR_FILENO);
-		ft_putstr_fd(args[1],STDERR_FILENO);
-		ft_putendl_fd(":numeric argument required", STDERR_FILENO);
+		// data->ret = 255;
+		ft_fprintf(STDERR_FILENO, "minishell: exit: %s:numeric argument required\n", args[0]);
+		exit (255);
 	}
 	//handle valid numeric arguments
-	else if (args[1])
-		data->ret = ft_atoi(args[1]);
+	else if (args[0])
+		// data->ret = ft_atoi(args[1]);
+		exit(ft_atoi(args[0]));
 	else// handle no arguments
-		data->ret = 0;
+		// data->ret = 0;
+		exit (0);
 }
 
 // #include <stdio.h>

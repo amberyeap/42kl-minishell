@@ -41,7 +41,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-// unnecessary
+// unused after tokenized
 typedef enum e_quote_type
 {
 	NO_QUOTE,
@@ -62,6 +62,7 @@ typedef enum e_token_type
 	TOKEN_EOF
 }	t_token_type;
 
+// quote and exoand are unused after tokenizer
 typedef struct s_token
 {
 	char			*value;
@@ -106,7 +107,7 @@ typedef struct s_parser
 	t_token		*token_list;
 	int			error;
 	char		*error_msg;
-	char		**env;
+	t_minishell	*shell; // pointer back to the main struct
 }	t_parser;
 
 typedef struct s_node
@@ -125,7 +126,7 @@ typedef struct s_env
 	char			*value;
 	char			*key;
 	struct s_env	*next;
-}				t_env;
+}	t_env;
 
 typedef struct s_minishell
 {
@@ -133,15 +134,15 @@ typedef struct s_minishell
 	char		**sorted_env;
 	int			exit;
 	int			ret;
-	t_env		*env;
-	t_token		*token_list;
+	t_env		*env; // pointer to the first var of the env
+	t_token		*token_list; // pointer to the first node of the tokenized list
 	t_node		*parser_list; // pointer to the first node of the parser
-	t_parser	*parser; //
+	t_parser	*parser; // pointer to a struct that holds the error/error msg
 }	t_minishell;
 
 // expansion.c
 char		*get_env_var(char **value, char *var_start, char *result, int *i);
-char		*expand_var(char *value);
+char		*expand_var(char *value, int exit_status);
 
 // free_nodes.c
 void		free_node(t_node *head);
@@ -245,7 +246,7 @@ int	length(char **arg);
 int	ft_env(char **args, t_env *env);
 
 // exit.c
-void	ft_exit(t_minishell *data, char **args);
+int	ft_exit(t_minishell *data, char **args);
 
 // pwd.c
 int	pwd(char **args);
