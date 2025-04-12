@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 15:33:42 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/12 09:49:46 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
 
 void	execute_node(t_node *current_node, t_minishell *data)
 {
@@ -21,8 +20,8 @@ void	execute_node(t_node *current_node, t_minishell *data)
 	{
 		if (current_node->type == NODE_PIPE)
 			set_pipe(current_node, data);
-		// else
-		// 	execute_cmd(current_node, data);
+		else
+			execute_cmd(current_node, data);
 		current_node = current_node->next;
 	}
 }

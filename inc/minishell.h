@@ -262,10 +262,10 @@ void		print_sort(char **sorted_env);
 void		free_array(char **array);
 
 // exec.c
-void	parent_execution(t_minishell *shell);
-void	execute_fork(t_node *current_node, t_minishell *data);
-int	check_redir(t_node *node);
-
+void		parent_execution(t_minishell *shell);
+void		execute_fork(t_node *current_node, t_minishell *data);
+int			check_redir(t_node *node);
+void		execute_cmd(t_node *node, t_minishell *data);
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
 void		set_pipe(t_node *current_node, t_minishell *data);
