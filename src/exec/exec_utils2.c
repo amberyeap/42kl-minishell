@@ -6,13 +6,13 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/12 09:53:19 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/12 10:08:45 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-char	*find_path(char *cmd, char **env)
+char	*find_path(char *cmd, t_env *env)
 {
 	char	*path;
 	char	*full_path;
