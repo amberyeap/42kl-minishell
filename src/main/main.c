@@ -74,26 +74,6 @@ char	*get_user_input(char **line)
 	return (*line);
 }
 
-// void	parent_execution(t_minishell *shell)
-// {
-// 	t_node	*current_node;
-
-// 	current_node = shell->parser_list;
-// 	if (!current_node)
-// 		return ;
-// 	if (current_node->type == NODE_COMMAND)
-// 	{
-// 		printf("entered parent_execution\n");
-// 		if (check_builtin(current_node->cmd))
-// 		{
-// 			shell->exit = run_builtin(current_node->arg, shell);
-// 			// printf("%d\n", shell->exit);
-// 			return ;
-// 		}
-// 	}
-// 	// execute_fork(shell, current_node);
-// }
-
 void	minishell_loop(t_minishell *shell)
 {
 	char	*line;
@@ -115,8 +95,6 @@ void	minishell_loop(t_minishell *shell)
 			main_parse(shell);
 		// printf("parsing complete\n");
 		parent_execution(shell);
-		// run_builtin(shell->parser_list->arg, shell);
-			//do something later
 
 		// print_tokens(shell->token_list);
 		// print_nodes(shell->parser_list);

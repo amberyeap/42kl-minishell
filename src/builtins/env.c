@@ -37,22 +37,34 @@
 // 	write (fd, "\n", 1);
 // }
 
-int	ft_env(char **args, t_env *env)
+int ft_env(char **args, t_env *env)
 {
-	if (args[1])
-	{
-		ft_putstr_fd("env: No such file or directory",2);
-		return (127);
-	}
-	if (!env)
-		return (0);
-	while (env)
-	{
-		ft_putendl_fd(env->value,1);
-		env = env->next;
-	}
-	return (0);
+    t_env *current;
+
+	current = env;
+    if (args && args[0] && args[1])
+    {
+        ft_putstr_fd("env: too many arguments\n", 2);
+        return (1);
+    }
+    if (!current)
+    {
+        ft_putstr_fd("env: environment not initialized\n", 2);
+        return (1);
+    }
+    while (current)
+    {
+        if (current->key && current->value)
+        {
+            printf("%s", current->key);
+            printf("=");
+            printf("%s\n", current->value);
+        }
+        current = current->next;
+    }
+    return (0);
 }
+
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <string.h>

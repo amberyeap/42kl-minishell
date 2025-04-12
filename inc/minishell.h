@@ -131,14 +131,12 @@ typedef struct s_minishell
 {
 	char		*user_input;
 	char		**sorted_env;
-	// char		**env; // can remove
 	int			exit;
 	int			ret;
 	t_env		*env;
 	t_token		*token_list;
 	t_node		*parser_list; // pointer to the first node of the parser
 	t_parser	*parser; //
-	// int			exit_status;
 }	t_minishell;
 
 // expansion.c
