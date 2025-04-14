@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/12 10:08:45 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/14 13:53:17 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*find_path(char *cmd, t_env *env)
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
 	path = get_env_value(env, "PATH");
-	printf("path: %s\n", path);
+	// printf("path: %s\n", path);
 	if (!path)
 		return (NULL);
 	paths = ft_split(path, ':');
@@ -31,7 +31,7 @@ char	*find_path(char *cmd, t_env *env)
 	{
 		full_path = ft_strjoin(paths[i], "/");
 		full_path = ft_strjoin(full_path, cmd);
-		printf("full path: %s\n", full_path);
+		// printf("full path: %s\n", full_path);
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			return (full_path);
@@ -50,7 +50,6 @@ void	execute_cmd(t_node *node, t_minishell *data)
 
 	cmd = expand_var(node->cmd);
 	cmd = find_path(cmd, data->env);
-	printf("cmd : %s\n", cmd);
 	if (cmd == NULL)
 	{
 		perror("Command not found");

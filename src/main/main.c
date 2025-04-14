@@ -93,7 +93,6 @@ void	minishell_loop(t_minishell *shell)
 		}
 		else
 			main_parse(shell);
-		// printf("parsing complete\n");
 		parent_execution(shell);
 
 		// print_tokens(shell->token_list);
