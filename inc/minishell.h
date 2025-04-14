@@ -35,6 +35,8 @@
 
 # include "../library/inc/libft.h"
 
+typedef struct s_minishell	t_minishell;
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                               for tokenizer                                */
@@ -118,6 +120,7 @@ typedef struct s_node
 	char			*heredoc_delim;
 	char			*redir_file;
 	t_direction		redir_direction;
+	t_minishell		*shell;
 	struct s_node	*next;
 }	t_node;
 
@@ -128,7 +131,7 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
-typedef struct s_minishell
+struct s_minishell
 {
 	char		*user_input;
 	char		**sorted_env;
@@ -138,11 +141,11 @@ typedef struct s_minishell
 	t_token		*token_list; // pointer to the first node of the tokenized list
 	t_node		*parser_list; // pointer to the first node of the parser
 	t_parser	*parser; // pointer to a struct that holds the error/error msg
-}	t_minishell;
+};
 
 // expansion.c
 char		*get_env_var(char **value, char *var_start, char *result, int *i);
-char		*expand_var(char *value, int exit_status);
+char		*expand_var(char *value);
 
 // free_nodes.c
 void		free_node(t_node *head);
@@ -177,7 +180,7 @@ int			is_redir_token(t_token_type type);
 void		consume_token(t_parser *parser);
 void		set_parser_error(t_parser *parser, char *msg);
 void		add_node_to_back(t_node **head, t_node *new_node);
-t_parser	*init_parser(t_token *token_list);
+t_parser	*init_parser(t_minishell *shell);
 
 // parser.c
 t_node		*create_node(t_node_type type);
