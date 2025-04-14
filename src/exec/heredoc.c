@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 10:31:49 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/14 13:11:05 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	quote_delim(char *delim)
 		#then write all the input in the write-end pipe
 		#then free the line
 */
-int	setup_heredoc(t_node *node)
+int	setup_heredoc(t_node *node, t_minishell *data)
 {
 	int		pipefd[2];
 	int		quoted;
@@ -50,7 +50,7 @@ int	setup_heredoc(t_node *node)
 			break ;
 		if (!quoted) //unquoted delimiter
 		{
-			expanded = expand_var(line);
+			expanded = expand_var(line, data->exit);
 			write(pipefd[1], expanded, ft_strlen(expanded));
 			free(expanded);
 		}

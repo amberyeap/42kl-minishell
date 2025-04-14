@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/04/04 17:06:05 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:25:12 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->user_input = NULL;
 	// shell->env = env;
 	(void)env;
+	shell->exit = 0;
 	shell->token_list = NULL;
 	shell->parser_list = NULL;
 	shell->parser = NULL;

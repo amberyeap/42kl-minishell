@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:53:17 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/14 15:26:29 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	char *cmd;
 	char **env;
 
-	cmd = expand_var(node->cmd);
+	cmd = expand_var(node->cmd, data->exit);
 	cmd = find_path(cmd, data->env);
 	if (cmd == NULL)
 	{
