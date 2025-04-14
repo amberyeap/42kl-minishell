@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 16:11:59 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:10:47 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@ int	handle_out(t_node *node, int *fd_out)
 	return (0);
 }
 
-int	handle_in(t_node *node, int *fd_in)
+int	handle_in(t_node *node, int *fd_in, t_minishell *data)
 {
 	if (*fd_in != -1) //Closed previous redir input if exist before
 		close(*fd_in);
 	if (node->type == NODE_REDIR_IN) //"<" cases
 		*fd_in = open(node->redir_file, O_RDONLY);
 	else if (node->type == NODE_HEREDOC) //"<<" Cases
-		*fd_in = setup_heredoc(node);
+		*fd_in = setup_heredoc(node, data);
 	if (*fd_in == -1)
 	{
 		perror("Redirection Error");
@@ -54,7 +54,7 @@ int	handle_in(t_node *node, int *fd_in)
 }
 
 //Check the Redirection Node
-int	check_redir(t_node *node)
+int	check_redir(t_node *node, t_minishell *data)
 {
 	int	fd_in;
 	int	fd_out;
@@ -65,7 +65,7 @@ int	check_redir(t_node *node)
 	{
 		if (node->type == NODE_REDIR_IN || node->type == NODE_HEREDOC)
 		{
-			if (handle_in(node, &fd_in) == -1)
+			if (handle_in(node, &fd_in, data) == -1)
 				return (-1);
 		}
 		else if (node->type == NODE_REDIR_OUT || node->type == NODE_APPEND)

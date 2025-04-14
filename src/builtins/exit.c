@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 11:23:56 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:22:59 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 int	ft_exit(t_minishell *data, char **args)
 {
 	data->exit = 1;// set exit to 1 first
-	ft_putstr_fd("exit ", STDERR_FILENO);
+	ft_fprintf(STDERR_FILENO, "exit ");
 	// handle with to many arguments
 	if (args[0] && args[1])
 	{
@@ -32,7 +32,7 @@ int	ft_exit(t_minishell *data, char **args)
 	else if (args[0] && !ft_strisnum(args[0]))
 	{
 		// data->ret = 255;
-		ft_fprintf(STDERR_FILENO, "minishell: exit: %s:numeric argument required\n", args[0]);
+		ft_fprintf(STDERR_FILENO, "minishell: exit: %s: numeric argument required\n", args[0]);
 		exit(255);
 	}
 	//handle valid numeric arguments

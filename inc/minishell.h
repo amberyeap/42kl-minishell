@@ -136,7 +136,7 @@ struct s_minishell
 	char		*user_input;
 	char		**sorted_env;
 	int			exit;
-	int			ret;
+	int			ret; // may be unused
 	t_env		*env; // pointer to the first var of the env
 	t_token		*token_list; // pointer to the first node of the tokenized list
 	t_node		*parser_list; // pointer to the first node of the parser
@@ -145,7 +145,7 @@ struct s_minishell
 
 // expansion.c
 char		*get_env_var(char **value, char *var_start, char *result, int *i);
-char		*expand_var(char *value);
+char		*expand_var(char *value, int exit_status);
 
 // free_nodes.c
 void		free_node(t_node *head);
@@ -266,11 +266,11 @@ void		free_array(char **array);
 // exec.c
 void		parent_execution(t_minishell *shell);
 void		execute_fork(t_node *current_node, t_minishell *data);
-int			check_redir(t_node *node);
+int			check_redir(t_node *node, t_minishell *data);
 void		execute_cmd(t_node *node, t_minishell *data);
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
 void		set_pipe(t_node *current_node, t_minishell *data);
-int			setup_heredoc(t_node *node);
+int			setup_heredoc(t_node *node, t_minishell *data);
 
 #endif

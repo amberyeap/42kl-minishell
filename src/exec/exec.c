@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/12 10:19:46 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:08:41 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 void	execute_node(t_node *current_node, t_minishell *data)
 {
-	if (check_redir(current_node) == -1)
+	if (check_redir(current_node, data) == -1)
 		return ;
 	while (current_node)
 	{
 		if (current_node->type == NODE_PIPE)
 			set_pipe(current_node, data);
 		else
-			execute_cmd(current_node, data);
+			execute_cmd(current_node, data); 
 		current_node = current_node->next;
 	}
 }
