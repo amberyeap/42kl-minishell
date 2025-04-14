@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:22:59 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 16:11:34 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,27 +20,25 @@
 int	ft_exit(t_minishell *data, char **args)
 {
 	data->exit = 1;// set exit to 1 first
-	ft_fprintf(STDERR_FILENO, "exit ");
+	ft_fprintf(STDERR_FILENO, "exit\n");
 	// handle with to many arguments
-	if (args[0] && args[1])
+	if (args && args[0] && args[1])
 	{
 		data->exit = 1;// set the return value to 1(error)
 		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
 		return (1);
 	}
 	//Handle for non-numeric arguments
-	else if (args[0] && !ft_strisnum(args[0]))
+	else if (args && args[0] && !ft_strisnum(args[0]))
 	{
 		// data->ret = 255;
 		ft_fprintf(STDERR_FILENO, "minishell: exit: %s: numeric argument required\n", args[0]);
 		exit(255);
 	}
 	//handle valid numeric arguments
-	else if (args[0])
-		// data->ret = ft_atoi(args[1]);
+	else if (args && args[0])
 		exit(ft_atoi(args[0]));
 	else// handle no arguments
-		// data->ret = 0;
 		exit(0);
 }
 
