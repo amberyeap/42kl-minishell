@@ -3,18 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 14:08:56 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:51:13 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <unistd.h>
 
 // Calculates the length of environment variable's key (before =)
 static size_t	env_size(char *env)
@@ -22,6 +18,8 @@ static size_t	env_size(char *env)
 	size_t	i;
 
 	i = 0;
+	if (!env)
+		return (0);
 	while (env[i] && env[i] != '=')
 		i++;
 	return (i);
@@ -56,9 +54,10 @@ int	unset(char **args, t_minishell *data)
 {
 	t_env	*now_node;
 	t_env	*previous_node;
+	int len_name;
 
 	// If no variable name is provided, return 0 for success
-	if (!args[1])
+	if (!args)
 		return (1);
 	now_node = data->env;// Start from the head of the environment list
 	previous_node = NULL;// Initialize to Null
@@ -66,9 +65,9 @@ int	unset(char **args, t_minishell *data)
 	// Traverse the environment list
 	while (now_node)
 	{
-		// Check if the current node matches the variable to unset
-		if (strncmp(args[1], now_node->value,
-				env_size(now_node->value)) == 0)
+		len_name = env_size(now_node->key);
+		if (len_name > 0 && strncmp(args[0], now_node->key, len_name) == 0
+			&& args[0][len_name] == '\0')
 		{
 			remove_env(data, previous_node, now_node);//remove the matching node
 			return (1);
@@ -79,74 +78,3 @@ int	unset(char **args, t_minishell *data)
 	}
 	return (0);// Return success if no matching node was found
 }
-
-// // Function prototypes
-// void    remove_env(t_minishell *data, t_env *previous_node, t_env *remove_node);
-// int     unset(char **args, t_minishell *data);
-// size_t  env_size(char *env);
-// void    freenode(t_minishell *data, t_env *node);
-
-// // Helper function to create an environment variable node
-// t_env *create_env_node(const char *value)
-// {
-//     t_env *new_node = malloc(sizeof(t_env));
-//     if (!new_node)
-//         return NULL;
-//     new_node->value = strdup(value);
-//     new_node->next = NULL;
-//     return new_node;
-// }
-
-// // Helper function to print the environment list
-// void print_env_list(t_env *head)
-// {
-//     t_env *current = head;
-//     while (current)
-//     {
-//         printf("%s\n", current->value);
-//         current = current->next;
-//     }
-// }
-
-// // Helper function to free the entire environment list
-// void free_env_list(t_env *head)
-// {
-//     t_env *tmp;
-//     while (head)
-//     {
-//         tmp = head;
-//         head = head->next;
-//         free(tmp->value);
-//         free(tmp);
-//     }
-// }
-
-// // **Test Case**
-// int main(void)
-// {
-//     t_minishell mini;
-//     char *args1[] = {"unset", "VAR2", NULL};
-//     char *args2[] = {"unset", "VAR3", NULL};
-
-//     // Setup environment list
-//     mini.env = create_env_node("VAR1=value1");
-//     mini.env->next = create_env_node("VAR2=value2");
-//     mini.env->next->next = create_env_node("VAR3=value3");
-
-//     printf("Before unsetting:\n");
-//     print_env_list(mini.env);
-
-//     // Test unsetting VAR2
-//     unset(args1, &mini);
-//     printf("\nAfter unsetting VAR2:\n");
-//     print_env_list(mini.env);
-
-//     // Test unsetting VAR3
-//     unset(args2, &mini);
-//     printf("\nAfter unsetting VAR3:\n");
-//     print_env_list(mini.env);
-
-//     // Free remaining environment list
-//     free_env_list(mini.env);
-//     return 0;
-// }

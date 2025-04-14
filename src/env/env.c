@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:19:38 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 19:21:00 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 12:12:08 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	sort_print_env(t_minishell *data)
 {
 	char **env_array;
 
+	printf("---- sort_print_env ----\n");
 	env_array = list_to_str(data->env);
 	if (!env_array)
 		return;

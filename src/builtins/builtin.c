@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 10:53:58 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 13:26:30 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 // [FIXED] BUG: only prints a newline when there is only one argument
 // [FIXED] BUG: segfaults when there is no argument input (eg: echo ), works for echo ""
 // [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, but as two separate strings
-// TO TEST: the skip_flags() 
+// TO TEST: the skip_flags()
 
 // CD BUGS
 // - 'cd ..' goes back to the home/USER path
@@ -126,7 +126,7 @@ int	run_builtin(char **args, t_minishell *data)
 // 		printf("%d ", data->parser_list->cmd[i]);
 
 //     int result = -1; // Default: not a built-in command
-    
+
 //     if (ft_strncmp(trimmed_cmd, "echo", 4) == 0)
 //         result = ft_echo(args);
 //     else if (ft_strncmp(trimmed_cmd, "cd", 2) == 0)

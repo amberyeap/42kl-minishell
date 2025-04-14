@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:18:02 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 15:26:29 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ char	*find_path(char *cmd, t_env *env)
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
 	path = get_env_value(env, "PATH");
+	// printf("path: %s\n", path);
 	if (!path)
 		return (NULL);
 	paths = ft_split(path, ':');
@@ -30,6 +31,7 @@ char	*find_path(char *cmd, t_env *env)
 	{
 		full_path = ft_strjoin(paths[i], "/");
 		full_path = ft_strjoin(full_path, cmd);
+		// printf("full path: %s\n", full_path);
 		if (access(full_path, F_OK | X_OK) == 0)
 		{
 			return (full_path);
