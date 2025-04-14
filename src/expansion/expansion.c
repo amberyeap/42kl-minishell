@@ -34,10 +34,10 @@ int	expand_exit_status(int exit_status, char **value, char **result, int *i)
 	char *exit_str;
 
 	exit_str = ft_itoa(exit_status);
-	i += ft_strlcpy(*result, exit_str, )
+	i += ft_strlcpy(*result, exit_str, ft_strlen(exit_str) + 1);
 }
 
-char	*expand_var(char *value, int exit_status)
+char	*expand_var(char *value)
 {
 	char	*var_start;
 	char	*result;
@@ -52,9 +52,9 @@ char	*expand_var(char *value, int exit_status)
 		return (free(result), ft_strdup(value));
 	while (*value)
 	{
-		if (*value == '$' && *(value + 1) == '?')
-			expand_exit_status(exit_status, &value, &result, &i);
-		else if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
+		// if (*value == '$' && *(value + 1) == '?')
+		// 	expand_exit_status(exit_status, &value, &result, &i);
+		if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
 		{
 			if (!get_env_var(&value, var_start, result, &i))
 				return (free(result), NULL);

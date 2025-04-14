@@ -57,7 +57,7 @@ void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 {
 	char	*expanded_arg;
 
-	expanded_arg = expand_var(parser->current_token->value, parser->shell->exit);
+	expanded_arg = expand_var(parser->current_token->value);
 	if (!*first_node)
 	{
 		*first_node = create_command_node(expanded_arg, NODE_COMMAND);
