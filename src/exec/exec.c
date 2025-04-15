@@ -6,11 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/04/14 15:13:19 by muhabin-         ###   ########.fr       */
-=======
-/*   Updated: 2025/04/14 13:08:41 by ayeap            ###   ########.fr       */
->>>>>>> main
+/*   Updated: 2025/04/15 13:04:09 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +14,6 @@
 
 void	execute_node(t_node *current_node, t_minishell *data)
 {
-<<<<<<< HEAD
 	t_node *temp = data->parser_list;
 	// 	while (temp)
 	// 	{
@@ -37,16 +32,13 @@ void	execute_node(t_node *current_node, t_minishell *data)
 		}
 
 	if (check_redir(current_node) == -1)
-=======
-	if (check_redir(current_node, data) == -1)
->>>>>>> main
 		return ;
 	while (current_node)
 	{
 		if (current_node->type == NODE_PIPE)
 			set_pipe(current_node, data);
 		else
-			execute_cmd(current_node, data); 
+			execute_cmd(current_node, data);
 		current_node = current_node->next;
 	}
 }
