@@ -57,7 +57,7 @@ char	*get_word(t_tokenizer *tokenizer, int *expand)
 			chunk = handle_quotes(tokenizer, quote);
 			if (!chunk)
 				return (free(word), NULL);
-			if (quote == 34 && ft_strchr(chunk, '$'))
+			if (quote == '"' && ft_strchr(chunk, '$'))
 				*expand = 1;
 		}
 		else

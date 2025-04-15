@@ -64,18 +64,21 @@ t_node	*create_command_node(char *cmd, t_node_type type)
 
 void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 {
-	char	*expanded_arg;
+	char	*word;
 
-	expanded_arg = expand_var(parser->current_token->value, parser->shell->exit);
+	if (parser->current_token->expand)
+		word = expand_var(parser->current_token->value, parser->shell->exit);
+	else
+		word = ft_strdup(parser->current_token->value);
 	if (!*first_node)
 	{
-		*first_node = create_command_node(expanded_arg, NODE_COMMAND);
+		*first_node = create_command_node(word, NODE_COMMAND);
 		add_node_to_back(head, *first_node);
 	}
 	else
-		if (!add_arg_to_command(expanded_arg, *first_node))
+		if (!add_arg_to_command(word, *first_node))
 			set_parser_error(parser, "Failed to add argument to command");
-	free(expanded_arg);
+	free(word);
 	consume_token(parser);
 }
 

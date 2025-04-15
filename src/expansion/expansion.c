@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-char	*get_env_var(char **value, char *var_start, char *result, int *i)
+char	*get_env_var(char **value, char *start, char *result, int *i)
 {
 	char	*expanded_var;
 	char	*var_name;
@@ -20,7 +20,7 @@ char	*get_env_var(char **value, char *var_start, char *result, int *i)
 	(*value)++;
 	while (ft_isalnum(**value))
 		(*value)++;
-	var_name = ft_substr(var_start + 1, 0, *value - (var_start + 1));
+	var_name = ft_substr(start + 1, 0, *value - (start + 1));
 	expanded_var = getenv(var_name);
 	if (expanded_var)
 		*i += ft_strlcpy(result + (*i), expanded_var,
@@ -41,7 +41,6 @@ void	expand_exit_status(int exit_status, char **value, char *result, int *i)
 
 char	*expand_var(char *value, int exit_status)
 {
-	// char	*var_start;
 	char	*result;
 	int		i;
 
@@ -49,9 +48,6 @@ char	*expand_var(char *value, int exit_status)
 	result = malloc(1024);
 	if (!result)
 		return (NULL);
-	// var_start = ft_strchr(value, '$');
-	// if (!var_start)
-	// 	return (free(result), ft_strdup(value));
 	while (*value)
 	{
 		if (*value == '$' && *(value + 1) == '?')

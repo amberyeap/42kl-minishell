@@ -144,7 +144,7 @@ struct s_minishell
 };
 
 // expansion.c
-char		*get_env_var(char **value, char *var_start, char *result, int *i);
+char		*get_env_var(char **value, char *start, char *result, int *i);
 char		*expand_var(char *value, int exit_status);
 
 // free_nodes.c
