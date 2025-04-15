@@ -6,11 +6,27 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 19:30:50 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 19:54:40 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+static int	check_symbol(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '-')
+			return (1);
+		else if (str[i] == '+')
+			return (2);
+		i++;
+	}
+	return (0);
+}
 
 /*
  * @brief this exit the shell
@@ -28,12 +44,15 @@ int	ft_exit(t_minishell *data, char **args)
 		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
 		return (1);
 	}
+	else if (check_symbol(args[1]) == 1)
+		exit(256 + ft_atoi(args[1]));
+	else if (check_symbol(args[1]) == 2)
+		exit(ft_atoi(args[1]));
 	//Handle for non-numeric arguments
 	else if (args[1] && !ft_strisnum(args[1]))
 	{
-		// data->ret = 255;
-		ft_fprintf(STDERR_FILENO, "minishell: exit: %s: numeric argument required\n", args[0]);
-		exit(255);
+		ft_fprintf(STDERR_FILENO, "minishell: exit: %s: numeric argument required\n", args[1]);
+		exit(2);
 	}
 	//handle valid numeric arguments
 	else if (args[1])
