@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 20:06:09 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 19:09:52 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ int	cd(char **args, t_minishell *data)
 {
 	int	ret_val;
 
+	if (length(args) > 2)
+		return (1);
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
 		return (go_to_path(0, data));
 	if (ft_strcmp(args[1], "-") == 0)
