@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/10 11:40:28 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/14 20:06:09 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,15 @@ int	cd(char **args, t_minishell *data)
 {
 	int	ret_val;
 
-	if (!args[0] || ft_strcmp(args[0], "~") == 0)
+	if (!args[1] || ft_strcmp(args[1], "~") == 0)
 		return (go_to_path(0, data));
-	if (ft_strcmp(args[0], "-") == 0)
+	if (ft_strcmp(args[1], "-") == 0)
 		return(go_to_path(1, data));
 	update_oldpwd(data);
-	ret_val = chdir(args[0]);
+	ret_val = chdir(args[1]);
 	if (ret_val == -1)
 	{
-		ft_fprintf(2,"Minishell: cd: %s: %s\n",args[0], strerror(errno));
+		ft_fprintf(2,"Minishell: cd: %s: %s\n",args[1], strerror(errno));
 		return (1);
 	}
 	update_pwd(data);

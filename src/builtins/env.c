@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 21:45:45 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 11:56:13 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:09:38 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	ft_env(char **args, t_env *env)
 	t_env	*current;
 
 	current = env;
-	if (length(args) > 0)
+	if (length(args) > 1)
 	{
 		ft_putstr_fd("env: too many arguments", 2);
 		return (1);

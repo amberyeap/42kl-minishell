@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 10:05:07 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 17:55:27 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 11:02:51 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	pwd(char **args)
 
 	if (length(args) > 1)
 	{
-		ft_putstr_fd("pwd: too many arguments",STDERR_FILENO);
+		ft_putstr_fd("pwd: too many arguments", STDERR_FILENO);
 	}
 	if (getcwd(cwd, PATH_MAX))
 	{

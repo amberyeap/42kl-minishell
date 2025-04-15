@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:26:30 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/14 19:26:31 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,19 @@
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
 {
-	if (ft_strncmp(command, "echo", 4) == 0)
+	if (ft_strcmp(command, "echo") == 0)
 		return (1);
-	if (ft_strncmp(command, "cd ", 2) == 0)
+	else if (ft_strcmp(command, "cd ") == 0)
 		return (1);
-	if (ft_strncmp(command, "pwd", 3) == 0)
+	else if (ft_strcmp(command, "pwd") == 0)
 		return (1);
-	if (ft_strncmp(command, "env", 3) == 0)
+	else if (ft_strcmp(command, "env") == 0)
 		return (1);
-	if (ft_strncmp(command, "exit", 4) == 0)
+	else if (ft_strcmp(command, "exit") == 0)
 		return (1);
-	if (ft_strncmp(command, "export", 6) == 0)
+	else if (ft_strcmp(command, "export") == 0)
 		return (1);
-	if (ft_strncmp(command, "unset", 5) == 0)
+	else if (ft_strcmp(command, "unset") == 0)
 		return (1);
 	return (0);
 }
