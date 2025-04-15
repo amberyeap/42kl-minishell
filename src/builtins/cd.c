@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 19:09:52 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 20:07:37 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ static int	go_to_path(int flag, t_minishell *data)
 	update_pwd(data);
 	return (0);
 }
+
 /*
 * @brief This is the main function for cd command
 * @note There is several steps for handling cd:-
@@ -67,12 +68,12 @@ int	cd(char **args, t_minishell *data)
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
 		return (go_to_path(0, data));
 	if (ft_strcmp(args[1], "-") == 0)
-		return(go_to_path(1, data));
+		return (go_to_path(1, data));
 	update_oldpwd(data);
 	ret_val = chdir(args[1]);
 	if (ret_val == -1)
 	{
-		ft_fprintf(2,"Minishell: cd: %s: %s\n",args[1], strerror(errno));
+		ft_fprintf(2, "Minishell: cd: %s: %s\n", args[1], strerror(errno));
 		return (1);
 	}
 	update_pwd(data);

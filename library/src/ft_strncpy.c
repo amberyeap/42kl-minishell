@@ -6,15 +6,17 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 11:47:28 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 19:21:25 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 20:03:06 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/libft.h"
 
-char *ft_strncpy(char *dst, const char *src, size_t size)
+char	*ft_strncpy(char *dst, const char *src, size_t size)
 {
-	size_t i = 0;
+	size_t	i;
+
+	i = 0;
 	if (!src || !dst)
 		return (NULL);
 	while (i < size && src[i])

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:51:13 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 20:27:23 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,15 @@ static size_t	env_size(char *env)
 // This tools helps for freeing the node that we want
 static void	freenode(t_minishell *data, t_env *node)
 {
-	if (!data | !node)//if the node is NULL or data not init, do nothin
-		return;
-	if (node->value)//check if theres is value inside
-		free(node->value);// this free the value store
-	// if the node to free is the head of the list, update the head
+	if (!data | !node)
+		return ;
+	if (node->value)
+		free(node->value);
 	if (data->env == node)
 		data->env = node->next;
 	free(node);
 }
+
 // This function removes the selected node by using freenode function
 void	remove_env(t_minishell *data, t_env *previous_node, t_env *remove_node)
 {
@@ -46,6 +46,7 @@ void	remove_env(t_minishell *data, t_env *previous_node, t_env *remove_node)
 		previous_node->next = remove_node->next;
 	freenode(data, remove_node);
 }
+
 /*
  * @brief unset command remove the environment variable from the shell's env
  * @param args only remove what comes after unset
@@ -54,27 +55,23 @@ int	unset(char **args, t_minishell *data)
 {
 	t_env	*now_node;
 	t_env	*previous_node;
-	int len_name;
+	int		len_name;
 
-	// If no variable name is provided, return 0 for success
 	if (!args)
 		return (1);
-	now_node = data->env;// Start from the head of the environment list
-	previous_node = NULL;// Initialize to Null
-
-	// Traverse the environment list
+	now_node = data->env;
+	previous_node = NULL;
 	while (now_node)
 	{
 		len_name = env_size(now_node->key);
 		if (len_name > 0 && strncmp(args[0], now_node->key, len_name) == 0
 			&& args[0][len_name] == '\0')
 		{
-			remove_env(data, previous_node, now_node);//remove the matching node
+			remove_env(data, previous_node, now_node);
 			return (1);
 		}
-		// Move to the next node
 		previous_node = now_node;
 		now_node = now_node->next;
 	}
-	return (0);// Return success if no matching node was found
+	return (0);
 }
