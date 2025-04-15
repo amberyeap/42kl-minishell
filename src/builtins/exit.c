@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 20:11:58 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 21:00:44 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,23 @@ int	ft_exit(t_minishell *data, char **args)
 {
 	data->exit = 1;
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	if (args[1] && args[2])
+	if (length(args) > 1 && args[1] && args[2])
 	{
 		data->exit = 1;
 		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
 		return (1);
 	}
-	else if (check_symbol(args[1]) == 1)
+	else if (length(args) > 1 && check_symbol(args[1]) == 1)
 		exit(256 + ft_atoi(args[1]));
-	else if (check_symbol(args[1]) == 2)
+	else if (length(args) > 1 && check_symbol(args[1]) == 2)
 		exit(ft_atoi(args[1]));
-	else if (args[1] && !ft_strisnum(args[1]))
+	else if (length(args) > 1 && args[1] && !ft_strisnum(args[1]))
 	{
 		ft_fprintf(STDERR_FILENO, "minishell: exit: ");
 		ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
 		exit(2);
 	}
-	else if (args[1])
+	else if (length(args) > 1 && args[1])
 		exit(ft_atoi(args[1]));
 	else
 		exit(0);
