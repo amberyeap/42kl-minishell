@@ -270,7 +270,8 @@ int			check_redir(t_node *node, t_minishell *data);
 void		execute_cmd(t_node *node, t_minishell *data);
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
-void		set_pipe(t_node *current_node, t_minishell *data);
+// void		set_pipe(t_node *current_node, t_minishell *data);
+void set_pipe(t_node *pipeline, t_minishell *shell);
 int			setup_heredoc(t_node *node, t_minishell *data);
 
 #endif

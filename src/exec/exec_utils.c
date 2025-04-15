@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 19:27:35 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 13:02:04 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,130 +75,233 @@
 // }
 void	set_child(int in_fd, int out_fd, t_minishell *data, t_node *cmd)
 {
+	printf("right now inside set_child\n");
 	if (in_fd != STDIN_FILENO)
 	{
-		dup2(in_fd, STDIN_FILENO);
+		if (dup2(in_fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2 in_fd");
+			exit(1);
+		}
 		close(in_fd);
 	}
 	if (out_fd != STDOUT_FILENO)
 	{
-		dup2(out_fd, STDOUT_FILENO);
+		if (dup2(out_fd, STDOUT_FILENO) == -1)
+		{
+			perror("dup2 out_fd");
+			exit(1);
+		}
 		close(out_fd);
 	}
-	execute_fork(cmd, data);
+	execute_cmd(cmd, data);
 	exit(data->exit);
 }
-static void	create_pipe(int pipefd[2])
-{
-	if (pipe(pipefd) == -1)
-	{
-		perror("pipe");
-		exit(1);
-	}
-	printf("[DEBUG] Pipe created: [%d, %d]\n", pipefd[0], pipefd[1]);
-}
-void	set_pipe(t_node *current_node, t_minishell *data)
-{
-	int		pipefd[2];
-	int		input_fd;
-	pid_t	pid;
+// static void	create_pipe(int pipefd[2])
+// {
+// 	if (pipe(pipefd) == -1)
+// 	{
+// 		perror("pipe");
+// 		exit(1);
+// 	}
+// 	printf("[DEBUG] Pipe created: [%d, %d]\n", pipefd[0], pipefd[1]);
+// }
 
-	input_fd = STDIN_FILENO; //start with stdin, takes from the 1 pipes
-	while (current_node)
-	{
-		if (current_node->next && current_node->next->type == NODE_PIPE) //Check if the next node is a pipe
-			create_pipe(pipefd);
-		else
-			pipefd[1] = STDOUT_FILENO; //Last cmd writes to stdout
-		pid = fork();
-		if (pid == 0)
-			set_child(input_fd, pipefd[1], data, current_node);
-		printf("[DEBUG] Parent PID %d created child PID %d for command: %s\n",
-				getpid(), pid, current_node->arg[0]); // Add this for clarity
+// void	set_pipe(t_node *current_node, t_minishell *data)
+// {
+// 	int		pipefd[2];
+// 	int		input_fd;
+// 	pid_t	pid;
 
-		// closed_fd(&input_fd, pipefd[0]);
-		close(pipefd[1]);
+// 	input_fd = STDIN_FILENO;
+// 	while (current_node)
+// 	{
+// 		if (current_node->next && current_node->next->type == NODE_PIPE)
+// 			pipe(pipefd);
+// 			// create_pipe(pipefd);
+// 		else
+// 			pipefd[1] = STDOUT_FILENO;
+// 		pid = fork();
+// 		if (pid == -1)
+// 		{
+// 			perror("fork");
+// 			exit(1);
+// 		}
+// 		if (pid == 0)
+// 		{
+// 			if (input_fd != STDIN_FILENO)
+// 			{
+// 				dup2(input_fd, STDIN_FILENO);
+// 				close(input_fd);
+// 			}
+// 			if (pipefd[1] != STDOUT_FILENO)
+// 			{
+// 				dup2(pipefd[1], STDOUT_FILENO);
+// 				close(pipefd[1]);
+// 			}
+// 			close(pipefd[0]);
+// 			set_child(input_fd, pipefd[1], data, current_node);
+// 		}
+// 		if (input_fd != STDIN_FILENO)
+// 			close(input_fd); // Close previous read-end
+// 		input_fd = pipefd[0];
+// 		current_node = current_node->next;
+// 		if (current_node && current_node->type == NODE_PIPE)
+// 			current_node = current_node->next;
+// 	}
+// 	while(wait(NULL) > 0);
+// 	printf("[DEBUG] Execution finished.\n");
+// }
+/*
+void set_pipe(t_node *pipeline, t_minishell *shell)
+{
+    int pipefd[2];
+    int input_fd = STDIN_FILENO; // Start with stdin
+    pid_t pid;
+	pid_t	last_pid;
+	int has_pipe;
+	int	status;
+
+    while (pipeline)
+    {
+		has_pipe = 0;
+        if (pipeline->next && pipeline->next->type == NODE_PIPE)
+        {
+            if (pipe(pipefd) == -1)
+            {
+                perror("pipe");
+                exit(1);
+            }
+			has_pipe = 1;
+        }
+        else
+        {
+            pipefd[1] = STDOUT_FILENO; // Last command writes to stdout
+			pipefd[0] = -1;
+        }
+
+        pid = fork();
+        if (pid == -1)
+        {
+            perror("fork");
+            exit(1);
+        }
+
+        if (pid == 0) // Child process
+        {
+            if (input_fd != STDIN_FILENO)
+            {
+                if (dup2(input_fd, STDIN_FILENO) == -1);
+				{
+					perror("dup2");
+					exit(EXIT_FAILURE);
+				}
+                close(input_fd);
+            }
+			if (has_pipe)
+			{
+				dup2(pipefd[1], STDOUT_FILENO);
+			}
+			if (has_pipe || pipefd[1] != STDOUT_FILENO)
+				close(pipefd[1]);
+			if (pipefd[0] != -1)
+				close(pipefd[0]);
+            execute_cmd(pipeline, shell);
+            exit(shell->exit);
+        }
+
+        // Parent process
 		if (input_fd != STDIN_FILENO)
 			close(input_fd); // Close previous read-end
-		// Update input_fd for the next command
-		input_fd = pipefd[0];
-		current_node = current_node->next;
-		if (current_node && current_node->type == NODE_PIPE)
-			current_node = current_node->next;
+		if (has_pipe)
+		{
+			close(pipefd[1]); // Close write-end of the pipe in parent
+			input_fd = pipefd[0]; // Set input_fd to read-end of the pipe
+		}
+		else
+			input_fd = STDIN_FILENO;
+		// if (has_pipe)
+        // 	close(pipefd[1]);
+        // input_fd = pipefd[0];
+        pipeline = pipeline->next;
+        if (pipeline && pipeline->type == NODE_PIPE)
+            pipeline = pipeline->next;
+    }
+
+    // Wait for all child processes
+	while ((pid = wait(&status)) > 0) {
+		if (pid == last_pid) {
+			shell->exit = WIFEXITED(status) ? WEXITSTATUS(status) : 128 + WTERMSIG(status);
+		}
 	}
-	while(wait(NULL) > 0);
-	printf("[DEBUG] Execution finished.\n");
 }
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <unistd.h>
-// #include <string.h>
-// #include <sys/types.h>
-// #include <sys/wait.h>
+*/
+void	set_pipe(t_node *node, t_minishell *data)
+{
+	int		pipe_fd[2];
+	int		prev_pipe_in = -1;
+	pid_t	pid;
+	t_node	*current = node;
 
-// Define node types
-// #define NODE_COMMAND 1
-// #define NODE_PIPE 2
-
-// // Function prototype from your shell code
-// void set_pipe(t_node *current_node, t_minishell *data);
-
-// // Helper function to create a command node
-// t_node *create_command(char **args)
-// {
-//     t_node *new_node = malloc(sizeof(t_node));
-//     new_node->type = NODE_COMMAND;
-//     new_node->arg = args;
-//     new_node->next = NULL;
-//     return new_node;
-// }
-
-// // Helper function to create a pipe node
-// t_node *create_pipe_node()
-// {
-//     t_node *new_node = malloc(sizeof(t_node));
-//     new_node->type = NODE_PIPE;
-//     new_node->arg = NULL;
-//     new_node->next = NULL;
-//     return new_node;
-// }
-
-// // Dummy execute_fork function to mimic command execution
-// void execute_fork(t_minishell *data, t_node *cmd)
-// {
-// 	(void)data;
-//     execvp(cmd->arg[0], cmd->arg);
-//     perror("execvp failed");
-//     exit(1);
-// }
-
-
-// // Main function to test the pipeline execution
-// int main()
-// {
-//     t_minishell shell;
-//     shell.exit = 0;
-
-//     // Test command: ls | grep "test" | wc -l
-//     char *cmd1[] = {"/bin/ls", NULL};
-//     char *cmd2[] = {"/usr/bin/grep", "test", NULL};
-//     char *cmd3[] = {"/usr/bin/wc", "-l", NULL};
-
-//     // Creating nodes
-//     t_node *cmd_node1 = create_command(cmd1);
-//     t_node *pipe_node1 = create_pipe_node();
-//     t_node *cmd_node2 = create_command(cmd2);
-//     t_node *pipe_node2 = create_pipe_node();
-//     t_node *cmd_node3 = create_command(cmd3);
-
-//     // Linking the nodes: ls | grep "test" | wc -l
-//     cmd_node1->next = pipe_node1;
-//     pipe_node1->next = cmd_node2;
-//     cmd_node2->next = pipe_node2;
-//     pipe_node2->next = cmd_node3;
-
-//     // Execute the pipeline
-//     set_pipe(cmd_node1, &shell);
-
-//     return 0;
-// }
+	while (current != NULL)
+	{
+		if (current->next != NULL && current->next->type == NODE_PIPE)
+		{
+			if (pipe(pipe_fd) == -1)
+			{
+				perror("minishell: pipe");
+				data->exit = EXIT_FAILURE;
+				return ;
+			}
+		}
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("minishell: fork");
+			data->exit = EXIT_FAILURE;
+			exit(EXIT_FAILURE);
+		}
+		else if (pid == 0)
+		{
+			if (prev_pipe_in != -1)
+			{
+				if (dup2(prev_pipe_in, STDIN_FILENO) == -1)
+				{
+					perror("minishell: dup2");
+					data->exit = EXIT_FAILURE;
+					exit(EXIT_FAILURE);
+				}
+				close(prev_pipe_in);
+			}
+			if (current->next != NULL && current->next->type == NODE_PIPE)
+			{
+				if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+				{
+					perror("minishell: dup2");
+					exit(EXIT_FAILURE);
+				}
+				close(pipe_fd[1]);
+				close(pipe_fd[0]);
+			}
+			execute_cmd(current, data);
+			exit(data->exit);
+		}
+		else
+		{
+			if (prev_pipe_in != -1)
+				close(prev_pipe_in);
+			if (current->next != NULL && current->next->type == NODE_PIPE)
+			{
+				prev_pipe_in = pipe_fd[0];
+				close(pipe_fd[1]);
+			}
+			else
+				prev_pipe_in = -1;
+			current = current->next;
+			if (current != NULL && current->type == NODE_PIPE)
+				current = current->next;
+		}
+	}
+	while (waitpid(-1, NULL, 0) > 0)
+		;
+}

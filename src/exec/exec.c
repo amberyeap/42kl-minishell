@@ -6,49 +6,22 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/04/14 15:13:19 by muhabin-         ###   ########.fr       */
-=======
-/*   Updated: 2025/04/14 13:08:41 by ayeap            ###   ########.fr       */
->>>>>>> main
+/*   Updated: 2025/04/15 13:01:58 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	execute_node(t_node *current_node, t_minishell *data)
-{
-<<<<<<< HEAD
-	t_node *temp = data->parser_list;
-	// 	while (temp)
-	// 	{
-    //     if (temp->cmd) // Check if cmd is not NULL
-    //         printf("Executing command: %s\n", temp->cmd);
-    //     else
-    //         printf("Executing command: (null)\n");
-    //     temp = temp->next;
-	// 	}
-		temp = data->parser_list;
-		while (temp && temp->arg)
-		{
-        for (int i = 0; temp->arg[i]; i++)
-            printf("Arg: %s\n", temp->arg[i]);
-        temp = temp->next;
-		}
 
-	if (check_redir(current_node) == -1)
-=======
-	if (check_redir(current_node, data) == -1)
->>>>>>> main
+void	execute_node(t_node *node, t_minishell *data)
+{
+	if (check_redir(node, data) == -1)
 		return ;
-	while (current_node)
-	{
-		if (current_node->type == NODE_PIPE)
-			set_pipe(current_node, data);
-		else
-			execute_cmd(current_node, data); 
-		current_node = current_node->next;
-	}
+
+	if (node->type == NODE_PIPE || (node->next && node->next->type == NODE_PIPE))
+		set_pipe(node, data);
+	else
+		execute_cmd(node, data);
 }
 
 /*
