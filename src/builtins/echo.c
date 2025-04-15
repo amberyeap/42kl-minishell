@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/09 15:24:44 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 11:01:57 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	ft_echo(char **args)
 		return (0);
 	}
 	i = skip_flags(args, &newline);
-	i = 0;
+	i = 1;
 	while (args[i])
 	{
 		printf("%s", args[i]);

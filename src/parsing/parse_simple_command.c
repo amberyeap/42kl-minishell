@@ -40,16 +40,25 @@ int	add_arg_to_command(char *arg, t_node *cmd_node)
 t_node	*create_command_node(char *cmd, t_node_type type)
 {
 	t_node	*node;
+	char	**cmd_arg;
 
+	cmd_arg = malloc(sizeof(char *) * 2);
+	if (!cmd_arg)
+		return (NULL);
 	node = create_node(type);
 	if (!node)
-		return (NULL);
+		return (free(cmd_arg), NULL);
 	node->cmd = ft_strdup(cmd);
 	if (!node->cmd)
 	{
 		free(node);
 		return (NULL);
 	}
+	cmd_arg[0] = ft_strdup(cmd);
+	cmd_arg[1] = NULL;
+	if (!cmd_arg[0])
+		return (free(cmd_arg), free(node), NULL);
+	node->arg = cmd_arg;
 	return (node);
 }
 
