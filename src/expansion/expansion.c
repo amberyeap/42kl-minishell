@@ -31,7 +31,7 @@ char	*get_env_var(char **value, char *start, char *result, int *i)
 
 void	expand_exit_status(int exit_status, char **value, char *result, int *i)
 {
-	char *exit_str;
+	char	*exit_str;
 
 	exit_str = ft_itoa(exit_status);
 	*i += ft_strlcpy(result + (*i), exit_str, ft_strlen(exit_str) + 1);

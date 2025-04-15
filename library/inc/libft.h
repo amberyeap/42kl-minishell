@@ -20,9 +20,8 @@
 # include <stdarg.h>
 
 // additional functions
-int	ft_strisnum(const char *str);
+int		ft_strisnum(const char *str);
 char	*ft_strncpy(char *dst, const char *src, size_t size);
-
 
 // ft_printf
 int		ft_fprintf(int fd, const char *format, ...);

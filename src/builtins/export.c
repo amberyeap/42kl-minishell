@@ -3,36 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 10:03:51 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 14:27:11 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 21:03:48 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
 // if add new var with an empty value
-void add_var_empty(t_minishell *data, char *name, char *value)
+void	add_var_empty(t_minishell *data, char *name, char *value)
 {
 	t_env	*new_var;
 
 	new_var = create_new(name, value);
 	if (!new_var)
-		return;
+		return ;
 	add_env(data, new_var);
 }
+
 // check where it is a env
 int	is_env(t_env *env, char *var_name)
 {
-	while(env)
+	while (env)
 	{
 		if (strcmp(env->key, var_name) == 0)
-			return (1);//succes exist
+			return (1);
 		env = env->next;
 	}
-	return (0);// not exist
+	return (0);
 }
+
 // Helper that can handle without equal sign
 int	handle_other(char *arg, t_minishell *data)
 {
@@ -42,20 +44,20 @@ int	handle_other(char *arg, t_minishell *data)
 			arg);
 		return (1);
 	}
-	if (!is_env(data->env,arg))
+	if (!is_env(data->env, arg))
 		add_var_empty(data, arg, "");
 	return (0);
 }
+
 // Helper that Handle argument with equal sign
 int	handle_equal(char *equal, char *arg, t_minishell *data)
 {
-	char *var_name;//before = (key)
-	char *var_value;// after =
+	char	*var_name;
+	char	*var_value;
 
-	//split the argument into variable name and value
-	var_name = ft_substr(arg, 0, equal - arg);// extract before =
-	var_value = ft_strdup(equal + 1);// extract value after =
-	if (!valid_var_name(var_name))// check if the variable name is valid
+	var_name = ft_substr(arg, 0, equal - arg);
+	var_value = ft_strdup(equal + 1);
+	if (!valid_var_name(var_name))
 	{
 		ft_fprintf(2, "Minishell: export: \'%s\': not a valid identifier\n",
 			var_name);
@@ -63,8 +65,8 @@ int	handle_equal(char *equal, char *arg, t_minishell *data)
 		free(var_value);
 		return (1);
 	}
-	else// if valid
-		update_env_var(data, var_name,var_value);// goes here to check if new or update
+	else
+		update_env_var(data, var_name, var_value);
 	free(var_name);
 	free(var_value);
 	return (0);
@@ -74,8 +76,8 @@ int	handle_equal(char *equal, char *arg, t_minishell *data)
 //for the print export must got 2 condition for with = and w/o
 int	export(char **args, t_minishell *data)
 {
-	int		i;// iterates the argument
-	char	*result; // stores if their is =
+	int		i;
+	char	*result;
 
 	i = 0;
 	if (!args[1])
@@ -83,17 +85,17 @@ int	export(char **args, t_minishell *data)
 		sort_print_env(data);
 		return (0);
 	}
-	while (args[++i])// iterates through each argument skips 0
+	while (args[++i])
 	{
-		result = ft_strchr(args[i], '=');//check if argument contains an =
+		result = ft_strchr(args[i], '=');
 		if (result)
 		{
-			if (handle_equal(result, args[i], data) != 0) // handle variable assignment
-				return (1);// return error
+			if (handle_equal(result, args[i], data) != 0)
+				return (1);
 		}
 		else
 		{
-			if (handle_other(args[i], data) != 0)// Handle variable export without assignment
+			if (handle_other(args[i], data) != 0)
 				return (1);
 		}
 	}

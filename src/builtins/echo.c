@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 11:01:57 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 20:12:25 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	skip_flags(char **args, int *newline)
 		printf("entered skip_flags\n");
 		j = 1;
 		if (args[i][j +1] != '\0' && args[i][j + 1] != 'n')
-			break;
+			break ;
 		else if (args[i][j + 1] != '\0')
 		{
 			while (args[i][j + 1] == 'n')
@@ -89,4 +89,3 @@ int	ft_echo(char **args)
 	printf("\n");
 	return (0);
 }
-

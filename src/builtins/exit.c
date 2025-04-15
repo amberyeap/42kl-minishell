@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 19:54:40 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 21:00:44 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,35 +29,36 @@ static int	check_symbol(char *str)
 }
 
 /*
- * @brief this exit the shell
- * @note what should it handle?
- * @note need to specify...
+1. handles too many arguments
+2. handles integer with '-' symbol
+3. handles integer with '+' symbol
+4. handles non-numeric arguments
+5. handles valid numeric arguments (without '-' or '+')
+6. handles no arguments
 */
 int	ft_exit(t_minishell *data, char **args)
 {
-	data->exit = 1;// set exit to 1 first
+	data->exit = 1;
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	// handle with to many arguments
-	if (args[1] && args[2])
+	if (length(args) > 1 && args[1] && args[2])
 	{
-		data->exit = 1;// set the return value to 1(error)
+		data->exit = 1;
 		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
 		return (1);
 	}
-	else if (check_symbol(args[1]) == 1)
+	else if (length(args) > 1 && check_symbol(args[1]) == 1)
 		exit(256 + ft_atoi(args[1]));
-	else if (check_symbol(args[1]) == 2)
+	else if (length(args) > 1 && check_symbol(args[1]) == 2)
 		exit(ft_atoi(args[1]));
-	//Handle for non-numeric arguments
-	else if (args[1] && !ft_strisnum(args[1]))
+	else if (length(args) > 1 && args[1] && !ft_strisnum(args[1]))
 	{
-		ft_fprintf(STDERR_FILENO, "minishell: exit: %s: numeric argument required\n", args[1]);
+		ft_fprintf(STDERR_FILENO, "minishell: exit: ");
+		ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
 		exit(2);
 	}
-	//handle valid numeric arguments
-	else if (args[1])
+	else if (length(args) > 1 && args[1])
 		exit(ft_atoi(args[1]));
-	else// handle no arguments
+	else
 		exit(0);
 }
 

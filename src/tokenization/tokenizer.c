@@ -36,11 +36,6 @@
 // 	}
 // }
 
-int	is_quote(char c)
-{
-	return (c == '\'' || c == '"');
-}
-
 char	*get_word(t_tokenizer *tokenizer, int *expand)
 {
 	char	*chunk;

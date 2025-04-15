@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 19:26:31 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/15 20:05:03 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 
 // ECHO BUGS
 // [FIXED] BUG: only prints a newline when there is only one argument
-// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), works for echo ""
-// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, but as two separate strings
+// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), 
+// works for echo ""
+// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, 
+// but as two separate strings
 // TO TEST: the skip_flags()
 
 // CD BUGS
@@ -115,7 +117,8 @@ int	run_builtin(char **args, t_minishell *data)
 
 //     // Debug prints (keep these temporarily)
 //     printf("Raw command: '%s'\n", data->parser_list->cmd);
-//     printf("strcmp('env', cmd) = %d\n", strcmp(data->parser_list->cmd, "env"));
+//     printf("strcmp('env', cmd) = %d\n",
+//		strcmp(data->parser_list->cmd, "env"));
 
 //     // Trim whitespace from command
 //     char *trimmed_cmd = trim_whitespace(data->parser_list->cmd);

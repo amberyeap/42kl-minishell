@@ -217,14 +217,14 @@ t_token		*tokenize(char *user_input);
 // utils.c
 int			is_whitespace(char c);
 int			is_operator(char c);
-int	is_quote(char c);
+int			is_quote(char c);
 
 //builtin.c
 int			run_builtin(char **args, t_minishell *data);
 int			check_builtin(char *command);
 
 // export.c
-int	export(char **args, t_minishell *data);
+int			export(char **args, t_minishell *data);
 
 int			valid_var_name(char *var_name);
 void		update_env_var(t_minishell *data, char *var_name, char *var_value);
@@ -242,20 +242,20 @@ void		update_pwd(t_minishell *data);
 int			change_directory(char *path);
 
 // echo.c
-int	ft_echo(char **args);
-int	length(char **arg);
+int			ft_echo(char **args);
+int			length(char **arg);
 
 // env.c
-int	ft_env(char **args, t_env *env);
+int			ft_env(char **args, t_env *env);
 
 // exit.c
-int	ft_exit(t_minishell *data, char **args);
+int			ft_exit(t_minishell *data, char **args);
 
 // pwd.c
-int	pwd(char **args);
+int			pwd(char **args);
 
 // unset.c
-int	unset(char **args, t_minishell *data);
+int			unset(char **args, t_minishell *data);
 
 // env_sort.c
 void		sorting_env(char **array_env);

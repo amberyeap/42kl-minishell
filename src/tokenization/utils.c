@@ -23,3 +23,9 @@ int	is_operator(char c)
 {
 	return (c == '|' || c == '<' || c == '>');
 }
+
+// returns a number (aka true) if the char is a quote
+int	is_quote(char c)
+{
+	return (c == '\'' || c == '"');
+}
