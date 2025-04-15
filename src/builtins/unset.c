@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:51:13 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:40:50 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	unset(char **args, t_minishell *data)
 	int len_name;
 
 	// If no variable name is provided, return 0 for success
-	if (!args)
+	if (!args[1])
 		return (1);
 	now_node = data->env;// Start from the head of the environment list
 	previous_node = NULL;// Initialize to Null
@@ -66,8 +66,8 @@ int	unset(char **args, t_minishell *data)
 	while (now_node)
 	{
 		len_name = env_size(now_node->key);
-		if (len_name > 0 && strncmp(args[0], now_node->key, len_name) == 0
-			&& args[0][len_name] == '\0')
+		if (len_name > 0 && strncmp(args[1], now_node->key, len_name) == 0
+			&& args[1][len_name] == '\0')
 		{
 			remove_env(data, previous_node, now_node);//remove the matching node
 			return (1);

@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 10:03:51 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:12:31 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:27:11 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,8 @@ int	export(char **args, t_minishell *data)
 	int		i;// iterates the argument
 	char	*result; // stores if their is =
 
-	i = -1;
-	if (!args)
+	i = 0;
+	if (!args[1])
 	{
 		sort_print_env(data);
 		return (0);

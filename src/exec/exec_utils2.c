@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 16:01:53 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:53:58 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	if (cmd == NULL)
 	{
 		perror("Command not found");
-		data->exit = 127;
+		data->exit = 126;
 		return ;
 	}
 	env = list_to_str(data->env);
@@ -63,6 +63,6 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	if (execve(cmd, node->arg, env) == -1)
 	{
 		perror("Execution failed");
-		data->exit = 126;
+		data->exit = 127;
 	}
 }
