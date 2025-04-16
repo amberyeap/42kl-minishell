@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 15:30:36 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/16 10:59:16 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	handle_out(t_node *node, int *fd_out)
 
 int	handle_in(t_node *node, int *fd_in, t_minishell *data)
 {
-	if (*fd_in != -1) //Closed previous redir input if exist before
+	if (*fd_in != -1)
 		close(*fd_in);
 	if (node->type == NODE_REDIR_IN) //"<" cases
 		*fd_in = open(node->redir_file, O_RDONLY);
