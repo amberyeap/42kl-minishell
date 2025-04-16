@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 21:03:27 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/16 09:59:58 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	unset(char **args, t_minishell *data)
 
 	// If no variable name is provided, return 0 for success
 	if (!args[1])
-		return (1);
+		return (0);
 	now_node = data->env;
 	previous_node = NULL;
 	while (now_node)
@@ -69,7 +69,7 @@ int	unset(char **args, t_minishell *data)
 			&& args[1][len_name] == '\0')
 		{
 			remove_env(data, previous_node, now_node);
-			return (1);
+			return (0);
 		}
 		previous_node = now_node;
 		now_node = now_node->next;
