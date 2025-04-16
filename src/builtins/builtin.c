@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 20:05:03 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/16 17:01:57 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,19 +27,19 @@
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
 {
-	if (ft_strcmp(command, "echo") == 0)
+	if (ft_strncmp(command, "echo", 4) == 0)
 		return (1);
-	else if (ft_strcmp(command, "cd ") == 0)
+	else if (ft_strncmp(command, "cd", 2) == 0)
 		return (1);
-	else if (ft_strcmp(command, "pwd") == 0)
+	else if (ft_strncmp(command, "pwd", 3) == 0)
 		return (1);
-	else if (ft_strcmp(command, "env") == 0)
+	else if (ft_strncmp(command, "env", 3) == 0)
 		return (1);
-	else if (ft_strcmp(command, "exit") == 0)
+	else if (ft_strncmp(command, "exit", 4) == 0)
 		return (1);
-	else if (ft_strcmp(command, "export") == 0)
+	else if (ft_strncmp(command, "export", 6) == 0)
 		return (1);
-	else if (ft_strcmp(command, "unset") == 0)
+	else if (ft_strncmp(command, "unset", 5) == 0)
 		return (1);
 	return (0);
 }
@@ -73,19 +73,19 @@ int	run_builtin(char **args, t_minishell *data)
 	int	result;
 
 	result = 0;
-	if (ft_strcmp(data->parser_list->cmd, "echo") == 0)
+	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
 		result = ft_echo(args);
-	else if (ft_strcmp(data->parser_list->cmd, "cd") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
 		result = cd(args, data);
-	else if (ft_strcmp(data->parser_list->cmd, "pwd") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
 		result = pwd(args);
-	else if (ft_strcmp(data->parser_list->cmd, "env") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
 		result = ft_env(args, data->env);
-	else if (ft_strcmp(data->parser_list->cmd, "export") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
 		result = export(args, data);
-	else if (ft_strcmp(data->parser_list->cmd, "unset") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
 		result = unset(args, data);
-	else if (ft_strcmp(data->parser_list->cmd, "exit") == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
 		result = ft_exit(data, args);
 	return (result);
 }
