@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/16 10:59:16 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:37:10 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,13 @@ int	check_redir(t_node *node, t_minishell *data)
 	{
 		if (node->type == NODE_REDIR_IN || node->type == NODE_HEREDOC)
 		{
+			printf("entered handle_in\n");
 			if (handle_in(node, &fd_in, data) == -1)
 				return (-1);
 		}
 		else if (node->type == NODE_REDIR_OUT || node->type == NODE_APPEND)
 		{
+			printf("entered handle_out\n");
 			if (handle_out(node, &fd_out) == -1)
 				return (-1);
 		}

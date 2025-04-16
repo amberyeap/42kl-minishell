@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 14:53:58 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/16 19:12:46 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 
 	cmd = expand_var(node->cmd, data->exit);
 	cmd = find_path(cmd, data->env);
+	// printf("%s\n", cmd);
 	if (cmd == NULL)
 	{
 		perror("Command not found");
