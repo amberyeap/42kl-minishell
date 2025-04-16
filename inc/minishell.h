@@ -90,10 +90,10 @@ typedef enum s_node_type
 {
 	NODE_COMMAND,
 	NODE_PIPE,
-	NODE_REDIR_IN,
-	NODE_REDIR_OUT,
-	NODE_HEREDOC,
-	NODE_APPEND,
+	NODE_REDIR_IN, // <
+	NODE_REDIR_OUT, // >
+	NODE_HEREDOC, // <<
+	NODE_APPEND, // >>
 	NODE_EOF
 }	t_node_type;
 
@@ -271,7 +271,7 @@ void		execute_cmd(t_node *node, t_minishell *data);
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
 // void		set_pipe(t_node *current_node, t_minishell *data);
-void set_pipe(t_node *pipeline, t_minishell *shell);
+void		set_pipe(t_node *pipeline, t_minishell *shell);
 int			setup_heredoc(t_node *node, t_minishell *data);
 
 #endif
