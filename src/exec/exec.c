@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/16 10:25:44 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/16 10:51:47 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	parent_execution(t_minishell *shell)
 		!(current_node->next && current_node->next->type == NODE_PIPE))
 		{
 			shell->exit = run_builtin(current_node->arg, shell);
+			return ;
 		}
 	execute_fork(current_node, shell);
 }
