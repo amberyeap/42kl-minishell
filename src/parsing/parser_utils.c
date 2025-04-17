@@ -30,6 +30,7 @@ void	set_parser_error(t_parser *parser, char *msg)
 {
 	parser->error = 1;
 	parser->error_msg = ft_strdup(msg);
+	parser->shell->exit = 1;
 }
 
 void	add_node_to_back(t_node **head, t_node *new_node)

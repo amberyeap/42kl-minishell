@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/04/15 20:33:45 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 15:52:38 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	reset_main(t_minishell *shell)
 	free(shell->user_input);
 	if (shell->parser_list)
 		free_nodes_list(shell->parser_list);
+	shell->parser = NULL;
 	shell->parser_list = NULL;
 	shell->token_list = NULL;
 	shell->user_input = NULL;
@@ -42,9 +43,10 @@ int	check_token_error(t_minishell *shell)
 	{
 		if (current->type == TOKEN_ERROR)
 		{
-			printf("%s\n", current->value);
+			ft_fprintf(STDERR_FILENO, "minishell: syntax error: %s\n", current->value);
 			free_token_list(shell->token_list);
 			shell->token_list = NULL;
+			shell->exit = 2;
 			return (1);
 		}
 		current = current->next;
@@ -55,10 +57,12 @@ int	check_token_error(t_minishell *shell)
 void	cleanup_parser(t_minishell *shell)
 {
 	free_token_list(shell->token_list);
-	if (shell->parser->error_msg)
-		free(shell->parser->error_msg);
 	free(shell->user_input);
 	shell->token_list = NULL;
-	shell->parser->error_msg = NULL;
+	if (shell->parser && shell->parser->error_msg)
+	{
+		free(shell->parser->error_msg);
+		shell->parser->error_msg = NULL;
+	}
 	shell->user_input = NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/16 19:13:34 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 12:09:40 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,76 @@ int	check_builtin(char *command)
 	return (0);
 }
 
+void	handle_builtin(char **args, t_minishell *data, int *result)
+{
+	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
+		ft_echo(args);
+	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
+		cd(args, data);
+	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
+		pwd(args);
+	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
+		ft_env(args, data->env);
+	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
+		export(args, data);
+	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
+		unset(args, data);
+	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
+		ft_exit(data, args);
+}
+
+int	is_redir(t_node_type type)
+{
+	if (type == NODE_APPEND || type == NODE_HEREDOC
+		|| type == NODE_REDIR_IN || type == NODE_REDIR_OUT)
+		return (1);
+	return (0);
+}
+
+int	check_redir_exists(t_minishell *data)
+{
+	t_node *current_node;
+
+	current_node = data->parser_list;
+
+	while (current_node)
+	{
+		if (is_redir(current_node->type))
+			return (1);
+		current_node = current_node->next;
+	}
+	return (0);
+}
+
+int run_builtin(char **args, t_minishell *data)
+{
+	int result;
+	int has_redir;
+	pid_t pid;
+	int status;
+	
+	result = 0;
+	has_redir = 0;
+	if (check_redir_exists(data))
+		has_redir = 1;
+	if (has_redir)
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			if (check_redir(data->parser_list, data) == -1) exit(1);
+			handle_builtin(args, data, &result);
+			exit(result);
+		}
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			result = WEXITSTATUS(status);
+	}
+	else
+		handle_builtin(args, data, &result);
+	return (result);
+}
+
 //run the builtin after being check
 // int	run_builtin(char **args, t_minishell *data)
 // {
@@ -68,27 +138,27 @@ int	check_builtin(char *command)
 // 	return (result);
 // }
 
-int	run_builtin(char **args, t_minishell *data)
-{
-	int	result;
+// int	run_builtin(char **args, t_minishell *data)
+// {
+// 	int	result;
 
-	result = 0;
-	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
-		result = ft_echo(args);
-	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
-		result = cd(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
-		result = pwd(args);
-	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
-		result = ft_env(args, data->env);
-	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
-		result = export(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
-		result = unset(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
-		result = ft_exit(data, args);
-	return (result);
-}
+// 	result = 0;
+// 	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
+// 		result = ft_echo(args);
+// 	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
+// 		result = cd(args, data);
+// 	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
+// 		result = pwd(args);
+// 	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
+// 		result = ft_env(args, data->env);
+// 	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
+// 		result = export(args, data);
+// 	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
+// 		result = unset(args, data);
+// 	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
+// 		result = ft_exit(data, args);
+// 	return (result);
+// }
 
 // Helper function to trim whitespace from both ends of a string
 // char *trim_whitespace(char *str)

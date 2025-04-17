@@ -62,5 +62,10 @@ t_node	*parse(t_parser *parser)
 		if (parser->error)
 			break ;
 	}
+	if (parser->error)
+	{
+		free_nodes_list(head);
+		return (NULL);
+	}
 	return (head);
 }

@@ -141,6 +141,7 @@ struct s_minishell
 	t_token		*token_list; // pointer to the first node of the tokenized list
 	t_node		*parser_list; // pointer to the first node of the parser
 	t_parser	*parser; // pointer to a struct that holds the error/error msg
+	pid_t		shell_pid;
 };
 
 // expansion.c

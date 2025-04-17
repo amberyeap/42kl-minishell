@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/16 16:37:10 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 13:03:11 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ int	handle_out(t_node *node, int *fd_out)
 		*fd_out = open(node->redir_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (*fd_out == -1)
 	{
-		perror("Redirection Erorr");
+		perror("Redirection Error");
+		node->shell->exit = 1;
 		return (-1);
 	}
 	return (0);
@@ -48,6 +49,7 @@ int	handle_in(t_node *node, int *fd_in, t_minishell *data)
 	if (*fd_in == -1)
 	{
 		perror("Redirection Error");
+		node->shell->exit = 1;
 		return (-1);
 	}
 	return (0);
@@ -65,13 +67,13 @@ int	check_redir(t_node *node, t_minishell *data)
 	{
 		if (node->type == NODE_REDIR_IN || node->type == NODE_HEREDOC)
 		{
-			printf("entered handle_in\n");
+			// printf("entered handle_in\n");
 			if (handle_in(node, &fd_in, data) == -1)
 				return (-1);
 		}
 		else if (node->type == NODE_REDIR_OUT || node->type == NODE_APPEND)
 		{
-			printf("entered handle_out\n");
+			// printf("entered handle_out\n");
 			if (handle_out(node, &fd_out) == -1)
 				return (-1);
 		}

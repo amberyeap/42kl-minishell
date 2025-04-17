@@ -47,13 +47,17 @@ void	main_parse(t_minishell *shell)
 	if (!shell->parser)
 	{
 		ft_fprintf(STDERR_FILENO, "Failed to initialize parser\n");
+		shell->exit = 1;
 		cleanup_parser(shell);
+		return ;
 	}
 	shell->parser_list = parse(shell->parser);
 	if (shell->parser->error || !shell->parser_list)
 	{
 		ft_fprintf(STDERR_FILENO, "%s\n", shell->parser->error_msg);
+		shell->exit = 2;
 		cleanup_parser(shell);
+		return ;
 	}
 }
 
@@ -66,7 +70,7 @@ char	*get_user_input(char **line)
 	if (!*line)
 	{
 		printf("exit\n");
-		exit(1);
+		exit(0);
 	}
 	if (!**line)
 	{
@@ -91,13 +95,15 @@ void	minishell_loop(t_minishell *shell)
 		shell->token_list = tokenize(shell->user_input);
 		if (check_token_error(shell))
 		{
+			shell->exit = 2;
 			free(shell->user_input);
 			shell->user_input = NULL;
 			continue ;
 		}
 		else
 			main_parse(shell);
-		parent_execution(shell);
+		if (shell->parser_list)
+			parent_execution(shell);
 		reset_main(shell);
 	}
 	free_nodes_list(shell->parser_list);
