@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 15:55:18 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 19:29:37 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,7 @@ char	*find_path(char *cmd, t_env *env)
 		full_path = ft_strjoin(paths[i], "/");
 		full_path = ft_strjoin(full_path, cmd);
 		if (access(full_path, F_OK | X_OK) == 0)
-		{
 			return (full_path);
-		}
 		free(full_path);
 		i++;
 	}

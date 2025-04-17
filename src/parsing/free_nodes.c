@@ -14,7 +14,7 @@
 
 void	free_node(t_node *node)
 {
-	int		i;
+	int	i;
 
 	if (!node)
 		return ;

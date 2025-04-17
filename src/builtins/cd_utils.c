@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 22:01:07 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 20:06:24 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 19:30:10 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ char	*get_env_value(t_env *env, char *key)
 {
 	while (env)
 	{
-		if (ft_strcmp(env->key, key) == 0)
+		if (ft_strncmp(env->key, key, ft_strlen(key)) == 0)
 			return (env->value);
 		env = env->next;
 	}

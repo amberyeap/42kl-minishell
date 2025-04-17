@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 13:31:10 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/04 14:09:47 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/17 21:38:30 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	print_sort(char **sorted_env)
 		i++;
 	}
 }
+
 void	free_array(char **array)
 {
 	int	i;
@@ -40,6 +41,7 @@ void	free_array(char **array)
 		free(array[i]);
 	free(array);
 }
+
 //count node
 static int	count_node(t_env *env)
 {
@@ -89,6 +91,7 @@ char	**list_to_str(t_env *env)
 	array[i] = NULL;
 	return (array);
 }
+
 // insertion sorting method
 void	sorting_env(char **array_env)
 {
