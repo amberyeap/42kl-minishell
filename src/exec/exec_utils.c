@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 21:38:57 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/18 07:08:14 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@ void	set_pipe(t_node *node, t_minishell *data)
 	int		pipe_fd[2];
 	int		prev_pipe_in = -1;
 	pid_t	pid;
+	pid_t	last_pid;
+	int		status;
+
 	t_node	*current = node;
 
 	while (current != NULL)
@@ -78,6 +81,9 @@ void	set_pipe(t_node *node, t_minishell *data)
 				current = current->next;
 		}
 	}
-	while (waitpid(-1, NULL, 0) > 0)
-		;
+	while (waitpid(-1, &status, 0) > 0)
+	{
+		if (WIFEXITED(status) && pid == last_pid)
+			data->exit = WEXITSTATUS(status);
+	}
 }
