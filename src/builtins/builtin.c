@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 12:09:40 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/18 10:04:57 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,19 +47,19 @@ int	check_builtin(char *command)
 void	handle_builtin(char **args, t_minishell *data, int *result)
 {
 	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
-		ft_echo(args);
+		*result = ft_echo(args);
 	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
-		cd(args, data);
+		*result = cd(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
-		pwd(args);
+		*result = pwd(args);
 	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
-		ft_env(args, data->env);
+		*result = ft_env(args, data->env);
 	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
-		export(args, data);
+		*result = export(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
-		unset(args, data);
+		*result = unset(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
-		ft_exit(data, args);
+		*result = ft_exit(data, args);
 }
 
 int	is_redir(t_node_type type)
