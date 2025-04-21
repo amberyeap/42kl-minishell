@@ -52,6 +52,8 @@ char	*expand_var(char *value, int exit_status)
 	{
 		if (*value == '$' && *(value + 1) == '?')
 			expand_exit_status(exit_status, &value, result, &i);
+		else if (*value == '$' && *(value + 1) == '!')
+			value += 2;
 		else if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
 		{
 			if (!get_env_var(&value, value, result, &i))

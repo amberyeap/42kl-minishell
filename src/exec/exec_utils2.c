@@ -18,6 +18,7 @@ char	*find_path(char *cmd, t_env *env)
 	char	*full_path;
 	char	**paths;
 	int		i;
+	char	*temp;
 
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
@@ -28,8 +29,9 @@ char	*find_path(char *cmd, t_env *env)
 	i = 0;
 	while (paths[i])
 	{
-		full_path = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(full_path, cmd);
+		temp = ft_strjoin(paths[i], "/");
+		full_path = ft_strjoin(temp, cmd);
+		free(temp);
 		if (access(full_path, F_OK | X_OK) == 0)
 			return (full_path);
 		free(full_path);
@@ -42,12 +44,19 @@ char	*find_path(char *cmd, t_env *env)
 void	execute_cmd(t_node *node, t_minishell *data)
 {
 	//check for expansion
-	char *cmd;
-	char **env;
+	char	*cmd_expanded;
+	char	*cmd_path;
+	char	**env;
 
-	cmd = expand_var(node->cmd, data->exit);
-	cmd = find_path(cmd, data->env);
-	if (cmd == NULL)
+	if (!node->arg || !node->arg[0])
+	{
+		ft_fprintf(STDERR_FILENO, "minishell: empty command\n");
+		data->exit = 127;
+		return ;
+	}
+	cmd_expanded = expand_var(node->cmd, data->exit);
+	cmd_path = find_path(cmd_expanded, data->env);
+	if (cmd_path == NULL)
 	{
 		perror("Command not found");
 		data->exit = 126;
@@ -57,7 +66,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	// printf("debug: cmd = %s\n", cmd);
 	// for (int i = 0; node->arg[i]; i++)
  	// 	printf("debug: arg[%d] = %s\n", i, node->arg[i]);
-	if (execve(cmd, node->arg, env) == -1)
+	if (execve(cmd_path, node->arg, env) == -1)
 	{
 		perror("Execution failed");
 		data->exit = 127;

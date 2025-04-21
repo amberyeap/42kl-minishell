@@ -22,16 +22,20 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
-void	reset_main(t_minishell *shell)
+void    reset_main(t_minishell *shell)
 {
-	free_token_list(shell->token_list);
-	free(shell->user_input);
+	if (shell->user_input)
+	{
+		free(shell->user_input);
+		shell->user_input = NULL;
+	}
+	if (shell->token_list)
+		free_token_list(shell->token_list);
 	if (shell->parser_list)
 		free_nodes_list(shell->parser_list);
-	shell->parser = NULL;
-	shell->parser_list = NULL;
+	cleanup_parser(shell);
 	shell->token_list = NULL;
-	shell->user_input = NULL;
+	shell->parser_list = NULL;
 }
 
 int	check_token_error(t_minishell *shell)
@@ -54,15 +58,13 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
-void	cleanup_parser(t_minishell *shell)
+void    cleanup_parser(t_minishell *shell)
 {
-	free_token_list(shell->token_list);
-	free(shell->user_input);
-	shell->token_list = NULL;
-	if (shell->parser && shell->parser->error_msg)
+	if (shell->parser)
 	{
-		free(shell->parser->error_msg);
-		shell->parser->error_msg = NULL;
+		if (shell->parser->error_msg)
+			free(shell->parser->error_msg);
+		free(shell->parser);
+		shell->parser = NULL;
 	}
-	shell->user_input = NULL;
 }
