@@ -40,26 +40,28 @@ int	ft_exit(t_minishell *data, char **args)
 {
 	data->exit = 1;
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	if (length(args) > 1 && args[1] && args[2])
+	if (length(args) > 1)
 	{
-		data->exit = 1;
-		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
-		return (1);
+		if (!ft_strisnum(args[1]))
+		{
+			ft_fprintf(STDERR_FILENO, "minishell: exit: ");
+			ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
+			exit(2);
+		}
+		if (args[2])
+		{
+			data->exit = 1;
+			ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
+			return (1);
+		}
+		if (check_symbol(args[1]) == 1)
+			exit(256 + ft_atoi(args[1]));
+		else if (check_symbol(args[1]) == 2)
+			exit(ft_atoi(args[1] + 1));
+		else
+			exit(ft_atoi(args[1]));
 	}
-	else if (length(args) > 1 && check_symbol(args[1]) == 1)
-		exit(256 + ft_atoi(args[1]));
-	else if (length(args) > 1 && check_symbol(args[1]) == 2)
-		exit(ft_atoi(args[1]));
-	else if (length(args) > 1 && args[1] && !ft_strisnum(args[1]))
-	{
-		ft_fprintf(STDERR_FILENO, "minishell: exit: ");
-		ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
-		exit(2);
-	}
-	else if (length(args) > 1 && args[1])
-		exit(ft_atoi(args[1]));
-	else
-		exit(0);
+	exit(0);
 }
 
 // #include <stdio.h>
