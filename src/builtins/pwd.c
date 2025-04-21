@@ -30,6 +30,7 @@ int	pwd(char **args)
 {
 	char	cwd[PATH_MAX];
 
+	(void)args;
 	// if (length(args) > 1)
 	// {
 	// 	ft_putstr_fd("pwd: too many arguments", STDERR_FILENO);
