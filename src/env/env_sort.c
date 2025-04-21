@@ -67,9 +67,10 @@ static int	count_node(t_env *env)
 */
 char	**list_to_str(t_env *env)
 {
-	int	count;
-	char **array;
-	int	i;
+	int		count;
+	char	**array;
+	int		i;
+	char	*temp;
 
 	count = count_node(env);
 	array = malloc(sizeof(char *) * (count + 1));
@@ -78,8 +79,9 @@ char	**list_to_str(t_env *env)
 	i = 0;
 	while (env)
 	{
-		array[i] = ft_strjoin(env->key, "=");
-		array[i] = ft_strjoin(array[i], env->value);
+		temp = ft_strjoin(env->key, "=");
+		array[i] = ft_strjoin(temp, env->value);
+		free(temp);
 		if (!array[i])
 		{
 			free_array(array);
