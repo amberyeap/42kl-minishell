@@ -16,6 +16,7 @@ void	free_node(t_node *node)
 {
 	int	i;
 
+	i = 0;
 	if (!node)
 		return ;
 	if (node->cmd)
@@ -24,16 +25,13 @@ void	free_node(t_node *node)
 		free(node->heredoc_delim);
 	if (node->redir_file)
 		free(node->redir_file);
-	i = 0;
 	if (node->arg)
 	{
 		while (node->arg[i])
 			free(node->arg[i++]);
 		free(node->arg);
-		node->arg = NULL;
 	}
 	free(node);
-	node = NULL;
 }
 
 void	free_nodes_list(t_node *head)
