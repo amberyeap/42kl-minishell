@@ -16,7 +16,7 @@ char	*ft_strndup(const char *s, size_t n)
 {
 	char	*dup;
 
-	dup = malloc(n + 1);
+	dup = ft_calloc(n + 1, n);
 	if (!dup)
 		return (NULL);
 	ft_strncpy(dup, s, n);

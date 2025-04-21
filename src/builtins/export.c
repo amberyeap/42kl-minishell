@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 10:03:51 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/16 11:41:07 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/18 10:12:21 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int	export(char **args, t_minishell *data)
 	int		i;
 	char	*result;
 
-	i = 1;
+	i = 0;
 	if (!args[1])
 	{
 		sort_print_env(data);
