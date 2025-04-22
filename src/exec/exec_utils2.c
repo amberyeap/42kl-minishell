@@ -12,6 +12,16 @@
 
 #include "../../inc/minishell.h"
 
+void	free_paths(char **paths)
+{
+	int	i;
+
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
+	free(paths);
+}
+
 char	*find_path(char *cmd, t_env *env)
 {
 	char	*path;
@@ -37,13 +47,12 @@ char	*find_path(char *cmd, t_env *env)
 		free(full_path);
 		i++;
 	}
-	free(paths);
+	free_paths(paths);
 	return (NULL);
 }
 
 void	execute_cmd(t_node *node, t_minishell *data)
 {
-	//check for expansion
 	char	*cmd_expanded;
 	char	*cmd_path;
 	char	**env;
@@ -56,6 +65,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	}
 	cmd_expanded = expand_var(node->cmd, data->exit);
 	cmd_path = find_path(cmd_expanded, data->env);
+	free(cmd_expanded);
 	if (cmd_path == NULL)
 	{
 		perror("Command not found");
@@ -63,9 +73,6 @@ void	execute_cmd(t_node *node, t_minishell *data)
 		return ;
 	}
 	env = list_to_str(data->env);
-	// printf("debug: cmd = %s\n", cmd);
-	// for (int i = 0; node->arg[i]; i++)
- 	// 	printf("debug: arg[%d] = %s\n", i, node->arg[i]);
 	if (execve(cmd_path, node->arg, env) == -1)
 	{
 		perror("Execution failed");
