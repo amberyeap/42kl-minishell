@@ -12,21 +12,21 @@
 
 #include "../../inc/minishell.h"
 
-static int	check_symbol(char *str)
-{
-	int	i;
+// static int	check_symbol(char *str)
+// {
+// 	int	i;
 
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '-')
-			return (1);
-		else if (str[i] == '+')
-			return (2);
-		i++;
-	}
-	return (0);
-}
+// 	i = 0;
+// 	while (str[i])
+// 	{
+// 		if (str[i] == '-')
+// 			return (1);
+// 		else if (str[i] == '+')
+// 			return (2);
+// 		i++;
+// 	}
+// 	return (0);
+// }
 
 /*
 1. handles too many arguments
@@ -38,9 +38,9 @@ static int	check_symbol(char *str)
 */
 int	ft_exit(t_minishell *data, char **args)
 {
-	data->exit = 1;
+	data->exit = 1; // is this line necessary?
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	if (length(args) > 1)
+	if (length(args) == 2)
 	{
 		if (!ft_strisnum(args[1]))
 		{
@@ -48,18 +48,17 @@ int	ft_exit(t_minishell *data, char **args)
 			ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
 			exit(2);
 		}
-		if (args[2])
-		{
-			data->exit = 1;
-			ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
-			return (1);
-		}
-		if (check_symbol(args[1]) == 1)
-			exit(256 + ft_atoi(args[1]));
-		else if (check_symbol(args[1]) == 2)
-			exit(ft_atoi(args[1] + 1));
 		else
-			exit(ft_atoi(args[1]));
+			exit(ft_atoi(args[1]) % 256);
+	}
+	if (length(args) > 2)
+	{
+		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
+		if (!ft_strisnum(args[1]))
+			data->exit = 2;
+		else
+			data->exit = 1;
+		return (data->exit);
 	}
 	exit(0);
 }
