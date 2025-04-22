@@ -12,29 +12,13 @@
 
 #include "../../inc/minishell.h"
 
-// static int	check_symbol(char *str)
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	while (str[i])
-// 	{
-// 		if (str[i] == '-')
-// 			return (1);
-// 		else if (str[i] == '+')
-// 			return (2);
-// 		i++;
-// 	}
-// 	return (0);
-// }
-
 /*
-1. handles too many arguments
-2. handles integer with '-' symbol
-3. handles integer with '+' symbol
-4. handles non-numeric arguments
-5. handles valid numeric arguments (without '-' or '+')
-6. handles no arguments
+1. if there's only one arg after 'exit'
+	- check if it's a string
+	- if not string, print the number
+2. if there's more than one arg after 'exit'
+	- check if the first arg is string, exit code is 2
+	- if the first arg is a number, exit code is 1
 */
 int	ft_exit(t_minishell *data, char **args)
 {
