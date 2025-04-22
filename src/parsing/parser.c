@@ -32,7 +32,14 @@ t_node	*create_node(t_node_type type)
 void	parse_pipe(t_parser *parser, t_node **head)
 {
 	t_node	*pipe_node;
+	t_node	*first_node;
 
+	first_node = *head;
+	if (!first_node)
+	{
+		set_parser_error(parser, "Expected command before pipe");
+		return ;
+	}
 	pipe_node = create_node(NODE_PIPE);
 	if (!pipe_node)
 	{
