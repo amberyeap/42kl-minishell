@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 21:00:44 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/23 20:35:40 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@
 */
 int	ft_exit(t_minishell *data, char **args)
 {
-	data->exit = 1; // is this line necessary?
 	ft_fprintf(STDERR_FILENO, "exit\n");
 	if (length(args) == 2)
 	{
 		if (!ft_strisnum(args[1]))
 		{
 			ft_fprintf(STDERR_FILENO, "minishell: exit: ");
-			ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
+			ft_fprintf(STDERR_FILENO,
+				"%s: numeric argument required\n", args[1]);
 			exit(2);
 		}
 		else
