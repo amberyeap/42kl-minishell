@@ -36,7 +36,47 @@
 // 	}
 // }
 
-char	*get_word(t_tokenizer *tokenizer, int *expand)
+// char	*join_words(char *word, char *chunk, char ***error_msg)
+// {
+// 	char	*temp;
+
+// 	temp = ft_strjoin(word, chunk);
+// 	if (!temp)
+// 	{
+// 		**error_msg = "failed to join words";
+// 		return (NULL);
+// 	}
+// 	free(word);
+// 	free(chunk);
+// 	return (temp);
+// }
+
+char	*get_chunk(t_tokenizer *tokenizer, int *expand,
+	char *quote, char ***error_msg)
+{
+	char	*chunk;
+
+	if (is_quote(peek(tokenizer)))
+	{
+		*quote = peek(tokenizer);
+		chunk = handle_quotes(tokenizer, *quote);
+		if (!chunk)
+			return (**error_msg = "unterminated quote", NULL);
+		if (*quote == '"' && ft_strchr(chunk, '$'))
+			*expand = 1;
+	}
+	else
+	{
+		chunk = handle_no_quotes(tokenizer);
+		if (!chunk)
+			return (**error_msg = "failed to get word", NULL);
+		if (ft_strchr(chunk, '$'))
+			*expand = 1;
+	}
+	return (chunk);
+}
+
+char	*get_word(t_tokenizer *tokenizer, int *expand, char **error_msg)
 {
 	char	*chunk;
 	char	quote;
@@ -44,28 +84,18 @@ char	*get_word(t_tokenizer *tokenizer, int *expand)
 	char	*temp;
 
 	word = ft_strdup("");
-	while (peek(tokenizer) && !is_whitespace(peek(tokenizer)) && !is_operator(peek(tokenizer)))
+	while (peek(tokenizer) && !is_whitespace(peek(tokenizer))
+		&& !is_operator(peek(tokenizer)))
 	{
-		if (is_quote(peek(tokenizer)))
-		{
-			quote = peek(tokenizer);
-			chunk = handle_quotes(tokenizer, quote);
-			if (!chunk)
-				return (free(word), NULL);
-			if (quote == '"' && ft_strchr(chunk, '$'))
-				*expand = 1;
-		}
-		else
-		{
-			chunk = handle_no_quotes(tokenizer);
-			if (!chunk)
-				return (free(word), NULL);
-			if (ft_strchr(chunk, '$'))
-				*expand = 1;
-		}
+		chunk = get_chunk(tokenizer, expand, &quote, &error_msg);
+		if (!chunk)
+			return (free(word), NULL);
 		temp = ft_strjoin(word, chunk);
 		if (!temp)
-			return (NULL);
+		{
+			*error_msg = "failed to join words";
+			return (free(word), free(chunk), NULL);
+		}
 		free(word);
 		free(chunk);
 		word = temp;
@@ -78,11 +108,12 @@ t_token	*create_word_token(t_tokenizer *tokenizer)
 	t_token	*new_token;
 	char	*word;
 	int		expand;
+	char	*error_msg;
 
 	expand = 0;
-	word = get_word(tokenizer, &expand);
+	word = get_word(tokenizer, &expand, &error_msg);
 	if (!word)
-		return (create_token(TOKEN_ERROR, "Failed to get word"));
+		return (create_token(TOKEN_ERROR, error_msg));
 	new_token = create_token(TOKEN_WORD, word);
 	if (expand)
 		new_token->expand = 1;
