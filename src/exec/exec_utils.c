@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/18 07:08:14 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:09:58 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	set_pipe(t_node *node, t_minishell *data)
 	int		pipe_fd[2];
 	int		prev_pipe_in = -1;
 	pid_t	pid;
-	pid_t	last_pid;
+	pid_t	last_pid = 0;
 	int		status;
 
 	t_node	*current = node;

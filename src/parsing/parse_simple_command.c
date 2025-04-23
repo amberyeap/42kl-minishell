@@ -12,7 +12,8 @@
 
 #include "../../inc/minishell.h"
 
-int	replace_args(t_node *cmd_node, char *arg, char ***new_args, char ***old_args, int *i)
+int	replace_args(t_node *cmd_node, char *arg, char ***new_args,
+	char ***old_args, int *i)
 {
 	while (cmd_node->arg && cmd_node->arg[*i])
     {
@@ -51,7 +52,8 @@ int	add_arg_to_command(char *arg, t_node *cmd_node)
         return (0);
     i = 0;
     if (!replace_args(cmd_node, arg, &new_args, &old_args, &i))
-		set_parser_error(cmd_node->shell->parser, "Error duplicating arguments");
+		set_parser_error(cmd_node->shell->parser,
+			"Error duplicating arguments");
     cmd_node->arg = new_args;
     return (1);
 }
@@ -109,9 +111,7 @@ void	parse_simple_command(t_parser *parser, t_node **head)
 	while (parser->current_token)
 	{
 		if (is_redir_token(parser->current_token->type))
-		{
 			parse_redirection(parser, head);
-		}
 		else if (parser->current_token->type == TOKEN_WORD)
 			handle_word_token(parser, head, &first_node);
 		else if (parser->current_token->type == TOKEN_PIPE)
