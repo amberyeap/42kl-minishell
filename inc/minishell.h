@@ -69,7 +69,7 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	t_quote_type	quote;
+	t_quote_type	quote; // unused
 	int				expand;
 	struct s_token	*next;
 }	t_token;
@@ -235,9 +235,10 @@ int			check_redir(t_node *node, t_minishell *data);
 /*                                                                            */
 /* ************************************************************************** */
 
-char		*get_env_var(char **value, char *start, char *result, int *i);
+char		*get_env_var(char **value, char *start, char *result, int *i, t_minishell *shell);
 void		expand_exit_status(int exit_status, char **value, char *result, int *i);
-char		*expand_var(char *value, int exit_status);
+char		*expand_var(char *value, int exit_status, t_minishell *shell);
+void		expand_list(t_minishell *shell, t_node *parser_list);
 
 /* ************************************************************************** */
 /*                                                                            */
