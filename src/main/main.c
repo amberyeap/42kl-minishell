@@ -72,7 +72,7 @@ char	*get_user_input(char **line)
 		printf("exit\n");
 		exit(0);
 	}
-	if (!**line)
+	if (!**line || is_whitespace(**line))
 	{
 		free(*line);
 		*line = NULL;
@@ -143,16 +143,10 @@ void print_tokens(t_token *head)
         "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
         "HEREDOC", "APPEND", "ERROR", "EOF"
     };
-	const char *quote_strings[] = {
-		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
-	};
-
     while (current) {
         printf("Type: %-10s", type_strings[current->type]);
         if (current->value)
             printf(" Value: '%s'", current->value);
-		if (current->quote)
-			printf(" Quote: %s", quote_strings[current->quote]);
 		if (current->expand)
 			printf(" Expand: %d", current->expand);
         printf("\n");
