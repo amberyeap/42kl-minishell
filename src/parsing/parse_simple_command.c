@@ -87,10 +87,7 @@ void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 {
 	char	*word;
 
-	if (parser->current_token->expand)
-		word = expand_var(parser->current_token->value, parser->shell->exit);
-	else
-		word = ft_strdup(parser->current_token->value);
+	word = ft_strdup(parser->current_token->value);
 	if (!*first_node)
 	{
 		*first_node = create_command_node(word, NODE_COMMAND);
