@@ -12,11 +12,13 @@
 
 #include "../../inc/minishell.h"
 
-char	*get_env_var(char **value, char *start, char *result, int *i, t_minishell *shell)
+char	*get_env_var(char **value, char *result, int *i, t_minishell *shell)
 {
 	char	*expanded_var;
 	char	*var_name;
+	char	*start;
 
+	start = *value;
 	(*value)++;
 	while (ft_isalnum(**value))
 		(*value)++;
@@ -56,7 +58,7 @@ char	*expand_var(char *value, int exit_status, t_minishell *shell)
 			value += 2;
 		else if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
 		{
-			if (!get_env_var(&value, value, result, &i, shell))
+			if (!get_env_var(&value, result, &i, shell))
 				return (free(result), NULL);
 		}
 		else
@@ -66,46 +68,41 @@ char	*expand_var(char *value, int exit_status, t_minishell *shell)
 	return (result);
 }
 
-void expand_list(t_minishell *shell, t_node *parser_list)
+void	expand_list(t_minishell *shell, t_node *parser_list)
 {
-    char *expanded;
-    int i;
-    t_node *current;
+	char	*expanded;
+	int		i;
+	t_node	*current;
 
-    current = parser_list;
-    while (current)
-    {
-        if (current->cmd)
-        {
-            // Don't expand built-in command names
-            if (!check_builtin(current->cmd))
-            {
-                expanded = expand_var(current->cmd, shell->exit, shell);
-                free(current->cmd);
-                current->cmd = expanded;
-            }
-        }
-        
-        if (current->arg)
-        {
-            i = 0;
-            while (current->arg[i])
-            {
-                expanded = expand_var(current->arg[i], shell->exit, shell);
-                free(current->arg[i]);
-                current->arg[i] = expanded;
-                i++;
-            }
-        }
-        
-        // Also expand redirection file names if present
-        if (current->redir_file)
-        {
-            expanded = expand_var(current->redir_file, shell->exit, shell);
-            free(current->redir_file);
-            current->redir_file = expanded;
-        }
-        
-        current = current->next;
-    }
+	current = parser_list;
+	while (current)
+	{
+		if (current->cmd)
+		{
+			if (!check_builtin(current->cmd))
+			{
+				expanded = expand_var(current->cmd, shell->exit, shell);
+				free(current->cmd);
+				current->cmd = expanded;
+			}
+		}
+		if (current->arg)
+		{
+			i = 0;
+			while (current->arg[i])
+			{
+				expanded = expand_var(current->arg[i], shell->exit, shell);
+				free(current->arg[i]);
+				current->arg[i] = expanded;
+				i++;
+			}
+		}
+		if (current->redir_file)
+		{
+			expanded = expand_var(current->redir_file, shell->exit, shell);
+			free(current->redir_file);
+			current->redir_file = expanded;
+		}
+		current = current->next;
+	}
 }

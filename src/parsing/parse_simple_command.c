@@ -16,46 +16,46 @@ int	replace_args(t_node *cmd_node, char *arg, char ***new_args,
 	char ***old_args, int *i)
 {
 	while (cmd_node->arg && cmd_node->arg[*i])
-    {
-        (*new_args)[*i] = ft_strdup(cmd_node->arg[*i]);
-        if (!(*new_args)[*i])
-        {
-            while (--(*i) >= 0)
-                free((*new_args)[*i]);
-            free(*new_args);
-            return (0);
-        }
-        (*i)++;
-    }
-    (*new_args)[*i] = ft_strdup(arg);
-    (*new_args)[(*i) + 1] = NULL;
-    *old_args = cmd_node->arg;
-    *i = 0;
-    while (*old_args && (*old_args)[*i])
-        free((*old_args)[(*i)++]);
-    free(*old_args);
+	{
+		(*new_args)[*i] = ft_strdup(cmd_node->arg[*i]);
+		if (!(*new_args)[*i])
+		{
+			while (--(*i) >= 0)
+				free((*new_args)[*i]);
+			free(*new_args);
+			return (0);
+		}
+		(*i)++;
+	}
+	(*new_args)[*i] = ft_strdup(arg);
+	(*new_args)[(*i) + 1] = NULL;
+	*old_args = cmd_node->arg;
+	*i = 0;
+	while (*old_args && (*old_args)[*i])
+		free((*old_args)[(*i)++]);
+	free(*old_args);
 	return (1);
 }
 
 // this adds arguments to the command node as multiple strings
 int	add_arg_to_command(char *arg, t_node *cmd_node)
 {
-    int		i;
-    char	**new_args;
-    char	**old_args;
+	int		i;
+	char	**new_args;
+	char	**old_args;
 
-    i = 0;
-    while (cmd_node->arg && cmd_node->arg[i])
-        i++;
-    new_args = malloc(sizeof(char *) * (i + 2));
-    if (!new_args)
-        return (0);
-    i = 0;
-    if (!replace_args(cmd_node, arg, &new_args, &old_args, &i))
+	i = 0;
+	while (cmd_node->arg && cmd_node->arg[i])
+		i++;
+	new_args = malloc(sizeof(char *) * (i + 2));
+	if (!new_args)
+		return (0);
+	i = 0;
+	if (!replace_args(cmd_node, arg, &new_args, &old_args, &i))
 		set_parser_error(cmd_node->shell->parser,
 			"Error duplicating arguments");
-    cmd_node->arg = new_args;
-    return (1);
+	cmd_node->arg = new_args;
+	return (1);
 }
 
 t_node	*create_command_node(char *cmd, t_node_type type)
@@ -122,7 +122,7 @@ void	parse_simple_command(t_parser *parser, t_node **head)
 		{
 			if (first_node)
 				free_node(first_node);
-			return;
+			return ;
 		}
 	}
 }
