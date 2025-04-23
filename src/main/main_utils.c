@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/04/17 15:52:38 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/23 21:02:08 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	init_shell(t_minishell *shell, char **env)
 	shell->parser = NULL;
 }
 
-void    reset_main(t_minishell *shell)
+void	reset_main(t_minishell *shell)
 {
 	if (shell->user_input)
 	{
@@ -47,7 +47,8 @@ int	check_token_error(t_minishell *shell)
 	{
 		if (current->type == TOKEN_ERROR)
 		{
-			ft_fprintf(STDERR_FILENO, "minishell: syntax error: %s\n", current->value);
+			ft_fprintf(STDERR_FILENO,
+				"minishell: syntax error: %s\n", current->value);
 			free_token_list(shell->token_list);
 			shell->token_list = NULL;
 			shell->exit = 2;
@@ -58,7 +59,7 @@ int	check_token_error(t_minishell *shell)
 	return (0);
 }
 
-void    cleanup_parser(t_minishell *shell)
+void	cleanup_parser(t_minishell *shell)
 {
 	if (shell->parser)
 	{
