@@ -152,6 +152,7 @@ struct s_minishell
 
 //builtin.c
 int			run_builtin(char **args, t_minishell *data);
+int			check_redir_exists(t_minishell *data);
 int			check_builtin(char *command);
 
 // export.c
@@ -235,7 +236,7 @@ int			check_redir(t_node *node, t_minishell *data);
 /*                                                                            */
 /* ************************************************************************** */
 
-char		*get_env_var(char **value, char *start, char *result, int *i, t_minishell *shell);
+char		*get_env_var(char **value, char *result, int *i, t_minishell *shell);
 void		expand_exit_status(int exit_status, char **value, char *result, int *i);
 char		*expand_var(char *value, int exit_status, t_minishell *shell);
 void		expand_list(t_minishell *shell, t_node *parser_list);

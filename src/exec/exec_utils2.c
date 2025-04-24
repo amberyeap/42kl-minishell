@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 10:32:29 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 13:52:06 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ char	*find_path(char *cmd, t_env *env)
 
 void	execute_cmd(t_node *node, t_minishell *data)
 {
-	char	*cmd_expanded;
 	char	*cmd_path;
 	char	**env;
 
@@ -63,9 +62,7 @@ void	execute_cmd(t_node *node, t_minishell *data)
 		data->exit = 127;
 		return ;
 	}
-	cmd_expanded = expand_var(node->cmd, data->exit);
-	cmd_path = find_path(cmd_expanded, data->env);
-	free(cmd_expanded);
+	cmd_path = find_path(node->cmd, data->env);
 	if (cmd_path == NULL)
 	{
 		perror("Command not found");
