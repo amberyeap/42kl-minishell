@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 12:42:35 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/24 22:53:16 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,38 +27,39 @@
 //check the input whether it is a commmand or not
 int	check_builtin(char *command)
 {
-	if (ft_strncmp(command, "echo", 4) == 0)
+	if (ft_strncmp(command, "echo", 5) == 0)
 		return (1);
-	else if (ft_strncmp(command, "cd", 2) == 0)
+	else if (ft_strncmp(command, "cd", 3) == 0)
 		return (1);
-	else if (ft_strncmp(command, "pwd", 3) == 0)
+	else if (ft_strncmp(command, "pwd", 4) == 0)
 		return (1);
-	else if (ft_strncmp(command, "env", 3) == 0)
+	else if (ft_strncmp(command, "env", 4) == 0)
 		return (1);
-	else if (ft_strncmp(command, "exit", 4) == 0)
+	else if (ft_strncmp(command, "exit", 5) == 0)
 		return (1);
-	else if (ft_strncmp(command, "export", 6) == 0)
+	else if (ft_strncmp(command, "export", 7) == 0)
 		return (1);
-	else if (ft_strncmp(command, "unset", 5) == 0)
+	else if (ft_strncmp(command, "unset", 6) == 0)
 		return (1);
 	return (0);
 }
 
 void	handle_builtin(char **args, t_minishell *data, int *result)
 {
-	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
+	// dprintf(2, "checking\n");
+	if (ft_strncmp(data->parser_list->cmd, "echo", 5) == 0)
 		*result = ft_echo(args);
-	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "cd", 3) == 0)
 		*result = cd(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "pwd", 4) == 0)
 		*result = pwd(args);
-	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "env", 4) == 0)
 		*result = ft_env(args, data->env);
-	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "export", 7) == 0)
 		*result = export(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "unset", 6) == 0)
 		*result = unset(args, data);
-	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
+	else if (ft_strncmp(data->parser_list->cmd, "exit", 5) == 0)
 		*result = ft_exit(data, args);
 }
 

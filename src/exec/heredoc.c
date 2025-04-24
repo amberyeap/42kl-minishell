@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 10:29:49 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 17:53:46 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,3 +74,4 @@ int	setup_heredoc(t_node *node, t_minishell *data)
 	close(pipefd[1]);
 	return (pipefd[0]);
 }
+

@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 13:50:09 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 00:29:59 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,19 @@ t_node *find_cmd_node(t_node *node)
 	}
 	return (NULL);
 }
+
 void	execute_node(t_node *node, t_minishell *data)
 {
 	t_node	*cmd_node;
-
+	// print_parse_list(node);
+	// check_redir(node, data);
 	if (node->type == NODE_PIPE ||
 		 (node->next && node->next->type == NODE_PIPE))
 		set_pipe(node, data);
 	else
 	{
 		cmd_node = find_cmd_node(node);
-		if (cmd_node == NULL)
-			printf("dont do anythi=ngg");
-		else
-			execute_cmd(cmd_node, data);
+		execute_cmd(cmd_node, data);
 	}
 }
 
@@ -62,7 +61,8 @@ void	execute_fork(t_node *node, t_minishell *data)
 		if (check_redir_exists(data))
 		{
 			if (check_redir(node, data) == -1)
-				exit(1);
+				// exit(1);
+				data->exit = 1;
 		}
 		execute_node(node, data);
 		exit(data->exit);
@@ -114,4 +114,5 @@ void	parent_execution(t_minishell *shell)
 			return ;
 		}
 	execute_fork(node, shell);
+
 }
