@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 10:33:41 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 12:42:35 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,6 @@ int	check_redir_exists(t_minishell *data)
 
 int	run_builtin(char **args, t_minishell *data)
 {
-	int result;
-	int has_redir;
-	pid_t pid;
-	int status;
-
 	int		result;
 	pid_t	pid;
 	int		status;
