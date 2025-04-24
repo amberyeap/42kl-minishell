@@ -151,8 +151,10 @@ struct s_minishell
 /* ************************************************************************** */
 
 //builtin.c
+void		handle_builtin(char **args, t_minishell *data, int *result);
 int			run_builtin(char **args, t_minishell *data);
 int			check_redir_exists(t_minishell *data);
+int			is_directory(const char *path);
 int			check_builtin(char *command);
 
 // export.c
