@@ -19,18 +19,16 @@ void	free_node(t_node *node)
 	i = 0;
 	if (!node)
 		return ;
-	if (node->cmd)
-		free(node->cmd);
-	if (node->heredoc_delim)
-		free(node->heredoc_delim);
-	if (node->redir_file)
-		free(node->redir_file);
+	free(node->cmd);
+	free(node->heredoc_delim);
+	free(node->redir_file);
 	if (node->arg)
 	{
 		while (node->arg[i])
 			free(node->arg[i++]);
 		free(node->arg);
 	}
+	free(node->arg_expand);
 	free(node);
 }
 

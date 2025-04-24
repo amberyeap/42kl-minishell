@@ -18,25 +18,13 @@ t_node	*create_redir_node(t_token_type type)
 
 	redir_node = NULL;
 	if (type == TOKEN_APPEND)
-	{
 		redir_node = create_node(NODE_APPEND);
-		redir_node->redir_direction = OUTPUT;
-	}
 	else if (type == TOKEN_REDIR_IN)
-	{
 		redir_node = create_node(NODE_REDIR_IN);
-		redir_node->redir_direction = INPUT;
-	}
 	else if (type == TOKEN_REDIR_OUT)
-	{
 		redir_node = create_node(NODE_REDIR_OUT);
-		redir_node->redir_direction = OUTPUT;
-	}
 	else if (type == TOKEN_HEREDOC)
-	{
 		redir_node = create_node(NODE_HEREDOC);
-		redir_node->redir_direction = INPUT;
-	}
 	return (redir_node);
 }
 
@@ -44,6 +32,13 @@ void	redir_error(t_parser *parser, char *msg, t_node *redir_node)
 {
 	set_parser_error(parser, msg);
 	free_node(redir_node);
+}
+
+void	prep_heredoc(t_node *node, t_token *current_token)
+{
+	node->heredoc_delim = ft_strdup(current_token->value);
+	if (current_token->quote)
+		node->quoted = true;
 }
 
 void	parse_redirection(t_parser *parser, t_node **head)
@@ -68,7 +63,7 @@ void	parse_redirection(t_parser *parser, t_node **head)
 		return ;
 	}
 	if (redir_type == TOKEN_HEREDOC)
-		redir->heredoc_delim = ft_strdup(parser->current_token->value);
+		prep_heredoc(redir, parser->current_token);
 	else
 		redir->redir_file = ft_strdup(parser->current_token->value);
 	consume_token(parser);

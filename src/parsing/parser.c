@@ -24,7 +24,9 @@ t_node	*create_node(t_node_type type)
 	node->arg = NULL;
 	node->heredoc_delim = NULL;
 	node->redir_file = NULL;
-	node->redir_direction = -1;
+	node->expand = 0;
+	node->arg_expand = NULL;
+	node->quoted = false;
 	node->next = NULL;
 	return (node);
 }

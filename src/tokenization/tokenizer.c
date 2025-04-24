@@ -76,10 +76,10 @@ char	*get_chunk(t_tokenizer *tokenizer, int *expand,
 	return (chunk);
 }
 
-char	*get_word(t_tokenizer *tokenizer, int *expand, char **error_msg)
+char	*get_word(t_tokenizer *tokenizer, int *expand,
+	char *quote, char **error_msg)
 {
 	char	*chunk;
-	char	quote;
 	char	*word;
 	char	*temp;
 
@@ -87,7 +87,7 @@ char	*get_word(t_tokenizer *tokenizer, int *expand, char **error_msg)
 	while (peek(tokenizer) && !is_whitespace(peek(tokenizer))
 		&& !is_operator(peek(tokenizer)))
 	{
-		chunk = get_chunk(tokenizer, expand, &quote, &error_msg);
+		chunk = get_chunk(tokenizer, expand, quote, &error_msg);
 		if (!chunk)
 			return (free(word), NULL);
 		temp = ft_strjoin(word, chunk);
@@ -109,14 +109,20 @@ t_token	*create_word_token(t_tokenizer *tokenizer)
 	char	*word;
 	int		expand;
 	char	*error_msg;
+	char	quote;
 
 	expand = 0;
-	word = get_word(tokenizer, &expand, &error_msg);
+	quote = '\0';
+	word = get_word(tokenizer, &expand, &quote, &error_msg);
 	if (!word)
 		return (create_token(TOKEN_ERROR, error_msg));
 	new_token = create_token(TOKEN_WORD, word);
 	if (expand)
 		new_token->expand = 1;
+	if (quote == '\'')
+		new_token->quote = SINGLE_QUOTE;
+	else if (quote == '"')
+		new_token->quote = DOUBLE_QUOTE;
 	free(word);
 	return (new_token);
 }
