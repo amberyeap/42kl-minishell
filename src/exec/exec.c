@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 15:50:29 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 00:29:59 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,8 @@ void	execute_fork(t_node *node, t_minishell *data)
 		if (check_redir_exists(data))
 		{
 			if (check_redir(node, data) == -1)
-				exit(1);
+				// exit(1);
+				data->exit = 1;
 		}
 		execute_node(node, data);
 		exit(data->exit);
@@ -113,4 +114,5 @@ void	parent_execution(t_minishell *shell)
 			return ;
 		}
 	execute_fork(node, shell);
+
 }

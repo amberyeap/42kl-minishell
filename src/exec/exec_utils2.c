@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 22:57:32 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 00:00:28 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,6 +244,7 @@ void execute_cmd(t_node *node, t_minishell *data)
 		if (access(cmd, F_OK) != 0)
 		{
 			ft_fprintf(STDERR_FILENO, "minishell: %s: No such file or directory\n", cmd);
+			// dprintf(2, "checlsd\n");
 			exit(127);
 		}
 
