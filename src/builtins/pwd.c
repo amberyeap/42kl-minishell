@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 10:05:07 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/18 07:44:25 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:32:43 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,7 @@ int	pwd(char **args)
 {
 	char	cwd[PATH_MAX];
 
-	// if (length(args) > 1)
-	// {
-	// 	ft_putstr_fd("pwd: too many arguments", STDERR_FILENO);
-	// }
+	(void)args;
 	if (getcwd(cwd, PATH_MAX))
 	{
 		printf("%s\n", cwd);

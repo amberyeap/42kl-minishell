@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/18 07:45:26 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:33:33 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ int	cd(char **args, t_minishell *data)
 
 	if (length(args) > 2)
 	{
-		ft_fprintf(2, "Minishell: cd: too many arguments\n");
+		ft_fprintf(STDERR_FILENO,
+			"minishell: cd: too many arguments\n");
 		return (1);
 	}
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
@@ -76,7 +77,7 @@ int	cd(char **args, t_minishell *data)
 	ret_val = chdir(args[1]);
 	if (ret_val == -1)
 	{
-		ft_fprintf(2, "Minishell: cd: %s: %s\n", args[1], strerror(errno));
+		ft_fprintf(2, "minishell: cd: %s: %s\n", args[1], strerror(errno));
 		return (1);
 	}
 	update_pwd(data);

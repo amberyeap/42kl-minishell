@@ -12,27 +12,6 @@
 
 #include "../../inc/minishell.h"
 
-t_token	*create_quote_token(t_tokenizer *tokenizer)
-{
-	char	*word;
-	t_token	*token;
-	char	quote;
-
-	quote = peek(tokenizer);
-	word = handle_quotes(tokenizer, quote);
-	if (!word)
-		return (create_token(TOKEN_ERROR, "Unterminated quote"));
-	token = create_token(TOKEN_WORD, word);
-	if (quote == 34)
-		token->quote = DOUBLE_QUOTE;
-	else
-		token->quote = SINGLE_QUOTE;
-	if (ft_strchr(word, '$') && token->quote == DOUBLE_QUOTE)
-		token->expand = 1;
-	free(word);
-	return (token);
-}
-
 char	*handle_quotes(t_tokenizer *tokenizer, char quote)
 {
 	int		start;
@@ -50,3 +29,24 @@ char	*handle_quotes(t_tokenizer *tokenizer, char quote)
 	next_char(tokenizer);
 	return (word);
 }
+
+// t_token	*create_quote_token(t_tokenizer *tokenizer)
+// {
+// 	char	*word;
+// 	t_token	*token;
+// 	char	quote;
+
+// 	quote = peek(tokenizer);
+// 	word = handle_quotes(tokenizer, quote);
+// 	if (!word)
+// 		return (create_token(TOKEN_ERROR, "Unterminated quote"));
+// 	token = create_token(TOKEN_WORD, word);
+// 	if (quote == 34)
+// 		token->quote = DOUBLE_QUOTE;
+// 	else
+// 		token->quote = SINGLE_QUOTE;
+// 	if (ft_strchr(word, '$') && token->quote == DOUBLE_QUOTE)
+// 		token->expand = 1;
+// 	free(word);
+// 	return (token);
+// }

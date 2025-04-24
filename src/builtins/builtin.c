@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/22 15:20:46 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:33:41 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,9 @@ int	is_redir(t_node_type type)
 
 int	check_redir_exists(t_minishell *data)
 {
-	t_node *current_node;
+	t_node	*current_node;
 
 	current_node = data->parser_list;
-
 	while (current_node)
 	{
 		if (is_redir(current_node->type))
@@ -85,23 +84,25 @@ int	check_redir_exists(t_minishell *data)
 	return (0);
 }
 
-int run_builtin(char **args, t_minishell *data)
+int	run_builtin(char **args, t_minishell *data)
 {
 	int result;
 	int has_redir;
 	pid_t pid;
 	int status;
 
+	int		result;
+	pid_t	pid;
+	int		status;
+
 	result = 0;
-	has_redir = 0;
 	if (check_redir_exists(data))
-		has_redir = 1;
-	if (has_redir)
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			if (check_redir(data->parser_list, data) == -1) exit(1);
+			if (check_redir(data->parser_list, data) == -1)
+				exit(1);
 			handle_builtin(args, data, &result);
 			exit(result);
 		}

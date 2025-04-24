@@ -33,6 +33,11 @@ void	parse_pipe(t_parser *parser, t_node **head)
 {
 	t_node	*pipe_node;
 
+	if (!*head)
+	{
+		set_parser_error(parser, "Expected command before pipe");
+		return ;
+	}
 	pipe_node = create_node(NODE_PIPE);
 	if (!pipe_node)
 	{
@@ -44,6 +49,7 @@ void	parse_pipe(t_parser *parser, t_node **head)
 	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
 	{
 		set_parser_error(parser, "Expected command after pipe");
+		free(pipe_node);
 		return ;
 	}
 	parse_simple_command(parser, head);

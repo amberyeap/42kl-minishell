@@ -27,17 +27,17 @@ char	*handle_no_quotes(t_tokenizer *tokenizer)
 	return (word);
 }
 
-t_token	*create_unquoted_token(t_tokenizer *tokenizer)
-{
-	char	*word;
-	t_token	*token;
+// t_token	*create_unquoted_token(t_tokenizer *tokenizer)
+// {
+// 	char	*word;
+// 	t_token	*token;
 
-	word = handle_no_quotes(tokenizer);
-	if (!word)
-		return (create_token(TOKEN_ERROR, "Failed to create word token"));
-	token = create_token(TOKEN_WORD, word);
-	if (ft_strchr(word, '$'))
-		token->expand = 1;
-	free(word);
-	return (token);
-}
+// 	word = handle_no_quotes(tokenizer);
+// 	if (!word)
+// 		return (create_token(TOKEN_ERROR, "Failed to create word token"));
+// 	token = create_token(TOKEN_WORD, word);
+// 	if (ft_strchr(word, '$'))
+// 		token->expand = 1;
+// 	free(word);
+// 	return (token);
+// }

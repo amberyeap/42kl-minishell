@@ -6,60 +6,45 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/18 07:48:00 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:33:13 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-static int	check_symbol(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '-')
-			return (1);
-		else if (str[i] == '+')
-			return (2);
-		i++;
-	}
-	return (0);
-}
-
 /*
-1. handles too many arguments
-2. handles integer with '-' symbol
-3. handles integer with '+' symbol
-4. handles non-numeric arguments
-5. handles valid numeric arguments (without '-' or '+')
-6. handles no arguments
+1. if there's only one arg after 'exit'
+	- check if it's a string
+	- if not string, print the number
+2. if there's more than one arg after 'exit'
+	- check if the first arg is string, exit code is 2
+	- if the first arg is a number, exit code is 1
 */
 int	ft_exit(t_minishell *data, char **args)
 {
-	data->exit = 1;
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	if (length(args) > 1 && args[1] && args[2])
+	if (length(args) == 2)
 	{
-		data->exit = 1;
+		if (!ft_strisnum(args[1]))
+		{
+			ft_fprintf(STDERR_FILENO, "minishell: exit: ");
+			ft_fprintf(STDERR_FILENO,
+				"%s: numeric argument required\n", args[1]);
+			exit(2);
+		}
+		else
+			exit(ft_atoi(args[1]) % 256);
+	}
+	if (length(args) > 2)
+	{
 		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
-		return (1);
+		if (!ft_strisnum(args[1]))
+			data->exit = 2;
+		else
+			data->exit = 1;
+		return (data->exit);
 	}
-	else if (length(args) > 1 && check_symbol(args[1]) == 1)
-		exit(256 + ft_atoi(args[1]));
-	else if (length(args) > 1 && check_symbol(args[1]) == 2)
-		exit(ft_atoi(args[1]));
-	else if (length(args) > 1 && args[1] && !ft_strisnum(args[1]))
-	{
-		ft_fprintf(STDERR_FILENO, "minishell: exit: ");
-		ft_fprintf(STDERR_FILENO, "%s: numeric argument required\n", args[1]);
-		exit(2);
-	}
-	else if (length(args) > 1 && args[1])
-		exit(ft_atoi(args[1]));
-	else
-		exit(0);
+	exit(0);
 }
 
 // #include <stdio.h>

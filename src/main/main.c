@@ -38,8 +38,8 @@
 			need to test more cases
 */
 
-// void	print_tokens(t_token *head);
-// void	print_nodes(t_node *head);
+void	print_tokens(t_token *head);
+void	print_nodes(t_node *head);
 
 void	main_parse(t_minishell *shell)
 {
@@ -72,7 +72,7 @@ char	*get_user_input(char **line)
 		printf("exit\n");
 		exit(0);
 	}
-	if (!**line)
+	if (!**line || is_whitespace(**line))
 	{
 		free(*line);
 		*line = NULL;
@@ -103,10 +103,14 @@ void	minishell_loop(t_minishell *shell)
 		else
 			main_parse(shell);
 		if (shell->parser_list)
+		{
+			expand_list(shell, shell->parser_list);
 			parent_execution(shell);
+		}
+		// print_tokens(shell->token_list);
+		// print_nodes(shell->parser_list);
 		reset_main(shell);
 	}
-	free_nodes_list(shell->parser_list);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -120,6 +124,8 @@ int	main(int argc, char **argv, char **envp)
 	init_env(&shell, envp);
 	signal(SIGINT, signal_handler);
 	minishell_loop(&shell);
+	free_nodes_list(shell.parser_list);
+	free_env(shell.env);
 	return (0);
 }
 
@@ -130,56 +136,50 @@ int	main(int argc, char **argv, char **envp)
 /* ************************************************************************** */
 
 /* Debug function to print tokens */
-// void print_tokens(t_token *head)
-// {
-//     t_token *current = head;
-//     const char *type_strings[] = {
-//         "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
-//         "HEREDOC", "APPEND", "ERROR", "EOF"
-//     };
-// 	const char *quote_strings[] = {
-// 		"NO_QUOTE", "DOUBLE_QUOTE", "SINGLE_QUOTE", "UNTERMINATED QUOTE"
-// 	};
+void print_tokens(t_token *head)
+{
+    t_token *current = head;
+    const char *type_strings[] = {
+        "WORD", "PIPE", "REDIR_IN", "REDIR_OUT",
+        "HEREDOC", "APPEND", "ERROR", "EOF"
+    };
+    while (current) {
+        printf("Type: %-10s", type_strings[current->type]);
+        if (current->value)
+            printf(" Value: '%s'", current->value);
+		if (current->expand)
+			printf(" Expand: %d", current->expand);
+        printf("\n");
+        current = current->next;
+    }
+}
 
-//     while (current) {
-//         printf("Type: %-10s", type_strings[current->type]);
-//         if (current->value)
-//             printf(" Value: '%s'", current->value);
-// 		if (current->quote)
-// 			printf(" Quote: %s", quote_strings[current->quote]);
-// 		if (current->expand)
-// 			printf(" Expand: %d", current->expand);
-//         printf("\n");
-//         current = current->next;
-//     }
-// }
+void print_nodes(t_node *head)
+{
+	t_node	*current;
 
-// void print_nodes(t_node *head)
-// {
-// 	t_node	*current;
-
-// 	current = head;
-// 	while (current)
-// 	{
-// 		if (current->type == NODE_COMMAND)
-// 		{
-// 			printf("Command: %s\n", current->cmd);
-// 			if (current->arg)
-// 			{
-// 				for (int i = 0; current->arg[i]; i++)
-// 					printf("Arg: %s\n", current->arg[i]);
-// 			}
-// 		}
-// 		else if (current->type == NODE_PIPE)
-// 			printf("Pipe\n");
-// 		else if (current->type == NODE_REDIR_IN)
-// 			printf("Redir in: %s\n", current->redir_file);
-// 		else if (current->type == NODE_REDIR_OUT)
-// 			printf("Redir out: %s\n", current->redir_file);
-// 		else if (current->type == NODE_HEREDOC)
-// 			printf("Heredoc: %s\n", current->heredoc_delim);
-// 		else if (current->type == NODE_APPEND)
-// 			printf("Append: %s\n", current->redir_file);
-// 		current = current->next;
-// 	}
-// }
+	current = head;
+	while (current)
+	{
+		if (current->type == NODE_COMMAND)
+		{
+			printf("Command: %s\n", current->cmd);
+			if (current->arg)
+			{
+				for (int i = 0; current->arg[i]; i++)
+					printf("Arg: %s\n", current->arg[i]);
+			}
+		}
+		else if (current->type == NODE_PIPE)
+			printf("Pipe\n");
+		else if (current->type == NODE_REDIR_IN)
+			printf("Redir in: %s\n", current->redir_file);
+		else if (current->type == NODE_REDIR_OUT)
+			printf("Redir out: %s\n", current->redir_file);
+		else if (current->type == NODE_HEREDOC)
+			printf("Heredoc: %s\n", current->heredoc_delim);
+		else if (current->type == NODE_APPEND)
+			printf("Append: %s\n", current->redir_file);
+		current = current->next;
+	}
+}

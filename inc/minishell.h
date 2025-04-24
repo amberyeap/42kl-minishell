@@ -69,7 +69,7 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	t_quote_type	quote;
+	t_quote_type	quote; // unused
 	int				expand;
 	struct s_token	*next;
 }	t_token;
@@ -144,17 +144,110 @@ struct s_minishell
 	pid_t		shell_pid;
 };
 
-// expansion.c
-char		*get_env_var(char **value, char *start, char *result, int *i);
-char		*expand_var(char *value, int exit_status);
+/* ************************************************************************** */
+/*                                                                            */
+/*                                 builtins.c                                 */
+/*                                                                            */
+/* ************************************************************************** */
 
-// free_nodes.c
-void		free_node(t_node *head);
-void		free_nodes_list(t_node *head);
+//builtin.c
+int			run_builtin(char **args, t_minishell *data);
+int			check_builtin(char *command);
+
+// export.c
+int			export(char **args, t_minishell *data);
+
+// cd.c
+int			cd(char **args, t_minishell *data);
+
+// cd_utils.c
+char		*get_env_value(t_env *env, char *key);
+void		update_oldpwd(t_minishell *data);
+void		update_pwd(t_minishell *data);
+int			change_directory(char *path);
+
+// echo.c
+int			ft_echo(char **args);
+int			length(char **arg);
+
+// env.c
+int			ft_env(char **args, t_env *env);
+
+// exit.c
+int			ft_exit(t_minishell *data, char **args);
+
+// pwd.c
+int			pwd(char **args);
+
+// unset.c
+int			unset(char **args, t_minishell *data);
+
+// utils.c
+void		ft_memdel(void *ptr);
+int			valid_var_name(char *var_name);
+void		add_env(t_minishell *data, t_env *new_var);
+t_env		*create_new(char *var_name, char *var_value);
+void		update_env_var(t_minishell *data, char *var_name, char *var_value);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                   env.c                                    */
+/*                                                                            */
+/* ************************************************************************** */
+
+// env.c
+void		sort_print_env(t_minishell *data);
+void		free_env(t_env *env);
+int			init_env(t_minishell *data, char **envp);
+
+// env_sort.c
+void		sorting_env(char **array_env);
+char		**list_to_str(t_env *env);
+void		print_sort(char **sorted_env);
+void		free_array(char **array);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                   exec.c                                   */
+/*                                                                            */
+/* ************************************************************************** */
+
+// exec_utils.c
+void		set_pipe(t_node *pipeline, t_minishell *shell);
+// void		set_pipe(t_node *current_node, t_minishell *data);
+
+// exec_utils2.c
+void		execute_cmd(t_node *node, t_minishell *data);
+
+// exec.c
+void		parent_execution(t_minishell *shell);
+void		execute_fork(t_node *current_node, t_minishell *data);
+
+// heredoc.c
+int			setup_heredoc(t_node *node, t_minishell *data);
+
+// redir.c
+int			check_redir(t_node *node, t_minishell *data);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                 expansion.c                                */
+/*                                                                            */
+/* ************************************************************************** */
+
+char		*get_env_var(char **value, char *start, char *result, int *i, t_minishell *shell);
+void		expand_exit_status(int exit_status, char **value, char *result, int *i);
+char		*expand_var(char *value, int exit_status, t_minishell *shell);
+void		expand_list(t_minishell *shell, t_node *parser_list);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                    main.c                                  */
+/*                                                                            */
+/* ************************************************************************** */
 
 // main_utils.c
 void		init_shell(t_minishell *shell, char **env);
-int			init_env(t_minishell *data, char **envp);
 void		reset_main(t_minishell *shell);
 int			check_token_error(t_minishell *shell);
 void		cleanup_parser(t_minishell *shell);
@@ -163,6 +256,16 @@ void		cleanup_parser(t_minishell *shell);
 void		minishell_loop(t_minishell *shell);
 void		main_parse(t_minishell *shell);
 char		*get_user_input(char **line);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                  parsing.c                                 */
+/*                                                                            */
+/* ************************************************************************** */
+
+// free_nodes.c
+void		free_node(t_node *head);
+void		free_nodes_list(t_node *head);
 
 // parse_redir.c
 t_node		*create_redir_node(t_token_type type);
@@ -188,8 +291,20 @@ t_node		*create_node(t_node_type type);
 void		parse_pipe(t_parser *parser, t_node **head);
 t_node		*parse(t_parser *parser);
 
+/* ************************************************************************** */
+/*                                                                            */
+/*                                  signals.c                                 */
+/*                                                                            */
+/* ************************************************************************** */
+
 // signals.c
 void		signal_handler(int signum);
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                tokenization.c                              */
+/*                                                                            */
+/* ************************************************************************** */
 
 // tokenizer_create_tokens.c
 t_token		*create_token(t_token_type type, char *value);
@@ -219,64 +334,5 @@ t_token		*tokenize(char *user_input);
 int			is_whitespace(char c);
 int			is_operator(char c);
 int			is_quote(char c);
-int			is_directory(const char *path);
-
-//builtin.c
-int			run_builtin(char **args, t_minishell *data);
-int			check_builtin(char *command);
-
-// export.c
-int			export(char **args, t_minishell *data);
-
-int			valid_var_name(char *var_name);
-void		update_env_var(t_minishell *data, char *var_name, char *var_value);
-t_env		*create_new(char *var_name, char *var_value);
-void		add_env(t_minishell *data, t_env *new_var);
-void		sort_print_env(t_minishell *data);
-void		ft_memdel(void *ptr);
-
-// cd.c
-int			cd(char **args, t_minishell *data);
-
-char		*get_env_value(t_env *env, char *key);
-void		update_oldpwd(t_minishell *data);
-void		update_pwd(t_minishell *data);
-int			change_directory(char *path);
-
-// echo.c
-int			ft_echo(char **args);
-int			length(char **arg);
-
-// env.c
-int			ft_env(char **args, t_env *env);
-
-// exit.c
-int			ft_exit(t_minishell *data, char **args);
-
-// pwd.c
-int			pwd(char **args);
-
-// unset.c
-int			unset(char **args, t_minishell *data);
-
-// env_sort.c
-void		sorting_env(char **array_env);
-char		**list_to_str(t_env *env);
-void		print_sort(char **sorted_env);
-void		free_array(char **array);
-
-// exec.c
-void		parent_execution(t_minishell *shell);
-void		execute_fork(t_node *current_node, t_minishell *data);
-int			check_redir(t_node *node, t_minishell *data);
-void		execute_cmd(t_node *node, t_minishell *data);
-int			check_builtin(char *command);
-int			run_builtin(char **args, t_minishell *data);
-void		handle_builtin(char **args, t_minishell *data, int *result);
-void		set_pipe(t_node *pipeline, t_minishell *shell);
-int			setup_heredoc(t_node *node, t_minishell *data);
-
-// redir.c
-int		check_redir_exists(t_minishell *data);
 
 #endif

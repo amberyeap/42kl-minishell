@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/22 16:25:01 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:29:49 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	setup_heredoc(t_node *node, t_minishell *data)
 			break ;
 		if (!quoted) //unquoted delimiter
 		{
-			expanded = expand_var(line, data->exit);
+			expanded = expand_var(line, data->exit, data);
 			write(pipefd[1], expanded, ft_strlen(expanded));
 			free(expanded);
 		}

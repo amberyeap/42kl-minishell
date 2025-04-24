@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:19:38 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 12:12:08 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/23 11:45:33 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	sort_print_env(t_minishell *data)
 	free_array(env_array);
 }
 // free env_node
-static void	free_env(t_env *env)
+void	free_env(t_env *env)
 {
 	t_env	*temp;
 

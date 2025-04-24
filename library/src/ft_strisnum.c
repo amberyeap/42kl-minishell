@@ -17,10 +17,14 @@ int	ft_strisnum(const char *str)
 	int	i;
 
 	i = 0;
-	if (str == NULL)
-		return (0);
+	// if (str == NULL)
+	// 	return (0);
 	if (str[0] == '=')
 		i++;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
 	while (str[i])
 	{
 		if (str[i] < '0' || str[i] > '9')

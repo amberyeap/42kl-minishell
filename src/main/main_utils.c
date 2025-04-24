@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/04/17 15:52:38 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/23 21:02:08 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,18 @@ void	init_shell(t_minishell *shell, char **env)
 
 void	reset_main(t_minishell *shell)
 {
-	free_token_list(shell->token_list);
-	free(shell->user_input);
+	if (shell->user_input)
+	{
+		free(shell->user_input);
+		shell->user_input = NULL;
+	}
+	if (shell->token_list)
+		free_token_list(shell->token_list);
 	if (shell->parser_list)
 		free_nodes_list(shell->parser_list);
-	shell->parser = NULL;
-	shell->parser_list = NULL;
+	cleanup_parser(shell);
 	shell->token_list = NULL;
-	shell->user_input = NULL;
+	shell->parser_list = NULL;
 }
 
 int	check_token_error(t_minishell *shell)
@@ -43,7 +47,8 @@ int	check_token_error(t_minishell *shell)
 	{
 		if (current->type == TOKEN_ERROR)
 		{
-			ft_fprintf(STDERR_FILENO, "minishell: syntax error: %s\n", current->value);
+			ft_fprintf(STDERR_FILENO,
+				"minishell: syntax error: %s\n", current->value);
 			free_token_list(shell->token_list);
 			shell->token_list = NULL;
 			shell->exit = 2;
@@ -56,13 +61,11 @@ int	check_token_error(t_minishell *shell)
 
 void	cleanup_parser(t_minishell *shell)
 {
-	free_token_list(shell->token_list);
-	free(shell->user_input);
-	shell->token_list = NULL;
-	if (shell->parser && shell->parser->error_msg)
+	if (shell->parser)
 	{
-		free(shell->parser->error_msg);
-		shell->parser->error_msg = NULL;
+		if (shell->parser->error_msg)
+			free(shell->parser->error_msg);
+		free(shell->parser);
+		shell->parser = NULL;
 	}
-	shell->user_input = NULL;
 }

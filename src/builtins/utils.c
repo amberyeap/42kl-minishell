@@ -27,7 +27,7 @@ int	valid_var_name(char *var_name)
 	i = 0;
 	while (var_name[i] && var_name[i] != '=')
 	{
-		if (!isalnum(var_name[i]) && var_name[i] != '_')
+		if (!ft_isalnum(var_name[i]))
 			return (0);
 		i++;
 	}

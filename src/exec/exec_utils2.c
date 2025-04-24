@@ -6,11 +6,21 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/22 21:06:19 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:32:29 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
+
+void	free_paths(char **paths)
+{
+	int	i;
+
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
+	free(paths);
+}
 
 char	*find_path(char *cmd, t_env *env)
 {
@@ -18,6 +28,7 @@ char	*find_path(char *cmd, t_env *env)
 	char	*full_path;
 	char	**paths;
 	int		i;
+	char	*temp;
 
 	if (access(cmd, F_OK) == 0)
 		return (cmd);
@@ -28,68 +39,41 @@ char	*find_path(char *cmd, t_env *env)
 	i = 0;
 	while (paths[i])
 	{
-		full_path = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(full_path, cmd);
+		temp = ft_strjoin(paths[i], "/");
+		full_path = ft_strjoin(temp, cmd);
+		free(temp);
 		if (access(full_path, F_OK | X_OK) == 0)
 			return (full_path);
 		free(full_path);
 		i++;
 	}
-	free(paths);
+	free_paths(paths);
 	return (NULL);
 }
 
 void	execute_cmd(t_node *node, t_minishell *data)
 {
-	//check for expansion
-	char	*cmd;
+	char	*cmd_expanded;
+	char	*cmd_path;
 	char	**env;
-	int		result;
 
-	if (check_builtin(node->cmd))
+	if (!node->arg || !node->arg[0])
 	{
-		handle_builtin(node->arg, data, &result);
-		exit(result);
+		ft_fprintf(STDERR_FILENO, "minishell: empty command\n");
+		data->exit = 127;
+		return ;
 	}
-	cmd = expand_var(node->cmd, data->exit);
-	if (cmd == NULL || cmd[0] == '\0')
+	cmd_expanded = expand_var(node->cmd, data->exit);
+	cmd_path = find_path(cmd_expanded, data->env);
+	free(cmd_expanded);
+	if (cmd_path == NULL)
 	{
-		data->exit = 0;
-		exit(0);
-	}
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, F_OK) != 0) //Files not exit
-		{
-			fprintf(stderr, "%s: command not found\n", cmd);
-			data->exit = 127;
-			exit(127);
-		}
-		if (access(cmd, X_OK) != 0) // not executable
-		{
-			fprintf(stderr, "%s: Permission denied\n", cmd);
-			data->exit = 126;
-			exit(126);
-		}
-		if (is_directory(cmd))
-		{
-			ft_fprintf(2, "%s: Is a directory\n", cmd);
-			data->exit = 126;
-			exit(126);
-		}
-	}
-	else
-	{
-		cmd = find_path(cmd, data->env);
-		if (cmd == NULL)
-		{
-			ft_fprintf(2, "%s: command not found\n", node->cmd);
-			data->exit = 127;
-			exit(127);
-		}
+		perror("Command not found");
+		data->exit = 126;
+		return ;
 	}
 	env = list_to_str(data->env);
-	if (execve(cmd, node->arg, env) == -1)
+	if (execve(cmd_path, node->arg, env) == -1)
 	{
 		fprintf(stderr, "%s: command not found\n", node->cmd);
 		data->exit = 127;
