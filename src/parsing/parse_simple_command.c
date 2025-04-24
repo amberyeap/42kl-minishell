@@ -12,89 +12,87 @@
 
 #include "../../inc/minishell.h"
 
-int	replace_args(t_node *cmd_node, char *arg, char ***new_args,
-	char ***old_args, int *i)
+void	move_args(t_node *cmd_node, char **new_args, int *new_arg_expand)
 {
-	while (cmd_node->arg && cmd_node->arg[*i])
+	int	i;
+
+	i = 0;
+	while (cmd_node->arg[i])
 	{
-		(*new_args)[*i] = ft_strdup(cmd_node->arg[*i]);
-		if (!(*new_args)[*i])
-		{
-			while (--(*i) >= 0)
-				free((*new_args)[*i]);
-			free(*new_args);
-			return (0);
-		}
-		(*i)++;
+		new_args[i] = cmd_node->arg[i];
+		new_arg_expand[i] = cmd_node->arg_expand[i];
+		i++;
 	}
-	(*new_args)[*i] = ft_strdup(arg);
-	(*new_args)[(*i) + 1] = NULL;
-	*old_args = cmd_node->arg;
-	*i = 0;
-	while (*old_args && (*old_args)[*i])
-		free((*old_args)[(*i)++]);
-	free(*old_args);
-	return (1);
+	free(cmd_node->arg);
+	free(cmd_node->arg_expand);
 }
 
-// this adds arguments to the command node as multiple strings
-int	add_arg_to_command(char *arg, t_node *cmd_node)
+int	add_arg_to_command(char *word, int expand, t_node *cmd_node)
 {
 	int		i;
 	char	**new_args;
-	char	**old_args;
+	int		*new_arg_expand;
 
 	i = 0;
-	while (cmd_node->arg && cmd_node->arg[i])
+	while (cmd_node->arg[i])
 		i++;
 	new_args = malloc(sizeof(char *) * (i + 2));
 	if (!new_args)
 		return (0);
-	i = 0;
-	if (!replace_args(cmd_node, arg, &new_args, &old_args, &i))
-		set_parser_error(cmd_node->shell->parser,
-			"Error duplicating arguments");
+	new_arg_expand = malloc(sizeof(int) * (i + 2));
+	if (!new_arg_expand)
+		return (free(new_args), 0);
+	move_args(cmd_node, new_args, new_arg_expand);
+	new_args[i] = ft_strdup(word);
+	new_args[i + 1] = NULL;
+	new_arg_expand[i] = expand;
 	cmd_node->arg = new_args;
+	cmd_node->arg_expand = new_arg_expand;
 	return (1);
 }
 
-t_node	*create_command_node(char *cmd, t_node_type type)
+t_node	*create_command_node(char *cmd, t_node_type type, int expand)
 {
 	t_node	*node;
-	char	**cmd_arg;
 
-	cmd_arg = malloc(sizeof(char *) * 2);
-	if (!cmd_arg)
-		return (NULL);
 	node = create_node(type);
 	if (!node)
-		return (free(cmd_arg), NULL);
+		return (NULL);
 	node->cmd = ft_strdup(cmd);
 	if (!node->cmd)
-	{
-		free(node);
-		return (NULL);
-	}
-	cmd_arg[0] = ft_strdup(cmd);
-	cmd_arg[1] = NULL;
-	if (!cmd_arg[0])
-		return (free(cmd_arg), free(node), NULL);
-	node->arg = cmd_arg;
+		return (free(node), NULL);
+	node->arg = malloc(sizeof(char *) * 2);
+	if (!node->arg)
+		return (free(node->cmd), free(node), NULL);
+	node->arg[0] = ft_strdup(cmd);
+	if (!node->arg[0])
+		return (free(node->arg), free(node->cmd),
+			free(node), NULL);
+	node->arg[1] = NULL;
+	node->expand = expand;
+	node->arg_expand = malloc(sizeof(int) * 2);
+	if (!node->arg_expand)
+		return (free(node->arg[0]), free(node->arg),
+			free(node->cmd), free(node), NULL);
+	node->arg_expand[0] = expand;
+	node->arg_expand[1] = 0;
 	return (node);
 }
 
 void	handle_word_token(t_parser *parser, t_node **head, t_node **first_node)
 {
 	char	*word;
+	int		expand;
 
+	expand = parser->current_token->expand;
 	word = ft_strdup(parser->current_token->value);
 	if (!*first_node)
 	{
-		*first_node = create_command_node(word, NODE_COMMAND);
+		*first_node = create_command_node(word, NODE_COMMAND, expand);
 		add_node_to_back(head, *first_node);
 	}
 	else
-		if (!add_arg_to_command(word, *first_node))
+		if (!add_arg_to_command(word, expand, *first_node))
 			set_parser_error(parser, "Failed to add argument to command");
 	free(word);
 	consume_token(parser);
@@ -118,11 +116,5 @@ void	parse_simple_command(t_parser *parser, t_node **head)
 		}
 		else
 			break ;
-		if (parser->error)
-		{
-			if (first_node)
-				free_node(first_node);
-			return ;
-		}
 	}
 }
