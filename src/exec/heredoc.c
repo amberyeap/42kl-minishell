@@ -3,15 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/14 13:11:05 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/22 16:25:01 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
+
+int	is_directory(const char *path)
+{
+	int	fd;
+	fd = open(path, O_DIRECTORY);
+	if (fd >= 0)
+	{
+		close(fd);
+		return (1);
+	}
+	return (0); //not a directory
+}
 int	quote_delim(char *delim)
 {
 	int	len;

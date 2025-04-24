@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:40:44 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 20:12:25 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/22 13:24:16 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ static int	skip_flags(char **args, int *newline)
 	i = 1;
 	while (args[i] && ft_strncmp(args[i], "-n", 2) == 0)
 	{
-		printf("entered skip_flags\n");
 		j = 1;
 		if (args[i][j +1] != '\0' && args[i][j + 1] != 'n')
 			break ;
@@ -71,14 +70,13 @@ int	ft_echo(char **args)
 	int	newline;
 	int	i;
 
-	newline = 10;
+	newline = 1;
 	if (length(args) < 1)
 	{
 		printf("\n");
 		return (0);
 	}
 	i = skip_flags(args, &newline);
-	i = 1;
 	while (args[i])
 	{
 		printf("%s", args[i]);
@@ -86,6 +84,7 @@ int	ft_echo(char **args)
 			printf(" ");
 		i++;
 	}
-	printf("\n");
+	if (newline)
+		printf("\n");
 	return (0);
 }

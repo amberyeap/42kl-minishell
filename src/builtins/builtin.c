@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 12:09:40 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/22 15:20:46 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 // ECHO BUGS
 // [FIXED] BUG: only prints a newline when there is only one argument
-// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), 
+// [FIXED] BUG: segfaults when there is no argument input (eg: echo ),
 // works for echo ""
-// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, 
+// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line,
 // but as two separate strings
 // TO TEST: the skip_flags()
 
@@ -47,19 +47,19 @@ int	check_builtin(char *command)
 void	handle_builtin(char **args, t_minishell *data, int *result)
 {
 	if (ft_strncmp(data->parser_list->cmd, "echo", 4) == 0)
-		ft_echo(args);
+		*result = ft_echo(args);
 	else if (ft_strncmp(data->parser_list->cmd, "cd", 2) == 0)
-		cd(args, data);
+		*result = cd(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "pwd", 3) == 0)
-		pwd(args);
+		*result = pwd(args);
 	else if (ft_strncmp(data->parser_list->cmd, "env", 3) == 0)
-		ft_env(args, data->env);
+		*result = ft_env(args, data->env);
 	else if (ft_strncmp(data->parser_list->cmd, "export", 6) == 0)
-		export(args, data);
+		*result = export(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "unset", 5) == 0)
-		unset(args, data);
+		*result = unset(args, data);
 	else if (ft_strncmp(data->parser_list->cmd, "exit", 4) == 0)
-		ft_exit(data, args);
+		*result = ft_exit(data, args);
 }
 
 int	is_redir(t_node_type type)
@@ -91,7 +91,7 @@ int run_builtin(char **args, t_minishell *data)
 	int has_redir;
 	pid_t pid;
 	int status;
-	
+
 	result = 0;
 	has_redir = 0;
 	if (check_redir_exists(data))

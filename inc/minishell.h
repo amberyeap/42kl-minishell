@@ -219,6 +219,7 @@ t_token		*tokenize(char *user_input);
 int			is_whitespace(char c);
 int			is_operator(char c);
 int			is_quote(char c);
+int			is_directory(const char *path);
 
 //builtin.c
 int			run_builtin(char **args, t_minishell *data);
@@ -271,8 +272,11 @@ int			check_redir(t_node *node, t_minishell *data);
 void		execute_cmd(t_node *node, t_minishell *data);
 int			check_builtin(char *command);
 int			run_builtin(char **args, t_minishell *data);
-// void		set_pipe(t_node *current_node, t_minishell *data);
+void		handle_builtin(char **args, t_minishell *data, int *result);
 void		set_pipe(t_node *pipeline, t_minishell *shell);
 int			setup_heredoc(t_node *node, t_minishell *data);
+
+// redir.c
+int		check_redir_exists(t_minishell *data);
 
 #endif

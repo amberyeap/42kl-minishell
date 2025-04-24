@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 19:29:37 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/22 21:06:19 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,24 +42,57 @@ char	*find_path(char *cmd, t_env *env)
 void	execute_cmd(t_node *node, t_minishell *data)
 {
 	//check for expansion
-	char *cmd;
-	char **env;
+	char	*cmd;
+	char	**env;
+	int		result;
 
-	cmd = expand_var(node->cmd, data->exit);
-	cmd = find_path(cmd, data->env);
-	if (cmd == NULL)
+	if (check_builtin(node->cmd))
 	{
-		perror("Command not found");
-		data->exit = 126;
-		return ;
+		handle_builtin(node->arg, data, &result);
+		exit(result);
+	}
+	cmd = expand_var(node->cmd, data->exit);
+	if (cmd == NULL || cmd[0] == '\0')
+	{
+		data->exit = 0;
+		exit(0);
+	}
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK) != 0) //Files not exit
+		{
+			fprintf(stderr, "%s: command not found\n", cmd);
+			data->exit = 127;
+			exit(127);
+		}
+		if (access(cmd, X_OK) != 0) // not executable
+		{
+			fprintf(stderr, "%s: Permission denied\n", cmd);
+			data->exit = 126;
+			exit(126);
+		}
+		if (is_directory(cmd))
+		{
+			ft_fprintf(2, "%s: Is a directory\n", cmd);
+			data->exit = 126;
+			exit(126);
+		}
+	}
+	else
+	{
+		cmd = find_path(cmd, data->env);
+		if (cmd == NULL)
+		{
+			ft_fprintf(2, "%s: command not found\n", node->cmd);
+			data->exit = 127;
+			exit(127);
+		}
 	}
 	env = list_to_str(data->env);
-	// printf("debug: cmd = %s\n", cmd);
-	// for (int i = 0; node->arg[i]; i++)
- 	// 	printf("debug: arg[%d] = %s\n", i, node->arg[i]);
 	if (execve(cmd, node->arg, env) == -1)
 	{
-		perror("Execution failed");
+		fprintf(stderr, "%s: command not found\n", node->cmd);
 		data->exit = 127;
+		exit(127);
 	}
 }

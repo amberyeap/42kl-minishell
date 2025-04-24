@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 10:05:07 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/15 17:30:12 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/18 07:44:25 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@ int	pwd(char **args)
 {
 	char	cwd[PATH_MAX];
 
-	if (length(args) > 1)
-	{
-		ft_putstr_fd("pwd: too many arguments", STDERR_FILENO);
-	}
+	// if (length(args) > 1)
+	// {
+	// 	ft_putstr_fd("pwd: too many arguments", STDERR_FILENO);
+	// }
 	if (getcwd(cwd, PATH_MAX))
 	{
 		printf("%s\n", cwd);

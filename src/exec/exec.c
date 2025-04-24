@@ -3,25 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 15:52:29 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/23 01:36:55 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-
+t_node *find_cmd_node(t_node *node)
+{
+	t_node *now = node;
+	while (now)
+	{
+		if (now->type == NODE_COMMAND) // Or NODE_WORD if your structure uses that
+			return (now);
+		now = now->next;
+	}
+	return (NULL);
+}
 void	execute_node(t_node *node, t_minishell *data)
 {
-	if (check_redir(node, data) == -1)
-		return ;
+	t_node	*cmd_node;
 
-	if (node->type == NODE_PIPE || (node->next && node->next->type == NODE_PIPE))
+	if (node->type == NODE_PIPE ||
+		 (node->next && node->next->type == NODE_PIPE))
 		set_pipe(node, data);
 	else
-		execute_cmd(node, data);
+	{
+		cmd_node = find_cmd_node(node);
+		if (cmd_node == NULL)
+			printf("dont do anythi=ngg");
+		else
+			execute_cmd(cmd_node, data);
+	}
 }
 
 /*
@@ -31,10 +47,11 @@ void	execute_node(t_node *node, t_minishell *data)
 	# run the execute node
 	# Save the exit status, then restore the signal handler
 */
-void	execute_fork(t_node *current_node, t_minishell *data)
+void	execute_fork(t_node *node, t_minishell *data)
 {
 	pid_t	pid;
 	int		status;
+	t_node	*cmd_node;
 
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
@@ -43,7 +60,12 @@ void	execute_fork(t_node *current_node, t_minishell *data)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-		execute_node(current_node, data);
+		if (check_redir_exists(data))
+		{
+			if (check_redir(node, data) == -1)
+				exit(1);
+		}
+		execute_node(node, data);
 		exit(data->exit);
 	}
 	waitpid(pid, &status, 0);
@@ -54,17 +76,43 @@ void	execute_fork(t_node *current_node, t_minishell *data)
 
 void	parent_execution(t_minishell *shell)
 {
-	t_node	*current_node;
+	t_node	*node;
+	int	stdin = -1;
+	int	stdout = -1;
+	t_node	*cmd_node;
 
-	current_node = shell->parser_list;
-	if (!current_node)
-		return ;
-	if (current_node->type == NODE_COMMAND &&
-		check_builtin(current_node->cmd) &&
-		!(current_node->next && current_node->next->type == NODE_PIPE))
+	node = shell->parser_list;
+	cmd_node = find_cmd_node(node);
+	// if (node->type != NODE_COMMAND &&
+	// 	!(node->next && node->next->type == NODE_PIPE) &&
+	// 	check_redir_exists(shell))
+	if (cmd_node == NULL && check_redir_exists(shell))
+	{
+		stdin = dup(STDIN_FILENO);
+		stdout = dup(STDOUT_FILENO);
+
+		if (check_redir(node, shell) == -1)
+			shell->exit = 1;
+		else
+			shell->exit = 0;
+		if (stdin != -1)
 		{
-			shell->exit = run_builtin(current_node->arg, shell);
+			dup2(stdin, STDIN_FILENO);
+			close(stdin);
+		}
+		if (stdout != -1)
+		{
+			dup2(stdout, STDERR_FILENO);
+			close(stdout);
+		}
+		return ;
+	}
+	if (node->type == NODE_COMMAND &&
+		check_builtin(node->cmd) &&
+		!(node->next && node->next->type == NODE_PIPE))
+		{
+			shell->exit = run_builtin(node->arg, shell);
 			return ;
 		}
-	execute_fork(current_node, shell);
+	execute_fork(node, shell);
 }

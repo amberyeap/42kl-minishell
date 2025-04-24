@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 12:38:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 15:59:00 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/18 07:45:26 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,10 @@ int	cd(char **args, t_minishell *data)
 	int	ret_val;
 
 	if (length(args) > 2)
+	{
+		ft_fprintf(2, "Minishell: cd: too many arguments\n");
 		return (1);
+	}
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
 		return (go_to_path(0, data));
 	if (ft_strcmp(args[1], "-") == 0)

@@ -3,83 +3,105 @@
 /*                                                        :::      ::::::::   */
 /*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 14:00:15 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 13:03:11 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/23 00:50:42 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-void	apply_n_close(int fd, int std_fd)
+static int handle_input_redir(t_node *node, t_minishell *shell)
 {
-	if (fd != -1)
-	{
-		dup2(fd, std_fd);
-		close(fd);
-	}
+    int fd;
+
+    fd = open(node->redir_file, O_RDONLY);
+    if (fd == -1) {
+        ft_fprintf(STDERR_FILENO, "minishell: %s: %s\n",
+                  node->redir_file, strerror(errno));
+        shell->exit = 1;
+        return -1;
+    }
+    if (dup2(fd, STDIN_FILENO) == -1) {
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
-int	handle_out(t_node *node, int *fd_out)
+static int handle_output_redir(t_node *node, t_minishell *shell)
 {
-	if (*fd_out != -1)
-		close(*fd_out);
-	if (node->type == NODE_REDIR_OUT)
-		*fd_out = open(node->redir_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	else if (node->type == NODE_APPEND)
-		*fd_out = open(node->redir_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (*fd_out == -1)
-	{
-		perror("Redirection Error");
-		node->shell->exit = 1;
-		return (-1);
-	}
-	return (0);
+    int fd;
+    int flags = O_WRONLY | O_CREAT;
+
+    flags |= (node->type == NODE_APPEND) ? O_APPEND : O_TRUNC;
+    fd = open(node->redir_file, flags, 0644);
+    if (fd == -1) {
+        ft_fprintf(STDERR_FILENO, "minishell: %s: %s\n",
+                  node->redir_file, strerror(errno));
+        shell->exit = 1;
+        return -1;
+    }
+    if (dup2(fd, STDOUT_FILENO) == -1) {
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
 }
 
-int	handle_in(t_node *node, int *fd_in, t_minishell *data)
+static int handle_heredoc(t_node *node, t_minishell *shell)
 {
-	if (*fd_in != -1)
-		close(*fd_in);
-	if (node->type == NODE_REDIR_IN) //"<" cases
-		*fd_in = open(node->redir_file, O_RDONLY);
-	else if (node->type == NODE_HEREDOC) //"<<" Cases
-		*fd_in = setup_heredoc(node, data);
-	if (*fd_in == -1)
-	{
-		perror("Redirection Error");
-		node->shell->exit = 1;
-		return (-1);
+    int fd = setup_heredoc(node, shell);
+
+    if (fd == -1) {
+        shell->exit = 1;
+        return -1;
+    }
+    if (dup2(fd, STDIN_FILENO) == -1) {
+        close(fd);
+        return -1;
 	}
-	return (0);
+    close(fd);
+    return 0;
 }
 
-//Check the Redirection Node
-int	check_redir(t_node *node, t_minishell *data)
+int check_redir(t_node *node, t_minishell *shell)
 {
-	int	fd_in;
-	int	fd_out;
+    int stdin_fd = -1;
+    int stdout_fd = -1;
+    int result = 0;
 
-	fd_in = -1;
-	fd_out = -1;
-	while (node)
-	{
-		if (node->type == NODE_REDIR_IN || node->type == NODE_HEREDOC)
-		{
-			// printf("entered handle_in\n");
-			if (handle_in(node, &fd_in, data) == -1)
-				return (-1);
-		}
-		else if (node->type == NODE_REDIR_OUT || node->type == NODE_APPEND)
-		{
-			// printf("entered handle_out\n");
-			if (handle_out(node, &fd_out) == -1)
-				return (-1);
-		}
-		node = node->next;
-	}
-	apply_n_close(fd_in, STDIN_FILENO);
-	apply_n_close(fd_out, STDOUT_FILENO);
-	return (0);
+    while (node && result == 0) {
+
+        if (node->type == NODE_PIPE)
+			break;
+        if (node->type == NODE_REDIR_IN || node->type == NODE_HEREDOC) {
+            if (stdin_fd != -1) {
+                close(stdin_fd);
+                stdin_fd = -1;
+            }
+            if (node->type == NODE_REDIR_IN)
+                result = handle_input_redir(node, shell);
+            else
+                result = handle_heredoc(node, shell);
+        }
+        else if (node->type == NODE_REDIR_OUT || node->type == NODE_APPEND) {
+            if (stdout_fd != -1) {
+                close(stdout_fd);
+                stdout_fd = -1;
+            }
+            result = handle_output_redir(node, shell);
+        }
+        node = node->next;
+    }
+
+    // Cleanup if error occurred
+    if (result == -1) {
+        if (stdin_fd != -1) close(stdin_fd);
+        if (stdout_fd != -1) close(stdout_fd);
+    }
+    return result;
 }
