@@ -23,7 +23,7 @@
 
 // - handle expansion DONE? waiting for execution to complete i think
 // - handle exit codes
-// - handle signals -> what's the diff between interactive mode 
+// - handle signals -> what's the diff between interactive mode
 //		and non-interactive?
 // - handle history DONE?
 // - handle escape characters NOT NEEDED BY SUBJECT.PDF
@@ -32,9 +32,9 @@
 /* as of 23 Feb
 	- unquoted words joined to quoted words (eg: "hi"world)
 		-> also has LEAKS
-	- second word onwards after the redir is treated as an 
+	- second word onwards after the redir is treated as an
 		arg to the command (first word)
-		(eg: echo hi > input ls) -> should be correct or not? 
+		(eg: echo hi > input ls) -> should be correct or not?
 			need to test more cases
 */
 

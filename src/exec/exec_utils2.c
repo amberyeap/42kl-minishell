@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 19:29:37 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/24 10:32:29 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ void	execute_cmd(t_node *node, t_minishell *data)
 	env = list_to_str(data->env);
 	if (execve(cmd_path, node->arg, env) == -1)
 	{
-		perror("Execution failed");
+		fprintf(stderr, "%s: command not found\n", node->cmd);
 		data->exit = 127;
+		exit(127);
 	}
 }

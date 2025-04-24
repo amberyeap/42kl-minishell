@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/23 20:34:26 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/24 10:33:41 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 // ECHO BUGS
 // [FIXED] BUG: only prints a newline when there is only one argument
-// [FIXED] BUG: segfaults when there is no argument input (eg: echo ), 
+// [FIXED] BUG: segfaults when there is no argument input (eg: echo ),
 // works for echo ""
-// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line, 
+// [FIXED BUT FUNCTION TOO LONG] BUG: doesn't print "hello"world in one line,
 // but as two separate strings
 // TO TEST: the skip_flags()
 
@@ -86,6 +86,11 @@ int	check_redir_exists(t_minishell *data)
 
 int	run_builtin(char **args, t_minishell *data)
 {
+	int result;
+	int has_redir;
+	pid_t pid;
+	int status;
+
 	int		result;
 	pid_t	pid;
 	int		status;
