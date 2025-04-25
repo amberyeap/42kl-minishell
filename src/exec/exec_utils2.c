@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 09:13:53 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/25 00:00:28 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 14:19:45 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ void execute_cmd(t_node *node, t_minishell *data)
 {
     char *cmd;
     char **env;
-    int result;
+    // int result;
 
 	// 3. Handle empty command
 	if (!node->cmd || !node->cmd[0])
@@ -222,11 +222,11 @@ void execute_cmd(t_node *node, t_minishell *data)
 	}
 
     // 2. Handle regular builtins
-    if (check_builtin(node->cmd))
-    {
-        handle_builtin(node->arg, data, &result);
-        exit(result);
-    }
+    // if (check_builtin(node->cmd))
+    // {
+    //     handle_builtin(node->arg, data, &result);
+    //     exit(result);
+    // }
     // 4. Handle path resolution
     if (!ft_strchr(node->cmd, '/')) // Only search PATH if not absolute/relative path
     {
