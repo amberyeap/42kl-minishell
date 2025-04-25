@@ -77,11 +77,11 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 	current = parser_list;
 	while (current)
 	{
-		if (current->cmd)
+		if (current->cmd && current->expand)
 		{
-			if (!check_builtin(current->cmd))
+			expanded = expand_var(current->cmd, shell->exit, shell);
+			if (expanded)
 			{
-				expanded = expand_var(current->cmd, shell->exit, shell);
 				free(current->cmd);
 				current->cmd = expanded;
 			}
@@ -91,17 +91,17 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 			i = 0;
 			while (current->arg[i])
 			{
-				expanded = expand_var(current->arg[i], shell->exit, shell);
-				free(current->arg[i]);
-				current->arg[i] = expanded;
+				if (current->arg_expand[i])
+				{
+					expanded = expand_var(current->arg[i], shell->exit, shell);
+					if (expanded)
+					{
+						free(current->arg[i]);
+						current->arg[i] = expanded;
+					}
+				}
 				i++;
 			}
-		}
-		if (current->redir_file)
-		{
-			expanded = expand_var(current->redir_file, shell->exit, shell);
-			free(current->redir_file);
-			current->redir_file = expanded;
 		}
 		current = current->next;
 	}
