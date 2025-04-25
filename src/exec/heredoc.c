@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 17:53:46 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 07:58:52 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,16 @@ int	is_directory(const char *path)
 	}
 	return (0); //not a directory
 }
-int	quote_delim(char *delim)
+int	quote_delim(t_node *node)
 {
-	int	len;
+	// int	len;
 
-	len = ft_strlen(delim);
-	if ((delim[0] == '"' && delim[len - 1] == '"')
-		|| (delim[0] == '\'' && delim[len - 1] == '\''))
+	// len = ft_strlen(delim);
+	// if ((delim[0] == '"' && delim[len - 1] == '"')
+	// 	|| (delim[0] == '\'' && delim[len - 1] == '\''))
+	// 	return (1);
+	// return (0);
+	if (node->quoted == true)
 		return (1);
 	return (0);
 }
@@ -53,7 +56,7 @@ int	setup_heredoc(t_node *node, t_minishell *data)
 	char	*line;
 	char	*expanded;
 
-	quoted = quote_delim(node->heredoc_delim);
+	quoted = quote_delim(node);
 	pipe(pipefd);
 	while (1)
 	{
