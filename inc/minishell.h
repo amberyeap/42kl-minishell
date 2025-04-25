@@ -49,7 +49,6 @@ typedef enum e_quote_type
 	NO_QUOTE,
 	DOUBLE_QUOTE,
 	SINGLE_QUOTE,
-	UNTERMINATED_QUOTE
 }	t_quote_type;
 
 typedef enum e_token_type
@@ -119,8 +118,9 @@ typedef struct s_node
 	char			**arg;
 	char			*heredoc_delim;
 	char			*redir_file;
-	t_direction		redir_direction;
-	t_minishell		*shell;
+	int				expand; // flag to mark cmd_node needs expansion
+	int				*arg_expand; // array of ints to mark which arg in the arg[] needs expansion
+	bool			quoted;
 	struct s_node	*next;
 }	t_node;
 
@@ -276,8 +276,8 @@ void		redir_error(t_parser *parser, char *msg, t_node *redir_node);
 void		parse_redirection(t_parser *parser, t_node **head);
 
 // parse_simple_command.c
-int			add_arg_to_command(char *arg, t_node *command);
-t_node		*create_command_node(char *cmd, t_node_type type);
+int			add_arg_to_command(char *arg, int expand, t_node *command);
+t_node		*create_command_node(char *cmd, t_node_type type, int expand);
 void		handle_word_token(t_parser *parser, t_node **head,
 				t_node **first_node);
 void		parse_simple_command(t_parser *parser, t_node **head);
