@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/25 00:29:59 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 19:56:33 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,21 @@ void	execute_node(t_node *node, t_minishell *data)
 	{
 		cmd_node = find_cmd_node(node);
 		execute_cmd(cmd_node, data);
+	}
+}
+
+void	check_signal(int status, t_minishell *data)
+{
+	int sig;
+
+	if (WIFSIGNALED(status))
+	{
+		sig = WTERMSIG(status);
+		data->exit = 128 + sig;
+		if (sig == SIGINT)
+			printf("\n");
+		if (sig == SIGQUIT)
+			printf("Quit (core dumped)\n");
 	}
 }
 
@@ -70,7 +85,8 @@ void	execute_fork(t_node *node, t_minishell *data)
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 		data->exit = WEXITSTATUS(status);
-	signal(SIGINT, signal_handler);
+	signal(SIGINT, new_prompt);
+	check_signal(status, data);
 }
 
 void	parent_execution(t_minishell *shell)
