@@ -99,11 +99,15 @@ char	*get_user_input(char **line)
 		printf("exit\n");
 		exit(0);
 	}
-	if (!**line || (is_whitespace(**line) && is_whitespace(**line + 1)))
+	while (is_whitespace(**line))
 	{
-		free(*line);
-		*line = NULL;
-		return (NULL);
+		if (!**line)
+		{
+			free(*line);
+			*line = NULL;
+			return (NULL);
+		}
+		line++;
 	}
 	add_history(*line);
 	return (*line);
