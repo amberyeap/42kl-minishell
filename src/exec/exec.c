@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/25 00:29:59 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 20:47:58 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,14 @@ t_node *find_cmd_node(t_node *node)
 void	execute_node(t_node *node, t_minishell *data)
 {
 	t_node	*cmd_node;
-	// print_parse_list(node);
-	// check_redir(node, data);
+
 	if (node->type == NODE_PIPE ||
 		 (node->next && node->next->type == NODE_PIPE))
 		set_pipe(node, data);
 	else
 	{
+		if (check_redir(node, data) == -1)
+			exit(1);
 		cmd_node = find_cmd_node(node);
 		execute_cmd(cmd_node, data);
 	}
@@ -58,12 +59,6 @@ void	execute_fork(t_node *node, t_minishell *data)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
-		if (check_redir_exists(data))
-		{
-			if (check_redir(node, data) == -1)
-				// exit(1);
-				data->exit = 1;
-		}
 		execute_node(node, data);
 		exit(data->exit);
 	}
@@ -82,9 +77,6 @@ void	parent_execution(t_minishell *shell)
 
 	node = shell->parser_list;
 	cmd_node = find_cmd_node(node);
-	// if (node->type != NODE_COMMAND &&
-	// 	!(node->next && node->next->type == NODE_PIPE) &&
-	// 	check_redir_exists(shell))
 	if (cmd_node == NULL && check_redir_exists(shell))
 	{
 		stdin = dup(STDIN_FILENO);

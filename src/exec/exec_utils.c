@@ -6,7 +6,7 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 23:22:32 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/25 20:48:49 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ void set_pipe(t_node *node, t_minishell *data)
             }
 
             // 3. Redirections should override above dup2 if needed
-            if (check_redir(current, data) == -1)
-                exit(1);
+		if (check_redir(current, data) == -1)
+			exit(1);
 
             // 4. Execute command
             execute_cmd(current, data);
