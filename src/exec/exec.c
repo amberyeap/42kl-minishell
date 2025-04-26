@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/25 19:56:33 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/26 17:22:49 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,6 @@ void	execute_node(t_node *node, t_minishell *data)
 	{
 		cmd_node = find_cmd_node(node);
 		execute_cmd(cmd_node, data);
-	}
-}
-
-void	check_signal(int status, t_minishell *data)
-{
-	int sig;
-
-	if (WIFSIGNALED(status))
-	{
-		sig = WTERMSIG(status);
-		data->exit = 128 + sig;
-		if (sig == SIGINT)
-			printf("\n");
-		if (sig == SIGQUIT)
-			printf("Quit (core dumped)\n");
 	}
 }
 

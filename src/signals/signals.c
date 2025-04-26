@@ -30,3 +30,18 @@ void	setup_signals(void)
 	sa_int.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa_int, NULL);
 }
+
+void	check_signal(int status, t_minishell *data)
+{
+	int sig;
+
+	if (WIFSIGNALED(status))
+	{
+		sig = WTERMSIG(status);
+		data->exit = 128 + sig;
+		if (sig == SIGINT)
+			printf("\n");
+		if (sig == SIGQUIT)
+			printf("Quit (core dumped)\n");
+	}
+}
