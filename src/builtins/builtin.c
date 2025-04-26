@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 17:55:25 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 22:53:16 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/26 17:44:04 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ int	check_builtin(char *command)
 
 void	handle_builtin(char **args, t_minishell *data, int *result)
 {
-	// dprintf(2, "checking\n");
 	if (ft_strncmp(data->parser_list->cmd, "echo", 5) == 0)
 		*result = ft_echo(args);
 	else if (ft_strncmp(data->parser_list->cmd, "cd", 3) == 0)

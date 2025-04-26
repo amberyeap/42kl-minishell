@@ -68,40 +68,33 @@ char	*expand_var(char *value, int exit_status, t_minishell *shell)
 	return (result);
 }
 
-void	expand_list(t_minishell *shell, t_node *parser_list)
+void	expand_str(char **str, int expand, t_minishell *shell)
 {
 	char	*expanded;
+
+	if (expand)
+	{
+		expanded = expand_var(*str, shell->exit, shell);
+		free(*str);
+		*str = expanded;
+	}
+}
+
+void	expand_list(t_minishell *shell, t_node *parser_list)
+{
 	int		i;
 	t_node	*current;
 
 	current = parser_list;
 	while (current)
 	{
-		if (current->cmd && current->expand)
+		if (current->cmd)
+			expand_str(&current->cmd, current->expand, shell);
+		i = 0;
+		while (current->arg[i])
 		{
-			expanded = expand_var(current->cmd, shell->exit, shell);
-			if (expanded)
-			{
-				free(current->cmd);
-				current->cmd = expanded;
-			}
-		}
-		if (current->arg)
-		{
-			i = 0;
-			while (current->arg[i])
-			{
-				if (current->arg_expand[i])
-				{
-					expanded = expand_var(current->arg[i], shell->exit, shell);
-					if (expanded)
-					{
-						free(current->arg[i]);
-						current->arg[i] = expanded;
-					}
-				}
-				i++;
-			}
+			expand_str(&current->arg[i], current->arg_expand[i], shell);
+			i++;
 		}
 		current = current->next;
 	}

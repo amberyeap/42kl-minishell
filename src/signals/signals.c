@@ -33,7 +33,7 @@ void	setup_signals(void)
 
 void	check_signal(int status, t_minishell *data)
 {
-	int sig;
+	int	sig;
 
 	if (WIFSIGNALED(status))
 	{
