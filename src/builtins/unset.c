@@ -6,24 +6,11 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/23 20:30:02 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/26 19:34:24 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
-
-// Calculates the length of environment variable's key (before =)
-static size_t	env_size(char *env)
-{
-	size_t	i;
-
-	i = 0;
-	if (!env)
-		return (0);
-	while (env[i] && env[i] != '=')
-		i++;
-	return (i);
-}
 
 // This tools helps for freeing the node that we want
 static void	freenode(t_minishell *data, t_env *node)
@@ -55,23 +42,26 @@ int	unset(char **args, t_minishell *data)
 {
 	t_env	*now_node;
 	t_env	*previous_node;
-	int		len_name;
+	int		i;
 
 	if (!args[1])
 		return (0);
-	now_node = data->env;
-	previous_node = NULL;
-	while (now_node)
+	i = 1;
+	while (args[i])
 	{
-		len_name = env_size(now_node->key);
-		if (len_name > 0 && strncmp(args[1], now_node->key, len_name) == 0
-			&& args[1][len_name] == '\0')
+		now_node = data->env;
+		previous_node = NULL;
+		while (now_node)
 		{
-			remove_env(data, previous_node, now_node);
-			return (0);
+			if (ft_strcmp(args[i], now_node->key) == 0)
+			{
+				remove_env(data, previous_node, now_node);
+				break ;
+			}
+			previous_node = now_node;
+			now_node = now_node->next;
 		}
-		previous_node = now_node;
-		now_node = now_node->next;
+		i++;
 	}
 	return (0);
 }
