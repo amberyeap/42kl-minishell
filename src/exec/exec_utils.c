@@ -6,87 +6,93 @@
 /*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/25 20:48:49 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/26 10:31:47 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-
-void set_pipe(t_node *node, t_minishell *data)
+static void	wait_for_child(pid_t last_pid, t_minishell *data)
 {
-    int pipe_fd[2];
-    int prev_pipe_in = -1;
-    pid_t last_pid = -1;
+	int		status;
 	pid_t	pid;
-    t_node *current = node;
 
-    while (current)
-    {
-        int has_pipe = current->next && current->next->type == NODE_PIPE;
+	pid = waitpid(-1, &status, 0);
+	while (pid > 0)
+	{
+		if (WIFEXITED(status) && pid == last_pid)
+			data->exit = WEXITSTATUS(status);
+		pid = waitpid(-1, &status, 0);
+	}
+}
 
-        if (has_pipe && pipe(pipe_fd) == -1)
-        {
-            perror("minishell: pipe");
-            data->exit = EXIT_FAILURE;
-            return;
-        }
+static void	parent_fds(int *prev_pipe_in, int *pipe_fd, int has_pipe)
+{
+	if (*prev_pipe_in != -1)
+		close(*prev_pipe_in);
+	if (has_pipe)
+		*prev_pipe_in = pipe_fd[0];
+	else
+		*prev_pipe_in = -1;
+	if (has_pipe)
+		close(pipe_fd[1]);
+}
 
-        pid = fork();
-        if (pid == -1)
-        {
-            perror("minishell: fork");
-            data->exit = EXIT_FAILURE;
-            return ;
-        }
-        else if (pid == 0) // === CHILD ===
-        {
-            // 1. If input comes from previous pipe
-            if (prev_pipe_in != -1)
-            {
-                dup2(prev_pipe_in, STDIN_FILENO);
-                close(prev_pipe_in);
-            }
+static int	birthing_pipe(int *pipe_fd, int has_pipe)
+{
+	if (has_pipe)
+	{
+		if (pipe(pipe_fd) == -1)
+		{
+			perror("minishell: pipe");
+			return (-1);
+		}
+	}
+	return (0);
+}
 
-            // 2. If output goes to next command (pipe)
-            if (has_pipe)
-            {
-                dup2(pipe_fd[1], STDOUT_FILENO);
-                close(pipe_fd[0]);
-                close(pipe_fd[1]);
-            }
+static void	fork_n_exec(t_node *node, t_exec *info, t_minishell *data)
+{
+	if (info->prev_pipe_in != -1)
+	{
+		dup2(info->prev_pipe_in, STDIN_FILENO);
+		close(info->prev_pipe_in);
+	}
+	if (info->has_pipe)
+	{
+		dup2(info->pipe_fd[1], STDOUT_FILENO);
+		close(info->pipe_fd[0]);
+		close(info->pipe_fd[1]);
+	}
+	if (check_redir(node, data) == -1)
+		exit(1);
+	execute_cmd(node, data);
+	exit(data->exit);
+}
 
-            // 3. Redirections should override above dup2 if needed
-		if (check_redir(current, data) == -1)
-			exit(1);
+void	set_pipe(t_node *node, t_minishell *data)
+{
+	t_node	*current;
+	t_exec	info;
+	pid_t	last_pid;
+	pid_t	pid;
 
-            // 4. Execute command
-            execute_cmd(current, data);
-            exit(data->exit);
-        }
-        else // === PARENT ===
-        {
-            last_pid = pid;
-
-            // Clean up previous input pipe (we're done with it)
-            if (prev_pipe_in != -1)
-                close(prev_pipe_in);
-
-            // Prepare input pipe for next iteration
-            prev_pipe_in = has_pipe ? pipe_fd[0] : -1;
-
-            // Close write end in parent (only reader child needs it)
-            if (has_pipe)
-                close(pipe_fd[1]);
-
-            // Skip pipe node if present
-            current = has_pipe ? current->next->next : current->next;
-        }
-    }
-
-    // === Wait for children ===
-    int status;
-    while (waitpid(-1, &status, 0) > 0)
-        if (WIFEXITED(status) && pid == last_pid)
-            data->exit = WEXITSTATUS(status);
+	current = node;
+	info.prev_pipe_in = -1;
+	last_pid = -1;
+	while (current)
+	{
+		info.has_pipe = 0;
+		if (current->next && current->next->type == NODE_PIPE)
+			info.has_pipe = 1;
+		if (birthing_pipe(info.pipe_fd, info.has_pipe) == -1)
+			return ;
+		pid = fork();
+		if (pid == 0)
+			fork_n_exec(current, &info, data);
+		last_pid = pid;
+		parent_fds(&info.prev_pipe_in, info.pipe_fd, info.has_pipe);
+		current = movin_node(current, info.has_pipe);
+	}
+	wait_for_child(last_pid, data);
 }

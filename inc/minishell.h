@@ -144,6 +144,19 @@ struct s_minishell
 	pid_t		shell_pid;
 };
 
+typedef struct s_redir_info
+{
+	t_node	*last_in;
+	t_node	*last_out;
+	t_node	*last_heredoc;
+}	t_redir;
+
+typedef struct s_exec
+{
+	int		prev_pipe_in;
+	int		pipe_fd[2];
+	int		has_pipe;
+}	t_exec;
 /* ************************************************************************** */
 /*                                                                            */
 /*                                 builtins.c                                 */
@@ -217,10 +230,11 @@ void		free_array(char **array);
 
 // exec_utils.c
 void		set_pipe(t_node *pipeline, t_minishell *shell);
-// void		set_pipe(t_node *current_node, t_minishell *data);
+t_node		*movin_node(t_node *node, int has_pipe);
 
 // exec_utils2.c
 void		execute_cmd(t_node *node, t_minishell *data);
+void		print_and_exit_error(char *prefix, char *arg, int code);
 
 // exec.c
 void		parent_execution(t_minishell *shell);
@@ -230,6 +244,9 @@ void		execute_fork(t_node *current_node, t_minishell *data);
 int			setup_heredoc(t_node *node, t_minishell *data);
 
 // redir.c
+int			handle_heredoc(t_node *node, t_minishell *shell);
+int			output_redir(t_node *node, t_minishell *shell);
+int			input_redir(t_node *node, t_minishell *shell);
 int			check_redir(t_node *node, t_minishell *data);
 
 /* ************************************************************************** */
