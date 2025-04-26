@@ -320,6 +320,7 @@ t_node		*parse(t_parser *parser);
 // signals.c
 void		new_prompt(int signum);
 void		setup_signals(void);
+void		check_signal(int status, t_minishell *data);
 
 /* ************************************************************************** */
 /*                                                                            */

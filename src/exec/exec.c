@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 21:40:06 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/26 17:26:01 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/26 17:42:31 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	execute_fork(t_node *node, t_minishell *data)
 	if (WIFEXITED(status))
 		data->exit = WEXITSTATUS(status);
 	signal(SIGINT, signal_handler);
+	check_signal(status, data);
 }
 
 static void	redir_wo_cmd(t_node *node, t_minishell *shell)
