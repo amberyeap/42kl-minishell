@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 14:16:47 by ayeap             #+#    #+#             */
-/*   Updated: 2025/04/23 21:02:08 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/26 20:04:05 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,15 @@ void	cleanup_parser(t_minishell *shell)
 		free(shell->parser);
 		shell->parser = NULL;
 	}
+}
+
+int	is_only_spaces(char *str)
+{
+	while (*str)
+	{
+		if (*str != ' ')
+			return (0);
+		str++;
+	}
+	return (1);
 }

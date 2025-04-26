@@ -99,15 +99,11 @@ char	*get_user_input(char **line)
 		printf("exit\n");
 		exit(0);
 	}
-	while (is_whitespace(**line))
+	if (!**line || is_only_spaces(*line))
 	{
-		if (!**line)
-		{
-			free(*line);
-			*line = NULL;
-			return (NULL);
-		}
-		line++;
+		free(*line);
+		*line = NULL;
+		return (NULL);
 	}
 	add_history(*line);
 	return (*line);
@@ -138,8 +134,6 @@ void	minishell_loop(t_minishell *shell)
 			expand_list(shell, shell->parser_list);
 			parent_execution(shell);
 		}
-		// print_tokens(shell->token_list);
-		// print_nodes(shell->parser_list);
 		reset_main(shell);
 	}
 }
@@ -156,7 +150,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, SIG_IGN);
 	setup_signals();
 	minishell_loop(&shell);
-	free_nodes_list(shell.parser_list);
-	free_env(shell.env);
+	// free_nodes_list(shell.parser_list);
+	// free_env(shell.env);
 	return (0);
 }
