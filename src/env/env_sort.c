@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_sort.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 13:31:10 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/17 21:38:30 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/26 10:50:43 by muhabin-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 void	print_sort(char **sorted_env)
 {
-	int i;
+	int		i;
 	char	*equal;
+
 	i = 0;
 	while (sorted_env[i])
 	{
@@ -23,11 +24,11 @@ void	print_sort(char **sorted_env)
 		if (equal)
 		{
 			*equal = '\0';
-			printf("declare -x %s=\"%s\"\n",sorted_env[i], equal + 1);
+			printf("declare -x %s=\"%s\"\n", sorted_env[i], equal + 1);
 			*equal = '=';
 		}
 		else
-			printf("declare -x %s\n",sorted_env[i]);
+			printf("declare -x %s\n", sorted_env[i]);
 		i++;
 	}
 }
@@ -42,7 +43,6 @@ void	free_array(char **array)
 	free(array);
 }
 
-//count node
 static int	count_node(t_env *env)
 {
 	int	i;
@@ -94,7 +94,6 @@ char	**list_to_str(t_env *env)
 	return (array);
 }
 
-// insertion sorting method
 void	sorting_env(char **array_env)
 {
 	int		i;
@@ -102,7 +101,7 @@ void	sorting_env(char **array_env)
 	char	*temp;
 
 	if (!array_env || !array_env[0])
-		return;
+		return ;
 	i = 0;
 	while (array_env[i])
 	{
@@ -117,57 +116,3 @@ void	sorting_env(char **array_env)
 		i++;
 	}
 }
-
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include "../../minishell.h"
-
-// // Function to create a new environment node
-// t_env	*create_env_node(char *key, char *value)
-// {
-// 	t_env	*node;
-
-// 	node = malloc(sizeof(t_env));
-// 	if (!node)
-// 		return (NULL);
-// 	node->key = ft_strdup(key);
-// 	node->value = ft_strdup(value);
-// 	node->next = NULL;
-// 	return (node);
-// }
-
-// // Function to free the environment linked list
-// void	free_env_list(t_env *env)
-// {
-// 	t_env	*tmp;
-
-// 	while (env)
-// 	{
-// 		tmp = env;
-// 		env = env->next;
-// 		free(tmp->key);
-// 		free(tmp->value);
-// 		free(tmp);
-// 	}
-// }
-
-// // Main function to test sort_print_env
-// int	main(void)
-// {
-// 	t_minishell	data;
-
-// 	// Initialize the environment linked list
-// 	data.env = create_env_node("PATH", "/usr/bin");
-// 	data.env->next = create_env_node("HOME", "/home/user");
-// 	data.env->next->next = create_env_node("APPLE", "red");
-// 	data.env->next->next->next = create_env_node("ZEBRA", "stripes");
-// 	data.env->next->next->next->next = create_env_node("BANANA", "yellow");
-
-// 	// Call the sort_print_env function
-// 	sort_print_env(&data);
-
-// 	// Free the environment linked list
-// 	free_env_list(data.env);
-
-// 	return (0);
-// }
