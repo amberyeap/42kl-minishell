@@ -18,14 +18,14 @@ char	*handle_quotes(t_tokenizer *tokenizer, char quote)
 	int		len;
 	char	*word;
 
-	next_char(tokenizer);
+	// next_char(tokenizer);
 	start = tokenizer->position;
 	while (peek(tokenizer) != quote && peek(tokenizer))
 		next_char(tokenizer);
 	len = tokenizer->position - start;
 	if (peek(tokenizer) != quote)
 		return (NULL);
-	word = ft_substr(tokenizer->user_input, start, len);
+	word = ft_substr(tokenizer->user_input, start, len + 1);
 	next_char(tokenizer);
 	return (word);
 }

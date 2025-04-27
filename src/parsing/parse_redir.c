@@ -38,7 +38,7 @@ void	prep_heredoc(t_node *node, t_token *current_token)
 {
 	node->heredoc_delim = ft_strdup(current_token->value);
 	if (current_token->quote)
-		node->quoted = true;
+		node->quote = current_token->quote;
 }
 
 void	parse_redirection(t_parser *parser, t_node **head)

@@ -84,6 +84,20 @@ void	expand_str(char **str, int expand, t_minishell *shell)
 	}
 }
 
+void	remove_quotes(t_node *head)
+{
+	t_node *current;
+
+	current = head;
+	while (head)
+	{
+		if (current->cmd)
+		{
+			
+		}
+	}
+}
+
 void	expand_list(t_minishell *shell, t_node *parser_list)
 {
 	int		i;
@@ -93,7 +107,10 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 	while (current)
 	{
 		if (current->cmd)
+		{
 			expand_str(&current->cmd, current->expand, shell);
+			remove_quotes(current);
+		}
 		if (current->arg)
 		{
 			i = 0;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:06:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/26 10:32:25 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/27 19:09:28 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	is_directory(const char *path)
 
 int	quote_delim(t_node *node)
 {
-	if (node->quoted == true)
+	if (node->quote == DOUBLE_QUOTE || node->quote == SINGLE_QUOTE)
 		return (1);
 	return (0);
 }

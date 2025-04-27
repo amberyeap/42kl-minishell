@@ -52,7 +52,7 @@
 // }
 
 char	*get_chunk(t_tokenizer *tokenizer, int *expand,
-	char *quote, char ***error_msg)
+	char *quote, char **error_msg)
 {
 	char	*chunk;
 
@@ -61,7 +61,7 @@ char	*get_chunk(t_tokenizer *tokenizer, int *expand,
 		*quote = peek(tokenizer);
 		chunk = handle_quotes(tokenizer, *quote);
 		if (!chunk)
-			return (**error_msg = "unterminated quote", NULL);
+			return (*error_msg = "unterminated quote", NULL);
 		if (*quote == '"' && ft_strchr(chunk, '$'))
 			*expand = 1;
 	}
@@ -69,7 +69,7 @@ char	*get_chunk(t_tokenizer *tokenizer, int *expand,
 	{
 		chunk = handle_no_quotes(tokenizer);
 		if (!chunk)
-			return (**error_msg = "failed to get word", NULL);
+			return (*error_msg = "failed to get word", NULL);
 		if (ft_strchr(chunk, '$'))
 			*expand = 1;
 	}
@@ -84,10 +84,12 @@ char	*get_word(t_tokenizer *tokenizer, int *expand,
 	char	*temp;
 
 	word = ft_strdup("");
+	if (!word)
+		return (*error_msg = "Malloc failed", NULL);
 	while (peek(tokenizer) && !is_whitespace(peek(tokenizer))
 		&& !is_operator(peek(tokenizer)))
 	{
-		chunk = get_chunk(tokenizer, expand, quote, &error_msg);
+		chunk = get_chunk(tokenizer, expand, quote, error_msg);
 		if (!chunk)
 			return (free(word), NULL);
 		temp = ft_strjoin(word, chunk);
