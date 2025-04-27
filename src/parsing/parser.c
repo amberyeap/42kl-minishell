@@ -40,7 +40,7 @@ void	parse_pipe(t_parser *parser, t_node **head)
 		set_parser_error(parser, "Expected command before pipe");
 		return ;
 	}
-	if (!parser->current_token || parser->current_token->type != TOKEN_WORD)
+	if (!parser->current_token->next || parser->current_token->next->type != TOKEN_WORD)
 	{
 		set_parser_error(parser, "Expected command after pipe");
 		return ;
