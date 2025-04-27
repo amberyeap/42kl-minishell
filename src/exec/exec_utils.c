@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 22:31:18 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/26 10:31:47 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/28 01:16:44 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,14 @@ static void	fork_n_exec(t_node *node, t_exec *info, t_minishell *data)
 		dup2(info->prev_pipe_in, STDIN_FILENO);
 		close(info->prev_pipe_in);
 	}
+	if (check_redir(node, data) == -1)
+		exit(1);
 	if (info->has_pipe)
 	{
 		dup2(info->pipe_fd[1], STDOUT_FILENO);
 		close(info->pipe_fd[0]);
 		close(info->pipe_fd[1]);
 	}
-	if (check_redir(node, data) == -1)
-		exit(1);
 	execute_cmd(node, data);
 	exit(data->exit);
 }
