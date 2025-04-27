@@ -23,6 +23,8 @@ char	*get_env_var(char **value, char *result, int *i, t_minishell *shell)
 	while (ft_isalnum(**value))
 		(*value)++;
 	var_name = ft_substr(start + 1, 0, *value - (start + 1));
+	if (!var_name)
+		return (NULL);
 	expanded_var = get_env_value(shell->env, var_name);
 	if (expanded_var)
 		*i += ft_strlcpy(result + (*i), expanded_var,
@@ -56,7 +58,7 @@ char	*expand_var(char *value, int exit_status, t_minishell *shell)
 			expand_exit_status(exit_status, &value, result, &i);
 		else if (*value == '$' && *(value + 1) == '!')
 			value += 2;
-		else if (*value == '$' && ft_isalnum(*(value + 1)) && *(value + 1))
+		else if (*value == '$' && ft_isalnum(*(value + 1)))
 		{
 			if (!get_env_var(&value, result, &i, shell))
 				return (free(result), NULL);
@@ -75,6 +77,8 @@ void	expand_str(char **str, int expand, t_minishell *shell)
 	if (expand)
 	{
 		expanded = expand_var(*str, shell->exit, shell);
+		if (!expanded)
+			return ;
 		free(*str);
 		*str = expanded;
 	}
@@ -90,11 +94,14 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 	{
 		if (current->cmd)
 			expand_str(&current->cmd, current->expand, shell);
-		i = 0;
-		while (current->arg[i])
+		if (current->arg)
 		{
-			expand_str(&current->arg[i], current->arg_expand[i], shell);
-			i++;
+			i = 0;
+			while (current->arg[i])
+			{
+				expand_str(&current->arg[i], current->arg_expand[i], shell);
+				i++;
+			}
 		}
 		current = current->next;
 	}
