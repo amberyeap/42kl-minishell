@@ -43,7 +43,6 @@ typedef struct s_minishell	t_minishell;
 /*                                                                            */
 /* ************************************************************************** */
 
-// unused after tokenized
 typedef enum e_quote_type
 {
 	NO_QUOTE,
@@ -63,12 +62,11 @@ typedef enum e_token_type
 	TOKEN_EOF
 }	t_token_type;
 
-// quote and exoand are unused after tokenizer
 typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	t_quote_type	quote; // unused
+	t_quote_type	quote;
 	int				expand;
 	struct s_token	*next;
 }	t_token;
@@ -118,8 +116,10 @@ typedef struct s_node
 	char			**arg;
 	char			*heredoc_delim;
 	char			*redir_file;
-	int				expand; // flag to mark cmd_node needs expansion
-	int				*arg_expand; // array of ints to mark which arg in the arg[] needs expansion
+	int				expand;
+	// flag to mark cmd_node needs expansion
+	int				*arg_expand;
+	// array of ints to mark which arg in the arg[] needs expansion
 	bool			quoted;
 	struct s_node	*next;
 }	t_node;
@@ -136,7 +136,6 @@ struct s_minishell
 	char		*user_input;
 	char		**sorted_env;
 	int			exit;
-	int			ret; // may be unused
 	t_env		*env; // pointer to the first var of the env
 	t_token		*token_list; // pointer to the first node of the tokenized list
 	t_node		*parser_list; // pointer to the first node of the parser
@@ -157,6 +156,7 @@ typedef struct s_exec
 	int		pipe_fd[2];
 	int		has_pipe;
 }	t_exec;
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                                 builtins.c                                 */
@@ -255,8 +255,10 @@ int			check_redir(t_node *node, t_minishell *data);
 /*                                                                            */
 /* ************************************************************************** */
 
-char		*get_env_var(char **value, char *result, int *i, t_minishell *shell);
-void		expand_exit_status(int exit_status, char **value, char *result, int *i);
+char		*get_env_var(char **value, char *result, int *i,
+				t_minishell *shell);
+void		expand_exit_status(int exit_status, char **value,
+				char *result, int *i);
 char		*expand_var(char *value, int exit_status, t_minishell *shell);
 void		expand_list(t_minishell *shell, t_node *parser_list);
 
