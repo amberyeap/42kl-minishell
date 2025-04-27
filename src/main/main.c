@@ -150,7 +150,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, SIG_IGN);
 	setup_signals();
 	minishell_loop(&shell);
-	// free_nodes_list(shell.parser_list);
-	// free_env(shell.env);
+	free_nodes_list(shell.parser_list);
+	free_env(shell.env);
 	return (0);
 }

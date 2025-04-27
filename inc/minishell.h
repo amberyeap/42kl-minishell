@@ -271,6 +271,7 @@ void		init_shell(t_minishell *shell, char **env);
 void		reset_main(t_minishell *shell);
 int			check_token_error(t_minishell *shell);
 void		cleanup_parser(t_minishell *shell);
+int			is_only_spaces(char *str);
 
 // main.c
 void		minishell_loop(t_minishell *shell);
