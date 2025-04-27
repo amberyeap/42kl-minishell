@@ -6,7 +6,7 @@
 /*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 13:07:47 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/26 19:34:24 by ayeap            ###   ########.fr       */
+/*   Updated: 2025/04/27 22:54:16 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 // This tools helps for freeing the node that we want
 static void	freenode(t_minishell *data, t_env *node)
 {
-	if (!data | !node)
+	if (!data || !node)
 		return ;
+	if (node->key)
+		free(node->key);
 	if (node->value)
 		free(node->value);
 	if (data->env == node)
