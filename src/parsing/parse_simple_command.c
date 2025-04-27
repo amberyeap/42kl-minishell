@@ -58,22 +58,18 @@ t_node	*create_command_node(char *cmd, t_node_type type, int expand)
 	node = create_node(type);
 	if (!node)
 		return (NULL);
-	node->cmd = ft_strdup(cmd);
-	if (!node->cmd)
-		return (free(node), NULL);
 	node->arg = malloc(sizeof(char *) * 2);
 	if (!node->arg)
-		return (free(node->cmd), free(node), NULL);
+		return (free(node), NULL);
 	node->arg[0] = ft_strdup(cmd);
 	if (!node->arg[0])
-		return (free(node->arg), free(node->cmd),
-			free(node), NULL);
+		return (free(node->arg), free(node), NULL);
 	node->arg[1] = NULL;
+	node->cmd = node->arg[0];
 	node->expand = expand;
 	node->arg_expand = malloc(sizeof(int) * 2);
 	if (!node->arg_expand)
-		return (free(node->arg[0]), free(node->arg),
-			free(node->cmd), free(node), NULL);
+		return (free(node->arg[0]), free(node->arg), free(node), NULL);
 	node->arg_expand[0] = expand;
 	node->arg_expand[1] = 0;
 	return (node);

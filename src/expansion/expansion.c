@@ -78,7 +78,11 @@ void	expand_str(char **str, int expand, t_minishell *shell)
 	{
 		expanded = expand_var(*str, shell->exit, shell);
 		if (!expanded)
+		{
+			free(*str);
+			*str = NULL;
 			return ;
+		}
 		free(*str);
 		*str = expanded;
 	}
@@ -92,8 +96,6 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 	current = parser_list;
 	while (current)
 	{
-		if (current->cmd)
-			expand_str(&current->cmd, current->expand, shell);
 		if (current->arg)
 		{
 			i = 0;
@@ -103,6 +105,8 @@ void	expand_list(t_minishell *shell, t_node *parser_list)
 				i++;
 			}
 		}
+		if (current->cmd)
+			current->cmd = current->arg[0];
 		current = current->next;
 	}
 }

@@ -19,7 +19,6 @@ void	free_node(t_node *node)
 	i = 0;
 	if (!node)
 		return ;
-	free(node->cmd);
 	free(node->heredoc_delim);
 	free(node->redir_file);
 	if (node->arg)
