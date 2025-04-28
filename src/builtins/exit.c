@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muhabin- <muhabin-@student.42kl.edu.my>    +#+  +:+       +#+        */
+/*   By: ayeap <ayeap@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 08:01:54 by muhabin-          #+#    #+#             */
-/*   Updated: 2025/04/24 10:33:13 by muhabin-         ###   ########.fr       */
+/*   Updated: 2025/04/28 14:25:18 by ayeap            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,28 +23,22 @@
 int	ft_exit(t_minishell *data, char **args)
 {
 	ft_fprintf(STDERR_FILENO, "exit\n");
-	if (length(args) == 2)
+	if (length(args) == 1)
+		exit(0);
+	if (!ft_strisnum(args[1]))
 	{
-		if (!ft_strisnum(args[1]))
-		{
-			ft_fprintf(STDERR_FILENO, "minishell: exit: ");
-			ft_fprintf(STDERR_FILENO,
-				"%s: numeric argument required\n", args[1]);
-			exit(2);
-		}
-		else
-			exit(ft_atoi(args[1]) % 256);
+		ft_fprintf(STDERR_FILENO,
+			"minishell: exit: %s: numeric argument required\n", args[1]);
+		exit(2);
 	}
 	if (length(args) > 2)
 	{
-		ft_fprintf(STDERR_FILENO, "minishell: exit: too many arguments\n");
-		if (!ft_strisnum(args[1]))
-			data->exit = 2;
-		else
-			data->exit = 1;
+		ft_fprintf(STDERR_FILENO,
+			"minishell: exit: too many arguments\n");
+		data->exit = 1;
 		return (data->exit);
 	}
-	exit(0);
+	exit(ft_atoi(args[1]) % 256);
 }
 
 // #include <stdio.h>
